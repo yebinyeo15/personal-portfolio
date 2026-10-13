@@ -24,3 +24,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+
+# Local backup files
+src/App.backup.jsx
+
+# Accidentally created file
+/stash push -m backup-before-keyring
