@@ -30,3 +30,6 @@ src/App.backup.jsx
 
 # Accidentally created file
 /stash push -m backup-before-keyring
+
+# Chrome 테스트 파일
+.chrome-test/
