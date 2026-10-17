@@ -2098,42 +2098,79 @@ function App() {
 
                   {activeLoveCategory === "music" && (
                     <div className="love-archive__stage love-music">
-                      <div className="love-music__disc" aria-hidden="true">
-                        <i />
-                        <span>DAILY<br />MOOD</span>
-                      </div>
-                      <div className="love-music__interface">
-                        <span>VISUAL SOUND ARCHIVE / NO AUDIO</span>
-                        <strong>RHYTHM FOR<br />EVERY MOMENT</strong>
-                        <div className="love-music__wave" aria-hidden="true">
-                          {[12, 29, 18, 38, 24, 45, 31, 16, 36, 22, 42, 14].map((height, index) => (
-                            <i key={`${height}-${index}`} style={{ height }} />
-                          ))}
+                      <div className="love-music__player" aria-hidden="true">
+                        <span className="love-music__backplate" />
+                        <div className="love-music__toprail">
+                          <span>CYBER POP / 03</span>
+                          <i /><i /><i />
                         </div>
-                        <div className="love-music__timeline" aria-hidden="true"><i /></div>
-                        <small>AMBIENCE / RHYTHM / MEMORY</small>
+                        <div className="love-music__display">
+                          <span>VISUAL MODE</span>
+                          <strong>03:47</strong>
+                          <i /><i /><i /><i /><i /><i />
+                        </div>
+                        <div className="love-music__disc-bay">
+                          <div className="love-music__disc">
+                            <i />
+                            <span>DAILY<br />MOOD</span>
+                          </div>
+                        </div>
+                        <span className="love-music__side-label">CHROME DISC ARCHIVE</span>
+                        <div className="love-music__controls">
+                          <i>Ⅱ</i><i>‹‹</i><i>››</i><i>◆</i>
+                        </div>
+                        <span className="love-music__speaker" />
+                        <span className="love-music__shine" />
+                      </div>
+                      <div className="love-music__keyring" aria-hidden="true">
+                        <i /><i /><i />
+                        <span>♡</span>
+                      </div>
+                      <span className="love-music__star love-music__star--one" aria-hidden="true">✦</span>
+                      <span className="love-music__star love-music__star--two" aria-hidden="true">✧</span>
+                      <span className="love-music__sticker" aria-hidden="true">MOOD<br />ON</span>
+                      <div className="love-music__caption">
+                        <span>VISUAL SOUND ARCHIVE / NO AUDIO</span>
+                        <strong>RHYTHM<br />EVERY DAY.</strong>
+                        <div aria-hidden="true">
+                          <i /><i /><i /><i /><i /><i /><i /><i />
+                        </div>
+                        <small>AMBIENCE · RHYTHM · MEMORY</small>
                       </div>
                     </div>
                   )}
 
                   {activeLoveCategory === "cafe" && (
                     <div className="love-archive__stage love-cafe">
-                      <div className="love-cafe__cup" aria-hidden="true"><i /></div>
-                      <div className="love-cafe__receipt">
-                        <span>CAFE ARCHIVE</span>
-                        <strong>ARC-004</strong>
-                        <div>
-                          <p><b>SPACE</b><em>soft light</em></p>
-                          <p><b>DETAIL</b><em>quiet corner</em></p>
-                          <p><b>MOOD</b><em>slow pause</em></p>
+                      <span className="love-cafe__orbit" aria-hidden="true" />
+                      <div className="love-cafe__cup" aria-hidden="true">
+                        <span className="love-cafe__rim"><i /></span>
+                        <span className="love-cafe__handle" />
+                        <span className="love-cafe__reflection" />
+                        <span className="love-cafe__saucer" />
+                      </div>
+                      <div className="love-cafe__card">
+                        <div className="love-cafe__card-meta">
+                          <span>CAFE ARCHIVE</span>
+                          <span>NO. 004</span>
                         </div>
-                        <small>A QUIET PAUSE FOR NEW IDEAS.</small>
+                        <strong>PAUSE,<br />NOTICE,<br />INSPIRE.</strong>
+                        <p>Soft light, quiet corners<br />and a little time for myself.</p>
+                        <div className="love-cafe__card-tags">
+                          <span>SPACE</span><span>DETAIL</span><span>MOOD</span>
+                        </div>
+                        <div className="love-cafe__barcode" aria-hidden="true">
+                          <i /><i /><i /><i /><i /><i /><i /><i /><i />
+                        </div>
+                        <small>ARCHIVED / 2026.10 · STATUS: SLOW</small>
+                        <span className="love-cafe__card-shine" aria-hidden="true" />
                       </div>
-                      <div className="love-cafe__notes" aria-hidden="true">
-                        <span>FOUND OBJECTS</span>
-                        <i>01</i><i>02</i><i>03</i>
-                        <strong>LITTLE<br />DETAILS</strong>
+                      <div className="love-cafe__sticker" aria-hidden="true">
+                        <span>♡</span>
+                        <strong>STAY<br />A WHILE</strong>
                       </div>
+                      <span className="love-cafe__star" aria-hidden="true">✦</span>
+                      <span className="love-cafe__heart" aria-hidden="true">♥</span>
                     </div>
                   )}
                 </section>
