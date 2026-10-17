@@ -1448,6 +1448,63 @@ function App() {
             </div>
           </div>
 
+          <section
+            className="nintendo-planning-intro section"
+            aria-labelledby="nintendo-planning-title"
+          >
+            <div className="nintendo-planning-intro__grid" aria-hidden="true" />
+            <div className="nintendo-planning-intro__orbit" aria-hidden="true">
+              <span />
+            </div>
+            <span
+              className="nintendo-planning-intro__spark nintendo-planning-intro__spark--large"
+              aria-hidden="true"
+            >
+              ✦
+            </span>
+            <span
+              className="nintendo-planning-intro__spark nintendo-planning-intro__spark--small"
+              aria-hidden="true"
+            >
+              ✦
+            </span>
+
+            <div className="nintendo-planning-intro__content">
+              <p className="nintendo-planning-intro__label">
+                08 / PLANNING PROCESS
+              </p>
+
+              <div className="nintendo-planning-intro__title-wrap">
+                <span
+                  className="nintendo-planning-intro__system"
+                  aria-hidden="true"
+                >
+                  NEXT CHAPTER · RESEARCH MODE
+                </span>
+                <h3 id="nintendo-planning-title">
+                  <span>BEHIND THE</span>
+                  <em>Experience.</em>
+                </h3>
+              </div>
+
+              <div className="nintendo-planning-intro__footer">
+                <p>즐거운 경험은 어떤 고민에서 시작되었을까?</p>
+                <div className="nintendo-planning-intro__keywords">
+                  <span>RESEARCH</span>
+                  <i aria-hidden="true" />
+                  <span>INSIGHT</span>
+                  <i aria-hidden="true" />
+                  <span>STRATEGY</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="nintendo-planning-intro__scroll" aria-hidden="true">
+              <span>SCROLL TO EXPLORE</span>
+              <i />
+            </div>
+          </section>
+
           <div className="overview section">
             <div className="section-label">Overview</div>
             <div className="overview-intro">
@@ -1910,7 +1967,9 @@ function App() {
                       className={`personality-trait personality-trait--connection${selectedPersonalityTrait === "connection" ? " is-selected" : ""}${activePersonalityTrait === "connection" ? " is-active" : ""}`}
                       type="button"
                       aria-pressed={selectedPersonalityTrait === "connection"}
-                      onMouseEnter={() => setPreviewPersonalityTrait("connection")}
+                      onMouseEnter={() =>
+                        setPreviewPersonalityTrait("connection")
+                      }
                       onMouseLeave={() => setPreviewPersonalityTrait(null)}
                       onFocus={() => setPreviewPersonalityTrait("connection")}
                       onBlur={() => setPreviewPersonalityTrait(null)}
@@ -1928,7 +1987,9 @@ function App() {
                       className={`personality-trait personality-trait--positive${selectedPersonalityTrait === "positive" ? " is-selected" : ""}${activePersonalityTrait === "positive" ? " is-active" : ""}`}
                       type="button"
                       aria-pressed={selectedPersonalityTrait === "positive"}
-                      onMouseEnter={() => setPreviewPersonalityTrait("positive")}
+                      onMouseEnter={() =>
+                        setPreviewPersonalityTrait("positive")
+                      }
                       onMouseLeave={() => setPreviewPersonalityTrait(null)}
                       onFocus={() => setPreviewPersonalityTrait("positive")}
                       onBlur={() => setPreviewPersonalityTrait(null)}
@@ -2000,7 +2061,10 @@ function App() {
                   <p className="love-editorial__kicker">
                     PERSONAL DIGITAL ARCHIVE / 04 CATEGORIES
                   </p>
-                  <h3 className="love-editorial__headline" key={activeLoveCategory}>
+                  <h3
+                    className="love-editorial__headline"
+                    key={activeLoveCategory}
+                  >
                     {activeLove.headline}
                   </h3>
                   <p className="love-editorial__description">
@@ -2009,7 +2073,9 @@ function App() {
                   <nav className="love-category-nav" aria-label="취향 카테고리">
                     {Object.entries(loveCategories).map(([key, category]) => (
                       <button
-                        className={activeLoveCategory === key ? "is-active" : ""}
+                        className={
+                          activeLoveCategory === key ? "is-active" : ""
+                        }
                         type="button"
                         key={key}
                         aria-pressed={activeLoveCategory === key}
@@ -2051,10 +2117,15 @@ function App() {
                         </figcaption>
                         <i aria-hidden="true">VIEW / 35MM</i>
                       </figure>
-                      <div className="love-travel__film" aria-label="여행 사진 선택">
+                      <div
+                        className="love-travel__film"
+                        aria-label="여행 사진 선택"
+                      >
                         {travelArchive.map((image, index) => (
                           <button
-                            className={selectedTravelIndex === index ? "is-active" : ""}
+                            className={
+                              selectedTravelIndex === index ? "is-active" : ""
+                            }
                             type="button"
                             key={image.src}
                             aria-label={`${image.city} ${image.label} 사진 보기`}
@@ -2073,26 +2144,44 @@ function App() {
                           </button>
                         ))}
                       </div>
-                      <span className="love-archive__chrome-star" aria-hidden="true">✦</span>
+                      <span
+                        className="love-archive__chrome-star"
+                        aria-hidden="true"
+                      >
+                        ✦
+                      </span>
                     </div>
                   )}
 
                   {activeLoveCategory === "fashion" && (
                     <div className="love-archive__stage love-fashion">
                       <figure className="love-fashion__look love-fashion__look--main">
-                        <img src="/images/about/paris-view.jpg" alt="파리 여행에서 기록한 개인 스타일" />
+                        <img
+                          src="/images/about/paris-view.jpg"
+                          alt="파리 여행에서 기록한 개인 스타일"
+                        />
                         <figcaption>LOOK 01 / CITY NEUTRAL</figcaption>
                       </figure>
                       <figure className="love-fashion__look love-fashion__look--detail">
-                        <img src="/images/about/venice.jpg" alt="베네치아 여행에서 기록한 개인 스타일" />
+                        <img
+                          src="/images/about/venice.jpg"
+                          alt="베네치아 여행에서 기록한 개인 스타일"
+                        />
                         <figcaption>LOOK 02 / BLACK LAYER</figcaption>
                       </figure>
                       <div className="love-fashion__type" aria-hidden="true">
                         <span>PERSONAL LOOKBOOK</span>
-                        <strong>STYLE<br />IS A MOOD.</strong>
+                        <strong>
+                          STYLE
+                          <br />
+                          IS A MOOD.
+                        </strong>
                         <small>NEUTRAL · LAYERED · MODERN</small>
                       </div>
-                      <span className="love-fashion__chrome" aria-hidden="true" />
+                      <span
+                        className="love-fashion__chrome"
+                        aria-hidden="true"
+                      />
                     </div>
                   )}
 
@@ -2102,38 +2191,81 @@ function App() {
                         <span className="love-music__backplate" />
                         <div className="love-music__toprail">
                           <span>CYBER POP / 03</span>
-                          <i /><i /><i />
+                          <i />
+                          <i />
+                          <i />
                         </div>
                         <div className="love-music__display">
                           <span>VISUAL MODE</span>
                           <strong>03:47</strong>
-                          <i /><i /><i /><i /><i /><i />
+                          <i />
+                          <i />
+                          <i />
+                          <i />
+                          <i />
+                          <i />
                         </div>
                         <div className="love-music__disc-bay">
                           <div className="love-music__disc">
                             <i />
-                            <span>DAILY<br />MOOD</span>
+                            <span>
+                              DAILY
+                              <br />
+                              MOOD
+                            </span>
                           </div>
                         </div>
-                        <span className="love-music__side-label">CHROME DISC ARCHIVE</span>
+                        <span className="love-music__side-label">
+                          CHROME DISC ARCHIVE
+                        </span>
                         <div className="love-music__controls">
-                          <i>Ⅱ</i><i>‹‹</i><i>››</i><i>◆</i>
+                          <i>Ⅱ</i>
+                          <i>‹‹</i>
+                          <i>››</i>
+                          <i>◆</i>
                         </div>
                         <span className="love-music__speaker" />
                         <span className="love-music__shine" />
                       </div>
                       <div className="love-music__keyring" aria-hidden="true">
-                        <i /><i /><i />
+                        <i />
+                        <i />
+                        <i />
                         <span>♡</span>
                       </div>
-                      <span className="love-music__star love-music__star--one" aria-hidden="true">✦</span>
-                      <span className="love-music__star love-music__star--two" aria-hidden="true">✧</span>
-                      <span className="love-music__sticker" aria-hidden="true">MOOD<br />ON</span>
+                      <span
+                        className="love-music__star love-music__star--one"
+                        aria-hidden="true"
+                      >
+                        ✦
+                      </span>
+                      <span
+                        className="love-music__star love-music__star--two"
+                        aria-hidden="true"
+                      >
+                        ✧
+                      </span>
+                      <span className="love-music__sticker" aria-hidden="true">
+                        MOOD
+                        <br />
+                        ON
+                      </span>
                       <div className="love-music__caption">
                         <span>VISUAL SOUND ARCHIVE / NO AUDIO</span>
-                        <strong>RHYTHM<br />EVERY DAY.</strong>
+                        <strong>
+                          RHYTHM
+                          <br />
+                          EVERY DAY.
+                        </strong>
                         <div aria-hidden="true">
-                          <i /><i /><i /><i /><i /><i /><i /><i />
+                          <i />
+                          <i />
+                          <i />
+                          <i />
+                          <i />
+                          <i />
+                          <i />
+                          <i />
                         </div>
                         <small>AMBIENCE · RHYTHM · MEMORY</small>
                       </div>
@@ -2144,7 +2276,9 @@ function App() {
                     <div className="love-archive__stage love-cafe">
                       <span className="love-cafe__orbit" aria-hidden="true" />
                       <div className="love-cafe__cup" aria-hidden="true">
-                        <span className="love-cafe__rim"><i /></span>
+                        <span className="love-cafe__rim">
+                          <i />
+                        </span>
                         <span className="love-cafe__handle" />
                         <span className="love-cafe__reflection" />
                         <span className="love-cafe__saucer" />
@@ -2154,23 +2288,53 @@ function App() {
                           <span>CAFE ARCHIVE</span>
                           <span>NO. 004</span>
                         </div>
-                        <strong>PAUSE,<br />NOTICE,<br />INSPIRE.</strong>
-                        <p>Soft light, quiet corners<br />and a little time for myself.</p>
+                        <strong>
+                          PAUSE,
+                          <br />
+                          NOTICE,
+                          <br />
+                          INSPIRE.
+                        </strong>
+                        <p>
+                          Soft light, quiet corners
+                          <br />
+                          and a little time for myself.
+                        </p>
                         <div className="love-cafe__card-tags">
-                          <span>SPACE</span><span>DETAIL</span><span>MOOD</span>
+                          <span>SPACE</span>
+                          <span>DETAIL</span>
+                          <span>MOOD</span>
                         </div>
                         <div className="love-cafe__barcode" aria-hidden="true">
-                          <i /><i /><i /><i /><i /><i /><i /><i /><i />
+                          <i />
+                          <i />
+                          <i />
+                          <i />
+                          <i />
+                          <i />
+                          <i />
+                          <i />
+                          <i />
                         </div>
                         <small>ARCHIVED / 2026.10 · STATUS: SLOW</small>
-                        <span className="love-cafe__card-shine" aria-hidden="true" />
+                        <span
+                          className="love-cafe__card-shine"
+                          aria-hidden="true"
+                        />
                       </div>
                       <div className="love-cafe__sticker" aria-hidden="true">
                         <span>♡</span>
-                        <strong>STAY<br />A WHILE</strong>
+                        <strong>
+                          STAY
+                          <br />A WHILE
+                        </strong>
                       </div>
-                      <span className="love-cafe__star" aria-hidden="true">✦</span>
-                      <span className="love-cafe__heart" aria-hidden="true">♥</span>
+                      <span className="love-cafe__star" aria-hidden="true">
+                        ✦
+                      </span>
+                      <span className="love-cafe__heart" aria-hidden="true">
+                        ♥
+                      </span>
                     </div>
                   )}
                 </section>
