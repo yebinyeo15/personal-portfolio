@@ -5087,6 +5087,127 @@ footer p:last-child {
 .site-footer p:nth-child(2) {
   justify-self: center;
 }
+
+/* Typography system — display / editorial serif / Korean body / system mono */
+body,
+button,
+input,
+textarea,
+select {
+  font-family: var(--font-body);
+}
+h1,
+h2,
+h3,
+h4,
+.hero-title,
+.about-lead,
+.selected-works-title-primary,
+.nintendo-intro__title h2,
+.nintendo-experience__title-primary,
+.nintendo-character__title-primary,
+.nintendo-comparison__header h3,
+.nintendo-contribution__heading h3,
+.nintendo-collaboration__title-primary,
+.nintendo-documentation__title-primary,
+.editorial-project__title h2,
+.editorial-project__statement h3,
+.editorial-project__process-heading h3,
+.editorial-project__result-heading h3,
+.archive-heading h2,
+.skills-heading h2,
+.contact-copy h2,
+.more-about-heading h2,
+.more-about-panel h3,
+.love-category-nav strong {
+  font-family: var(--font-display);
+}
+.hero-title__primary,
+.selected-works-title-serif,
+.nintendo-experience__title-serif,
+.nintendo-character__title-serif,
+.nintendo-collaboration__title-serif,
+.nintendo-documentation__title-serif {
+  font-family: var(--font-serif);
+}
+.site-header,
+.hero-topline,
+.eyebrow,
+.section-index,
+.section-label,
+.detail-number,
+.project-tags,
+.more-about-label,
+.more-about-panel__meta,
+.more-about-desktop__path,
+.more-about-desktop__system,
+.more-about-progress,
+.identity-file__bar,
+.identity-file__footer,
+.love-editorial__kicker,
+.love-archive__system-bar,
+.nintendo-info-list,
+.archive-card__meta span,
+.skills-list > div > span,
+.contact-links span,
+.contact-top,
+.site-footer {
+  font-family: var(--font-mono);
+}
+.body-copy,
+.project-summary,
+.nintendo-experience__description,
+.nintendo-character__description,
+.nintendo-contribution__description,
+.nintendo-collaboration__copy,
+.nintendo-documentation__copy,
+.editorial-project__statement > p,
+.editorial-project__process-heading > p,
+.editorial-project__result-heading > p,
+.love-editorial__description,
+.more-about-panel__copy > p,
+.more-about-panel__body,
+.archive-card__meta p,
+.skills-list p,
+.contact-links p {
+  font-family: var(--font-body);
+  word-break: keep-all;
+}
+.body-copy {
+  font-size: clamp(14px, 1vw, 15.5px);
+  line-height: 1.82;
+}
+.project-summary,
+.nintendo-experience__description,
+.nintendo-character__description {
+  font-size: clamp(14px, 1vw, 15px);
+  line-height: 1.82;
+}
+.nintendo-contribution__description,
+.archive-card__meta p,
+.skills-list p,
+.contact-links p {
+  font-size: clamp(13px, 0.92vw, 14px);
+  line-height: 1.7;
+}
+.love-editorial__description {
+  font-size: clamp(14px, 0.92vw, 15.5px);
+  line-height: 1.72;
+}
+.site-header,
+.eyebrow,
+.section-index,
+.section-label,
+.more-about-label,
+.more-about-panel__meta {
+  font-weight: 400;
+}
+.eyebrow,
+.section-label,
+.more-about-label,
+.more-about-panel__meta {
+  letter-spacing: 0.13em;
+}
 .top-button {
   position: fixed;
   z-index: 15;
@@ -6626,6 +6747,35 @@ footer p:last-child {
   }
   footer p:last-child {
     display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .body-copy,
+  .project-summary,
+  .nintendo-experience__description,
+  .nintendo-character__description,
+  .nintendo-contribution__description,
+  .nintendo-collaboration__copy,
+  .nintendo-documentation__copy,
+  .editorial-project__statement > p,
+  .editorial-project__process-heading > p,
+  .editorial-project__result-heading > p,
+  .archive-card__meta p,
+  .skills-list p,
+  .contact-links p {
+    font-size: 12.5px;
+    line-height: 1.68;
+  }
+  .love-editorial__description,
+  .more-about-panel__copy > p,
+  .more-about-panel__body p {
+    font-size: 11.5px;
+    line-height: 1.58;
+  }
+  .selected-works-intro__lead,
+  .selected-works-intro__meta {
+    line-height: 1.6;
   }
 }
 
