@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
+import "./nintendoResearch.css";
 
 const ArrowIcon = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -332,6 +333,85 @@ const nintendoDocumentationArchives = [
   },
 ];
 
+const nintendoResearchInsights = [
+  {
+    key: "brand",
+    label: "Brand Experience",
+    title: "캐릭터보다 정보가 먼저 보이는 메인",
+    description:
+      "게임과 제품 정보 중심의 구성으로 캐릭터 IP의 개성과 세계관을 충분히 경험하기 어려웠습니다.",
+    direction: "캐릭터 중심의 몰입형 브랜드 경험 강화",
+    image: "/images/nintendo/research/nintendo-home.png",
+    alt: "기존 닌텐도 공식 사이트 메인 화면",
+  },
+  {
+    key: "discovery",
+    label: "Game Discovery",
+    title: "취향에 따른 게임 탐색의 한계",
+    description:
+      "게임 정보는 풍부하지만 관심사와 플레이 방식에 따라 게임을 발견할 수 있는 탐색 경로가 제한적이었습니다.",
+    direction: "관심사와 플레이 스타일에 따른 탐색 구조 개선",
+    image: "/images/nintendo/research/nintendo-store.png",
+    alt: "기존 닌텐도 스토어 화면",
+  },
+  {
+    key: "interaction",
+    label: "Interactive Experience",
+    title: "참여보다 탐색에 집중된 경험",
+    description:
+      "캐릭터와 게임을 소개하는 콘텐츠는 있지만, 사용자가 직접 반응하고 참여할 수 있는 인터랙션은 제한적이었습니다.",
+    direction: "캐릭터 IP를 활용한 참여형 인터랙션 강화",
+    image: "/images/nintendo/research/nintendo-character.png",
+    alt: "기존 닌텐도 공식 사이트 캐릭터 메뉴 화면",
+  },
+];
+
+const competitorResearch = [
+  {
+    key: "playstation",
+    label: "PlayStation",
+    image: "/images/nintendo/research/PlayStation.png",
+    alt: "PlayStation 공식 사이트 화면",
+    feature: "게임 비주얼과 프로모션의 강한 시각적 전달",
+    implication: "게임과 캐릭터 IP의 매력을 시각적으로 드러내는 구성",
+  },
+  {
+    key: "xbox",
+    label: "Xbox",
+    image: "/images/nintendo/research/Xbox.png",
+    alt: "Xbox 공식 사이트 화면",
+    feature: "Game Pass 중심의 게임 탐색과 검색·필터 기능",
+    implication: "관심사와 플레이 방식에 따른 게임 탐색 경로 강화",
+  },
+  {
+    key: "steamdeck",
+    label: "Steam Deck",
+    image: "/images/nintendo/research/Steam Deck.png",
+    alt: "Steam Deck 공식 사이트 화면",
+    feature: "제품의 특성과 플레이 경험을 명확히 소개하는 구성",
+    implication: "콘텐츠의 특징을 이해하기 쉬운 정보 구조",
+  },
+];
+
+const ResearchMedia = ({ src, alt, label }) => {
+  const [hasError, setHasError] = useState(false);
+
+  if (hasError) {
+    return (
+      <div
+        className="nintendo-research__placeholder"
+        role="img"
+        aria-label={alt}
+      >
+        <span>IMAGE PENDING</span>
+        <strong>{label}</strong>
+      </div>
+    );
+  }
+
+  return <img src={src} alt={alt} onError={() => setHasError(true)} />;
+};
+
 function App() {
   const aboutRef = useRef(null);
   const moreAboutRef = useRef(null);
@@ -339,8 +419,11 @@ function App() {
   const heroRef = useRef(null);
   const selectedWorksRef = useRef(null);
   const selectedWorksTitleRef = useRef(null);
+  const nintendoOverviewRef = useRef(null);
   const navHideTimerRef = useRef(null);
   const isPointerOverNavRef = useRef(false);
+  const previewTriggerRef = useRef(null);
+  const previewDialogRef = useRef(null);
   const [isAboutHeadlineActive, setIsAboutHeadlineActive] = useState(false);
   const [activeMoreAboutPanel, setActiveMoreAboutPanel] = useState(0);
   const [visibleMoreAboutCards, setVisibleMoreAboutCards] = useState(0);
@@ -352,27 +435,75 @@ function App() {
   const [isSelectedWorksTitleVisible, setIsSelectedWorksTitleVisible] =
     useState(false);
   const [nintendoComparePosition, setNintendoComparePosition] = useState(50);
+  const [visibleNintendoOverviewCards, setVisibleNintendoOverviewCards] =
+    useState(0);
   const [documentPreview, setDocumentPreview] = useState(null);
+  const [activeNintendoResearch, setActiveNintendoResearch] = useState("brand");
+  const [activeCompetitorResearch, setActiveCompetitorResearch] =
+    useState("playstation");
   const [selectedPersonalityTrait, setSelectedPersonalityTrait] =
     useState("curious");
   const [previewPersonalityTrait, setPreviewPersonalityTrait] = useState(null);
   const [activeLoveCategory, setActiveLoveCategory] = useState("travel");
   const [selectedTravelIndex, setSelectedTravelIndex] = useState(0);
 
+  const openDocumentPreview = (preview, event) => {
+    previewTriggerRef.current = event.currentTarget;
+    setDocumentPreview(preview);
+  };
+
+  const closeDocumentPreview = () => setDocumentPreview(null);
+
+  const handleResearchTabKeyDown = (event, items, activeKey, setActiveKey) => {
+    const currentIndex = items.findIndex((item) => item.key === activeKey);
+    let nextIndex;
+
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      nextIndex = (currentIndex + 1) % items.length;
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      nextIndex = (currentIndex - 1 + items.length) % items.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = items.length - 1;
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+    setActiveKey(items[nextIndex].key);
+    const tabs =
+      event.currentTarget.parentElement?.querySelectorAll('[role="tab"]');
+    tabs?.[nextIndex]?.focus();
+  };
+
   useEffect(() => {
     if (!documentPreview) return undefined;
 
     const previousOverflow = document.body.style.overflow;
-    const closeOnEscape = (event) => {
-      if (event.key === "Escape") setDocumentPreview(null);
+    const handlePreviewKeys = (event) => {
+      if (event.key === "Escape") {
+        setDocumentPreview(null);
+        return;
+      }
+      if (event.key === "Tab") {
+        const focusable = previewDialogRef.current?.querySelectorAll(
+          "button, [href], [tabindex]:not([tabindex='-1'])",
+        );
+        if (focusable?.length === 1) {
+          event.preventDefault();
+          focusable[0].focus();
+        }
+      }
     };
 
     document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", closeOnEscape);
+    window.addEventListener("keydown", handlePreviewKeys);
 
     return () => {
       document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", closeOnEscape);
+      window.removeEventListener("keydown", handlePreviewKeys);
+      previewTriggerRef.current?.focus();
     };
   }, [documentPreview]);
 
@@ -602,6 +733,56 @@ function App() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const section = nintendoOverviewRef.current;
+
+    if (!section) return undefined;
+
+    const reducedMotionQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
+    let animationFrame = null;
+
+    const updateOverviewCards = () => {
+      if (reducedMotionQuery.matches) {
+        setVisibleNintendoOverviewCards(2);
+        animationFrame = null;
+        return;
+      }
+
+      const rect = section.getBoundingClientRect();
+      const scrollRange = Math.max(
+        section.offsetHeight - window.innerHeight,
+        1,
+      );
+      const progress = Math.min(Math.max(-rect.top / scrollRange, 0), 1);
+      const nextVisibleCards = progress < 0.1 ? 0 : progress < 0.45 ? 1 : 2;
+
+      setVisibleNintendoOverviewCards((currentCount) =>
+        currentCount === nextVisibleCards ? currentCount : nextVisibleCards,
+      );
+      animationFrame = null;
+    };
+
+    const scheduleUpdate = () => {
+      if (animationFrame === null) {
+        animationFrame = window.requestAnimationFrame(updateOverviewCards);
+      }
+    };
+
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    reducedMotionQuery.addEventListener("change", scheduleUpdate);
+    updateOverviewCards();
+
+    return () => {
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+      reducedMotionQuery.removeEventListener("change", scheduleUpdate);
+      if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+    };
+  }, []);
+
   const showNavigation = () => {
     isPointerOverNavRef.current = true;
     if (navHideTimerRef.current !== null) {
@@ -658,6 +839,13 @@ function App() {
     previewPersonalityTrait || selectedPersonalityTrait;
   const activeLove = loveCategories[activeLoveCategory];
   const activeTravelImage = travelArchive[selectedTravelIndex];
+
+  const selectedNintendoResearch = nintendoResearchInsights.find(
+    (item) => item.key === activeNintendoResearch,
+  );
+  const selectedCompetitorResearch = competitorResearch.find(
+    (item) => item.key === activeCompetitorResearch,
+  );
 
   return (
     <div className="site-shell">
@@ -1418,11 +1606,11 @@ function App() {
                         className={`nintendo-documentation__image${index === 0 ? " nintendo-documentation__image--main" : " nintendo-documentation__image--detail"}`}
                         type="button"
                         key={item.src}
-                        onClick={() =>
-                          setDocumentPreview({
+                        onClick={(event) =>
+                          openDocumentPreview({
                             ...item,
                             isDetail: index > 0,
-                          })
+                          }, event)
                         }
                         aria-label={`${item.alt} 확대 보기`}
                       >
@@ -1505,46 +1693,494 @@ function App() {
             </div>
           </section>
 
-          <div className="overview section">
-            <div className="section-label">Overview</div>
-            <div className="overview-intro">
-              <h3>
-                즐거움은 유지하고,
-                <br />
-                정보는 더 명확하게.
-              </h3>
-              <p>
-                프로젝트의 배경과 목표를 설명하는 영역입니다. 실제 프로젝트
-                정보를 바탕으로 브랜드 분석, 사용자 요구, 개선 방향을 입력할 수
-                있습니다.
-              </p>
+          <section
+            className="nintendo-project-overview section is-reveal-ready"
+            aria-labelledby="nintendo-overview-title"
+            ref={nintendoOverviewRef}
+          >
+            <div className="nintendo-project-overview__stage">
+              <header className="nintendo-project-overview__header">
+                <p className="nintendo-project-overview__label">
+                  09 / PROJECT OVERVIEW
+                </p>
+                <p>NINTENDO RESEARCH ARCHIVE</p>
+                <p className="nintendo-project-overview__status">
+                  <span aria-hidden="true" /> SYSTEM ONLINE
+                </p>
+              </header>
+
+              <div className="nintendo-project-overview__workspace">
+                <div className="nintendo-project-overview__title-block">
+                  <p aria-hidden="true">FILE 09 — PROJECT DEFINITION</p>
+                  <h3 id="nintendo-overview-title">
+                    <span>FROM INFORMATION</span>
+                    <em>to Experience.</em>
+                  </h3>
+                  <div
+                    className="nintendo-project-overview__title-rule"
+                    aria-hidden="true"
+                  >
+                    <span>WEB RENEWAL</span>
+                    <i />
+                    <span>4 WEEKS</span>
+                  </div>
+                </div>
+
+                <div className="nintendo-project-overview__briefs">
+                  <article
+                    className={`nintendo-project-overview__card nintendo-project-overview__card--background${visibleNintendoOverviewCards >= 1 ? " is-visible" : ""}`}
+                  >
+                    <div className="nintendo-project-overview__window-bar">
+                      <div aria-hidden="true">
+                        <i />
+                        <i />
+                        <i />
+                      </div>
+                      <span>BACKGROUND.TXT</span>
+                      <span>01</span>
+                    </div>
+                    <div className="nintendo-project-overview__card-body">
+                      <div className="nintendo-project-overview__card-index">
+                        <span>01</span>
+                        <p>BACKGROUND</p>
+                      </div>
+                      <p className="nintendo-project-overview__brief-copy">
+                        기존 닌텐도 웹사이트는 게임 및 제품 정보를 제공하지만,
+                        캐릭터 IP를 중심으로 브랜드의 개성을 경험하거나 원하는
+                        게임을 직관적으로 탐색하는 데 아쉬움이 있었습니다.
+                      </p>
+                    </div>
+                    <p
+                      className="nintendo-project-overview__file-status"
+                      aria-hidden="true"
+                    >
+                      READ ONLY <span>●</span> ARCHIVE 01/02
+                    </p>
+                  </article>
+
+                  <article
+                    className={`nintendo-project-overview__card nintendo-project-overview__card--objective${visibleNintendoOverviewCards >= 2 ? " is-visible" : ""}`}
+                  >
+                    <div className="nintendo-project-overview__window-bar">
+                      <div aria-hidden="true">
+                        <i />
+                        <i />
+                        <i />
+                      </div>
+                      <span>OBJECTIVE.TXT</span>
+                      <span>02</span>
+                    </div>
+                    <div className="nintendo-project-overview__card-body">
+                      <div className="nintendo-project-overview__card-index">
+                        <span>02</span>
+                        <p>OBJECTIVE</p>
+                      </div>
+                      <p className="nintendo-project-overview__brief-copy">
+                        캐릭터 IP 중심으로 브랜드 경험을 강화하고, 게임 탐색
+                        구조와 인터랙션을 개선하여 정보 탐색 자체가 즐거운
+                        경험이 되는 웹사이트를 제안합니다.
+                      </p>
+                    </div>
+                    <p
+                      className="nintendo-project-overview__file-status"
+                      aria-hidden="true"
+                    >
+                      ACTIVE FILE <span>●</span> ARCHIVE 02/02
+                    </p>
+                  </article>
+                </div>
+
+                <footer className="nintendo-project-overview__keywords">
+                  <span>CORE KEYWORDS</span>
+                  <ul>
+                    <li>
+                      <span>01</span> CHARACTER IP
+                    </li>
+                    <li>
+                      <span>02</span> GAME DISCOVERY
+                    </li>
+                    <li>
+                      <span>03</span> INTERACTIVE EXPERIENCE
+                    </li>
+                  </ul>
+                  <span aria-hidden="true">END OF FILE ↵</span>
+                </footer>
+              </div>
             </div>
-            <div className="problem-grid">
-              <article>
-                <span>01</span>
-                <h4>Problem</h4>
-                <p>
-                  기존 사이트에서 발견한 문제와 개선이 필요한 사용자 경험을
-                  입력해 주세요.
-                </p>
-              </article>
-              <article>
-                <span>02</span>
-                <h4>Direction</h4>
-                <p>
-                  프로젝트가 해결하고자 한 방향과 핵심 디자인 전략을 입력해
-                  주세요.
-                </p>
-              </article>
-              <article>
-                <span>03</span>
-                <h4>Goal</h4>
-                <p>
-                  프로젝트의 실제 목표와 기대하는 사용자 경험을 입력해 주세요.
-                </p>
+          </section>
+
+          <section
+            className="nintendo-analysis section"
+            aria-labelledby="nintendo-analysis-title"
+          >
+            <header className="research-section-header">
+              <div className="research-section-header__meta">
+                <span>10 / NINTENDO ANALYSIS</span>
+                <span>OFFICIAL SITE · ANALYSIS LOG</span>
+              </div>
+              <div className="research-section-header__title">
+                <h3 id="nintendo-analysis-title">
+                  BEYOND THE <em>SCREEN.</em>
+                </h3>
+                <p>기존 닌텐도 사이트의 강점과 개선 가능성을 분석하다.</p>
+              </div>
+            </header>
+            <div className="nintendo-analysis__editorial">
+              <div
+                className="nintendo-analysis__viewer"
+                id="nintendo-analysis-viewer"
+                role="tabpanel"
+              >
+                <figure key={selectedNintendoResearch.key}>
+                  <ResearchMedia
+                    src={selectedNintendoResearch.image}
+                    alt={selectedNintendoResearch.alt}
+                    label={selectedNintendoResearch.label}
+                  />
+                </figure>
+                <article key={"copy-" + selectedNintendoResearch.key}>
+                  <span>ANALYSIS / {selectedNintendoResearch.label}</span>
+                  <h4>{selectedNintendoResearch.title}</h4>
+                  <p>{selectedNintendoResearch.description}</p>
+                  <div>
+                    <span>DESIGN DIRECTION</span>
+                    <strong>{selectedNintendoResearch.direction}</strong>
+                  </div>
+                </article>
+              </div>
+              <p className="research-selector-label">SELECT A SCREEN ↓</p>
+              <div
+                className="nintendo-analysis__tabs"
+                role="tablist"
+                aria-label="닌텐도 사이트 분석 화면 선택"
+              >
+                {nintendoResearchInsights.map((item, index) => (
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-controls="nintendo-analysis-viewer"
+                    aria-selected={activeNintendoResearch === item.key}
+                    tabIndex={activeNintendoResearch === item.key ? 0 : -1}
+                    className={activeNintendoResearch === item.key ? "is-active" : ""}
+                    key={item.key}
+                    onClick={() => setActiveNintendoResearch(item.key)}
+                    onKeyDown={(event) =>
+                      handleResearchTabKeyDown(
+                        event,
+                        nintendoResearchInsights,
+                        activeNintendoResearch,
+                        setActiveNintendoResearch,
+                      )
+                    }
+                  >
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    {index === 0 ? "MAIN" : index === 1 ? "STORE" : "CHARACTER"}
+                    <i aria-hidden="true">↗</i>
+                  </button>
+                ))}
+              </div>
+              <button
+                className="research-source-link research-source-link--light"
+                type="button"
+                onClick={(event) =>
+                  openDocumentPreview(
+                    {
+                      src: "/images/nintendo/research/nintendo-analysis.png",
+                      alt: "닌텐도 공식 사이트의 여섯 가지 분석 기준을 정리한 원본 자료",
+                      isResearch: true,
+                    },
+                    event,
+                  )
+                }
+              >
+                <span>SOURCE / ANALYSIS BOARD</span>
+                <strong>VIEW ORIGINAL RESEARCH ↗</strong>
+              </button>
+            </div>
+          </section>
+
+          <section
+            className="competitive-research section"
+            aria-labelledby="competitive-research-title"
+          >
+            <header className="research-section-header research-section-header--dark">
+              <div className="research-section-header__meta">
+                <span>11 / COMPETITIVE RESEARCH</span>
+                <span>03 PLATFORMS · COMPARATIVE VIEW</span>
+              </div>
+              <div className="research-section-header__title">
+                <h3 id="competitive-research-title">
+                  LOOKING BEYOND <em>NINTENDO.</em>
+                </h3>
+                <p>세 가지 게임 플랫폼의 경험을 비교하다.</p>
+              </div>
+            </header>
+            <p className="research-selector-label research-selector-label--dark">
+              SELECT A PLATFORM ↓
+            </p>
+            <div
+              className="competitive-research__tabs"
+              role="tablist"
+              aria-label="경쟁 플랫폼 선택"
+            >
+              {competitorResearch.map((item, index) => (
+                <button
+                  type="button"
+                  role="tab"
+                  aria-controls="competitive-research-viewer"
+                  aria-selected={activeCompetitorResearch === item.key}
+                  tabIndex={activeCompetitorResearch === item.key ? 0 : -1}
+                  className={activeCompetitorResearch === item.key ? "is-active" : ""}
+                  key={item.key}
+                  onClick={() => setActiveCompetitorResearch(item.key)}
+                  onKeyDown={(event) =>
+                    handleResearchTabKeyDown(
+                      event,
+                      competitorResearch,
+                      activeCompetitorResearch,
+                      setActiveCompetitorResearch,
+                    )
+                  }
+                >
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  {item.label}
+                  <i aria-hidden="true">↗</i>
+                </button>
+              ))}
+            </div>
+            <div
+              className="competitive-research__viewer"
+              id="competitive-research-viewer"
+              role="tabpanel"
+            >
+              <figure key={selectedCompetitorResearch.key}>
+                <ResearchMedia
+                  src={selectedCompetitorResearch.image}
+                  alt={selectedCompetitorResearch.alt}
+                  label={selectedCompetitorResearch.label}
+                />
+              </figure>
+              <article key={"competitor-" + selectedCompetitorResearch.key}>
+                <span>SELECTED PLATFORM / {selectedCompetitorResearch.label}</span>
+                <h4>{selectedCompetitorResearch.label}</h4>
+                <dl>
+                  <div>
+                    <dt>FEATURE</dt>
+                    <dd>{selectedCompetitorResearch.feature}</dd>
+                  </div>
+                  <div>
+                    <dt>INSIGHT</dt>
+                    <dd>{selectedCompetitorResearch.implication}</dd>
+                  </div>
+                </dl>
               </article>
             </div>
-          </div>
+            <div className="competitive-research__footer">
+              <aside className="competitive-research__takeaway">
+                <span>RESEARCH TAKEAWAY</span>
+                <p>
+                  브랜드의 개성을 전달하는 시각적 경험과 사용자가 원하는 게임을
+                  쉽게 발견할 수 있는 탐색 구조를 함께 강화하고자 했습니다.
+                </p>
+              </aside>
+              <button
+                className="research-source-link research-source-link--dark"
+                type="button"
+                onClick={(event) =>
+                  openDocumentPreview(
+                    {
+                      src: "/images/nintendo/research/competitive-research.png",
+                      alt: "PlayStation, Xbox, Steam Deck의 화면과 특징을 비교한 경쟁사 리서치 원본 자료",
+                      isResearch: true,
+                    },
+                    event,
+                  )
+                }
+                aria-label="경쟁사 리서치 원본 자료 확대 보기"
+              >
+                <span>SOURCE / COMPARISON BOARD</span>
+                <strong>VIEW ORIGINAL RESEARCH ↗</strong>
+              </button>
+            </div>
+          </section>
+
+          {/*
+          <section
+            className="nintendo-research section"
+            aria-labelledby="nintendo-research-title"
+          >
+            <header className="nintendo-research__header">
+              <div className="nintendo-research__meta">
+                <span>10 / RESEARCH &amp; ANALYSIS</span>
+                <span>FIELD NOTES · DIGITAL ARCHIVE</span>
+              </div>
+              <div className="nintendo-research__headline">
+                <h3 id="nintendo-research-title">
+                  BEYOND THE <em>SCREEN.</em>
+                </h3>
+                <p>브랜드 경험의 가능성을 발견하기 위한 두 가지 시선.</p>
+              </div>
+            </header>
+
+            <div
+              className="nintendo-research__track-tabs"
+              role="tablist"
+              aria-label="리서치 유형 선택"
+            >
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeResearchTrack === "nintendo"}
+                aria-controls="nintendo-analysis-panel"
+                className={activeResearchTrack === "nintendo" ? "is-active" : ""}
+                onClick={() => setActiveResearchTrack("nintendo")}
+              >
+                <span>01</span> NINTENDO ANALYSIS
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeResearchTrack === "competitive"}
+                aria-controls="competitive-research-panel"
+                className={activeResearchTrack === "competitive" ? "is-active" : ""}
+                onClick={() => setActiveResearchTrack("competitive")}
+              >
+                <span>02</span> COMPETITIVE RESEARCH
+              </button>
+            </div>
+
+            {activeResearchTrack === "nintendo" ? (
+              <div
+                className="nintendo-research__panel nintendo-research__panel--nintendo"
+                id="nintendo-analysis-panel"
+                role="tabpanel"
+                key="nintendo-analysis"
+              >
+                <figure className="nintendo-research__visual">
+                  <div className="nintendo-research__visual-frame">
+                    <ResearchMedia
+                      key={`${activeNintendoResearch.key}-${activeNintendoResearch.image}`}
+                      src={activeNintendoResearch.image}
+                      alt={activeNintendoResearch.alt}
+                      label={activeNintendoResearch.label}
+                    />
+                    <span aria-hidden="true">SOURCE / OFFICIAL WEB</span>
+                  </div>
+                  <figcaption>
+                    <span>ACTIVE VIEW</span>
+                    <strong>{activeNintendoResearch.label}</strong>
+                  </figcaption>
+                </figure>
+
+                <div className="nintendo-research__analysis">
+                  <div className="nintendo-research__analysis-intro">
+                    <span>01 / NINTENDO ANALYSIS</span>
+                    <h4>기존 닌텐도 공식 사이트를 6개 기준으로 분석했습니다.</h4>
+                  </div>
+
+                  <div className="nintendo-research__criterion-layout">
+                    <div
+                      className="nintendo-research__criterion-tabs"
+                      role="tablist"
+                      aria-label="닌텐도 분석 기준 선택"
+                    >
+                      {nintendoResearchCriteria.map((item, index) => (
+                        <button
+                          type="button"
+                          role="tab"
+                          aria-selected={activeNintendoCriterion === item.key}
+                          className={
+                            activeNintendoCriterion === item.key ? "is-active" : ""
+                          }
+                          key={item.key}
+                          onClick={() => setActiveNintendoCriterion(item.key)}
+                        >
+                          <span>{String(index + 1).padStart(2, "0")}</span>
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <article
+                      className="nintendo-research__insight"
+                      key={activeNintendoResearch.key}
+                    >
+                      <span>KEY FINDING</span>
+                      <h5>{activeNintendoResearch.label}</h5>
+                      <p>{activeNintendoResearch.description}</p>
+                      <div aria-hidden="true">
+                        <i />
+                        <span>ANALYSIS LOG / ACTIVE</span>
+                      </div>
+                    </article>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div
+                className="nintendo-research__panel nintendo-research__panel--competitive"
+                id="competitive-research-panel"
+                role="tabpanel"
+                key="competitive-research"
+              >
+                <div className="nintendo-research__competitive-visual">
+                  <ResearchMedia
+                    src="/images/nintendo/research/competitive-research.png"
+                    alt="PlayStation, Xbox, Steam Deck 경쟁사 분석 자료"
+                    label="COMPETITIVE RESEARCH"
+                  />
+                  <span aria-hidden="true">REFERENCE BOARD / 03 BRANDS</span>
+                </div>
+
+                <div className="nintendo-research__competitive-body">
+                  <div className="nintendo-research__competitor-tabs" role="tablist">
+                    {competitorResearch.map((item, index) => (
+                      <button
+                        type="button"
+                        role="tab"
+                        aria-selected={activeCompetitor === item.key}
+                        className={activeCompetitor === item.key ? "is-active" : ""}
+                        key={item.key}
+                        onClick={() => setActiveCompetitor(item.key)}
+                      >
+                        <span>{String(index + 1).padStart(2, "0")}</span>
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <article
+                    className="nintendo-research__competitor-insight"
+                    key={activeCompetitorResearch.key}
+                  >
+                    <div>
+                      <span>02 / COMPETITIVE RESEARCH</span>
+                      <h4>{activeCompetitorResearch.label}</h4>
+                      <p>{activeCompetitorResearch.summary}</p>
+                    </div>
+                    <ul>
+                      {activeCompetitorResearch.points.map((point) => (
+                        <li key={point}>{point}</li>
+                      ))}
+                    </ul>
+                  </article>
+                </div>
+
+                <div className="nintendo-research__comparison-index">
+                  <span>COMPARISON INDEX</span>
+                  <ol>
+                    {researchComparisonCriteria.map((criterion, index) => (
+                      <li key={criterion}>
+                        <span>{String(index + 1).padStart(2, "0")}</span>
+                        {criterion}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </div>
+            )}
+          </section>
+          */}
 
           <div className="process section">
             <div className="process-heading">
@@ -2430,17 +3066,18 @@ function App() {
           role="dialog"
           aria-modal="true"
           aria-label="문서 이미지 확대 보기"
-          onClick={() => setDocumentPreview(null)}
+          onClick={closeDocumentPreview}
         >
           <div
-            className={`document-preview__content${documentPreview.isDetail ? " document-preview__content--scrollable" : ""}`}
+            ref={previewDialogRef}
+            className={`document-preview__content${documentPreview.isDetail ? " document-preview__content--scrollable" : ""}${documentPreview.isResearch ? " document-preview__content--research" : ""}`}
             onClick={(event) => event.stopPropagation()}
           >
             <button
               className="document-preview__close"
               type="button"
               aria-label="닫기"
-              onClick={() => setDocumentPreview(null)}
+              onClick={closeDocumentPreview}
               autoFocus
             >
               <span aria-hidden="true">×</span>
