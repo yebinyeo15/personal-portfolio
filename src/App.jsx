@@ -1607,10 +1607,13 @@ function App() {
                         type="button"
                         key={item.src}
                         onClick={(event) =>
-                          openDocumentPreview({
-                            ...item,
-                            isDetail: index > 0,
-                          }, event)
+                          openDocumentPreview(
+                            {
+                              ...item,
+                              isDetail: index > 0,
+                            },
+                            event,
+                          )
                         }
                         aria-label={`${item.alt} 확대 보기`}
                       >
@@ -1861,7 +1864,9 @@ function App() {
                     aria-controls="nintendo-analysis-viewer"
                     aria-selected={activeNintendoResearch === item.key}
                     tabIndex={activeNintendoResearch === item.key ? 0 : -1}
-                    className={activeNintendoResearch === item.key ? "is-active" : ""}
+                    className={
+                      activeNintendoResearch === item.key ? "is-active" : ""
+                    }
                     key={item.key}
                     onClick={() => setActiveNintendoResearch(item.key)}
                     onKeyDown={(event) =>
@@ -1930,7 +1935,9 @@ function App() {
                   aria-controls="competitive-research-viewer"
                   aria-selected={activeCompetitorResearch === item.key}
                   tabIndex={activeCompetitorResearch === item.key ? 0 : -1}
-                  className={activeCompetitorResearch === item.key ? "is-active" : ""}
+                  className={
+                    activeCompetitorResearch === item.key ? "is-active" : ""
+                  }
                   key={item.key}
                   onClick={() => setActiveCompetitorResearch(item.key)}
                   onKeyDown={(event) =>
@@ -1961,7 +1968,9 @@ function App() {
                 />
               </figure>
               <article key={"competitor-" + selectedCompetitorResearch.key}>
-                <span>SELECTED PLATFORM / {selectedCompetitorResearch.label}</span>
+                <span>
+                  SELECTED PLATFORM / {selectedCompetitorResearch.label}
+                </span>
                 <h4>{selectedCompetitorResearch.label}</h4>
                 <dl>
                   <div>
