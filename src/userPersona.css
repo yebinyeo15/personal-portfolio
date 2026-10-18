@@ -1,0 +1,392 @@
+.user-persona {
+  --persona-ink: #11162d;
+  --persona-muted: #626b82;
+  --persona-accent: #9278c5;
+  --persona-line: rgba(17, 22, 45, 0.22);
+  box-sizing: border-box;
+  position: relative;
+  padding: clamp(42px, 5.2vh, 58px) clamp(24px, 5vw, 76px)
+    clamp(38px, 4.8vh, 52px);
+  color: var(--persona-ink);
+  background:
+    linear-gradient(rgba(104, 99, 143, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(104, 99, 143, 0.07) 1px, transparent 1px),
+    #eef0f8;
+  background-size: 34px 34px;
+}
+
+.user-persona__inner {
+  display: grid;
+  width: min(100%, 1440px);
+  height: 100%;
+  margin: 0 auto;
+  grid-template-rows: auto auto auto;
+  align-content: space-between;
+}
+
+.user-persona__header {
+  border-top: 1px solid rgba(17, 22, 45, 0.7);
+}
+
+.user-persona__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--persona-line);
+  font: 700 10px/1.2 var(--font-mono);
+  letter-spacing: 0.1em;
+}
+
+.user-persona__heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.45fr);
+  gap: clamp(36px, 6vw, 96px);
+  align-items: end;
+  padding: clamp(17px, 2.2vh, 24px) 0 clamp(24px, 3vh, 32px);
+}
+
+.user-persona__heading h3 {
+  margin: 0;
+  font: 500 clamp(52px, 4.6vw, 84px)/0.9 var(--font-display);
+  letter-spacing: -0.065em;
+  text-transform: uppercase;
+}
+
+.user-persona__heading h3 em {
+  color: var(--persona-accent);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  text-transform: none;
+}
+
+.user-persona__heading > p {
+  max-width: 410px;
+  margin: 0;
+  font: 600 clamp(14px, 0.88vw, 17px)/1.65 var(--font-body);
+  word-break: keep-all;
+}
+
+.user-persona__grid {
+  display: grid;
+  height: clamp(510px, 52vh, 560px);
+  min-height: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--persona-ink);
+  border-bottom: 0;
+  background: rgba(247, 248, 252, 0.7);
+}
+
+.user-persona__card {
+  display: flex;
+  min-width: 0;
+  padding: clamp(20px, 2.4vh, 26px) 28px 24px
+    clamp(24px, 2.25vw, 38px);
+  flex-direction: column;
+  border-right: 1px solid rgba(17, 22, 45, 0.12);
+}
+
+.user-persona__card:last-child {
+  border-right: 0;
+}
+
+.user-persona__identity {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--persona-muted);
+  font: 700 10px/1.3 var(--font-mono);
+  letter-spacing: 0.08em;
+}
+
+.user-persona__identity p {
+  margin: 0;
+  font-family: var(--font-body);
+  letter-spacing: 0;
+}
+
+.user-persona__visual {
+  position: relative;
+  display: grid;
+  height: clamp(200px, 21vh, 226px);
+  margin: clamp(4px, 0.7vh, 8px) 0 0;
+  place-items: end center;
+}
+
+.user-persona__visual::before {
+  content: "";
+  position: absolute;
+  bottom: 12px;
+  width: clamp(184px, 12vw, 220px);
+  height: clamp(150px, 9vw, 174px);
+  border-radius: 48% 52% 46% 54%;
+  background: radial-gradient(
+    circle at 50% 48%,
+    rgba(199, 191, 232, 0.56),
+    rgba(214, 209, 238, 0.22) 62%,
+    transparent 72%
+  );
+  filter: blur(1px);
+}
+
+.user-persona__visual::after {
+  content: "✦";
+  position: absolute;
+  top: 16px;
+  right: clamp(12px, 2vw, 34px);
+  color: var(--persona-accent);
+  font-size: 13px;
+}
+
+.user-persona__visual img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: auto;
+  height: clamp(200px, 21vh, 220px);
+  max-width: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 14px rgba(38, 34, 70, 0.13));
+}
+
+.user-persona__name {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: clamp(8px, 1.2vh, 13px);
+  padding-bottom: clamp(11px, 1.4vh, 15px);
+  border-bottom: 1px solid rgba(17, 22, 45, 0.14);
+}
+
+.user-persona__name h4 {
+  margin: 0;
+  font: 600 clamp(30px, 2vw, 38px)/1 var(--font-body);
+  letter-spacing: -0.055em;
+}
+
+.user-persona__name strong {
+  color: #604b8a;
+  font: 700 12px/1.3 var(--font-body);
+  white-space: nowrap;
+}
+
+.user-persona__characteristic {
+  min-height: 3.4em;
+  margin: clamp(11px, 1.4vh, 15px) 0;
+  font: 600 clamp(15px, 0.92vw, 18px)/1.7 var(--font-body);
+  word-break: keep-all;
+}
+
+.user-persona__card dl {
+  display: grid;
+  margin: 0;
+  gap: clamp(8px, 1.1vh, 12px);
+}
+
+.user-persona__card dl > div {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  gap: 14px;
+}
+
+.user-persona__card dt {
+  padding-top: 2px;
+  color: var(--persona-muted);
+  font: 700 9px/1.4 var(--font-mono);
+  letter-spacing: 0.09em;
+}
+
+.user-persona__card dd {
+  margin: 0;
+  font: 500 clamp(13px, 0.78vw, 15px)/1.55 var(--font-body);
+  word-break: keep-all;
+}
+
+.user-persona__pain dd {
+  color: #574272;
+  font-weight: 650;
+}
+
+.user-persona__button-area {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.user-persona__card button {
+  padding: 10px 0 2px;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  color: var(--persona-ink);
+  background: transparent;
+  cursor: pointer;
+  font: 700 10px/1.2 var(--font-mono);
+  letter-spacing: 0.08em;
+  transition: color 180ms ease, border-color 180ms ease;
+}
+
+.user-persona__card button span {
+  display: inline-block;
+  margin-left: 7px;
+  transition: transform 180ms ease;
+}
+
+.user-persona__card button:hover {
+  color: var(--persona-accent);
+}
+
+.user-persona__card button:hover span {
+  transform: translate(2px, -2px);
+}
+
+.user-persona__card button:focus-visible {
+  outline: 2px solid var(--persona-accent);
+  outline-offset: 5px;
+}
+
+.user-persona__direction {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 30px;
+  align-items: center;
+  padding: clamp(17px, 2vh, 22px) clamp(20px, 2vw, 30px);
+  color: #f1f4f8;
+  background: var(--persona-ink);
+}
+
+.user-persona__direction span {
+  color: var(--persona-accent);
+  font: 700 10px/1.2 var(--font-mono);
+  letter-spacing: 0.1em;
+}
+
+.user-persona__direction p {
+  margin: 0;
+  font: 600 clamp(18px, 1.35vw, 25px)/1.45 var(--font-body);
+  letter-spacing: -0.025em;
+  word-break: keep-all;
+}
+
+@media (min-width: 901px) and (min-height: 900px) {
+  .user-persona {
+    height: 100vh;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 1200px) {
+  .user-persona__heading {
+    grid-template-columns: minmax(0, 1.35fr) minmax(270px, 0.65fr);
+  }
+
+  .user-persona__card {
+    padding-right: 24px;
+    padding-left: 24px;
+  }
+
+  .user-persona__card dl > div {
+    grid-template-columns: 70px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 900px), (max-height: 899px) {
+  .user-persona {
+    height: auto;
+    min-height: 0;
+    padding-top: 52px;
+    padding-bottom: 58px;
+  }
+
+  .user-persona__inner {
+    height: auto;
+    align-content: normal;
+  }
+
+  .user-persona__grid {
+    height: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .user-persona__heading {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .user-persona__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .user-persona__card {
+    border-right: 0;
+    border-bottom: 1px solid rgba(17, 22, 45, 0.14);
+  }
+
+  .user-persona__card:last-child {
+    border-bottom: 0;
+  }
+
+  .user-persona__characteristic {
+    min-height: 0;
+  }
+
+  .user-persona__visual {
+    height: 210px;
+  }
+}
+
+@media (max-width: 600px) {
+  .user-persona {
+    padding: 64px 20px 70px;
+  }
+
+  .user-persona__meta {
+    align-items: flex-start;
+  }
+
+  .user-persona__meta span:last-child {
+    max-width: 160px;
+    text-align: right;
+  }
+
+  .user-persona__heading h3 {
+    font-size: clamp(42px, 13vw, 58px);
+  }
+
+  .user-persona__card {
+    padding: 28px 20px;
+  }
+
+  .user-persona__visual {
+    height: 200px;
+  }
+
+  .user-persona__visual img {
+    height: 196px;
+  }
+
+  .user-persona__name {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .user-persona__card dl > div,
+  .user-persona__direction {
+    grid-template-columns: 1fr;
+  }
+
+  .user-persona__direction {
+    gap: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .user-persona__card button,
+  .user-persona__card button span {
+    transition: none;
+  }
+}

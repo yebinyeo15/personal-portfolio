@@ -1,8 +1,15 @@
 .nintendo-analysis,
 .competitive-research {
   min-height: 0;
-  padding: clamp(58px, 5vw, 78px) clamp(24px, 5vw, 80px)
-    clamp(62px, 5.5vw, 86px);
+  padding: clamp(70px, 5vw, 90px) clamp(24px, 5vw, 80px)
+    clamp(74px, 5.5vw, 98px);
+}
+
+.nintendo-analysis > *,
+.competitive-research > * {
+  width: min(100%, 1320px);
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .nintendo-analysis .research-section-header__title,
@@ -13,7 +20,19 @@
 
 .nintendo-analysis .research-section-header__title h3,
 .competitive-research .research-section-header__title h3 {
-  font-size: clamp(44px, 5.4vw, 84px);
+  font-family: var(--font-display);
+  font-size: clamp(46px, 5.4vw, 88px);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -0.065em;
+}
+
+.nintendo-analysis .research-section-header__title h3 em,
+.competitive-research .research-section-header__title h3 em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  text-transform: none;
 }
 
 .nintendo-analysis__editorial {
@@ -111,6 +130,7 @@
 .competitive-research__tabs {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(8px, 1vw, 14px);
 }
 
 .research-selector-label {
@@ -126,31 +146,32 @@
 }
 
 .nintendo-analysis__tabs {
-  border-bottom: 1px solid #11162d;
+  border-bottom: 0;
 }
 
 .nintendo-analysis__tabs button,
 .competitive-research__tabs button {
   position: relative;
   min-width: 0;
-  border: 0;
+  border: 1px solid transparent;
+  border-radius: 4px;
   color: inherit;
-  background: transparent;
   cursor: pointer;
   font: 700 11px/1.2 "Space Mono", monospace;
   letter-spacing: 0.06em;
   text-align: left;
-  transition: color 200ms ease, background-color 200ms ease;
+  transition:
+    color 200ms ease,
+    background-color 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease;
 }
 
 .nintendo-analysis__tabs button {
-  padding: 17px clamp(42px, 4vw, 58px) 17px clamp(14px, 2vw, 28px);
-  border-right: 1px solid rgba(17, 22, 45, 0.25);
-}
-
-.nintendo-analysis__tabs button:last-child,
-.competitive-research__tabs button:last-child {
-  border-right: 0;
+  padding: 16px clamp(42px, 4vw, 58px) 16px clamp(14px, 2vw, 28px);
+  border-color: rgba(17, 22, 45, 0.3);
+  background: rgba(255, 255, 255, 0.48);
+  box-shadow: 0 2px 0 rgba(17, 22, 45, 0.08);
 }
 
 .nintendo-analysis__tabs button span,
@@ -195,12 +216,15 @@
 
 .nintendo-analysis__tabs button:hover {
   color: #5d477f;
-  background: rgba(201, 197, 229, 0.35);
+  border-color: #9d8bc9;
+  background: rgba(201, 197, 229, 0.42);
 }
 
 .nintendo-analysis__tabs button.is-active {
-  color: #6f579d;
-  background: rgba(201, 197, 229, 0.58);
+  color: #34244f;
+  border-color: #8f79c2;
+  background: #c9c5e5;
+  box-shadow: 0 3px 0 rgba(93, 71, 127, 0.22);
 }
 
 .nintendo-analysis__tabs button.is-active::after,
@@ -220,13 +244,15 @@
 }
 
 .competitive-research__tabs {
-  border-top: 1px solid rgba(237, 240, 250, 0.55);
-  border-bottom: 1px solid rgba(237, 240, 250, 0.55);
+  border-top: 0;
+  border-bottom: 0;
 }
 
 .competitive-research__tabs button {
-  padding: 15px clamp(42px, 4vw, 58px) 15px clamp(14px, 2vw, 28px);
-  border-right: 1px solid rgba(237, 240, 250, 0.2);
+  padding: 14px clamp(42px, 4vw, 58px) 14px clamp(14px, 2vw, 28px);
+  border-color: rgba(237, 240, 250, 0.32);
+  background: rgba(237, 240, 250, 0.06);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .competitive-research__tabs button span {
@@ -235,12 +261,15 @@
 
 .competitive-research__tabs button:hover {
   color: #fff;
-  background: rgba(183, 176, 221, 0.09);
+  border-color: #b7b0dd;
+  background: rgba(183, 176, 221, 0.16);
 }
 
 .competitive-research__tabs button.is-active {
   color: #fff;
-  background: rgba(183, 176, 221, 0.24);
+  border-color: #c9c5e5;
+  background: rgba(169, 155, 213, 0.42);
+  box-shadow: 0 3px 0 rgba(183, 176, 221, 0.28);
 }
 
 .competitive-research__viewer {
@@ -326,8 +355,8 @@
 @media (min-width: 901px) {
   .nintendo-analysis,
   .competitive-research {
-    padding-top: clamp(34px, 2.8vw, 46px);
-    padding-bottom: clamp(48px, 4vw, 64px);
+    padding-top: clamp(100px, 7vw, 112px);
+    padding-bottom: clamp(64px, 4vw, 80px);
   }
 
   .nintendo-analysis .research-section-header__title,
@@ -337,11 +366,22 @@
   }
 
   .nintendo-analysis__viewer {
-    height: auto;
+    height: clamp(415px, 42.6vh, 460px);
   }
 
   .nintendo-analysis__viewer figure {
     aspect-ratio: auto;
+  }
+
+  .nintendo-analysis__viewer figure,
+  .competitive-research__viewer figure {
+    overflow: hidden;
+  }
+
+  .nintendo-analysis__viewer figure img,
+  .competitive-research__viewer figure img {
+    height: 100%;
+    object-fit: cover;
   }
 
   .nintendo-analysis__viewer article {
@@ -353,7 +393,7 @@
   }
 
   .competitive-research__viewer {
-    height: auto;
+    height: clamp(415px, 42.6vh, 460px);
     min-height: 0;
   }
 
@@ -415,7 +455,7 @@
 @media (max-width: 600px) {
   .nintendo-analysis,
   .competitive-research {
-    padding: 64px 20px 70px;
+    padding: 72px 20px 78px;
   }
 
   .nintendo-analysis__viewer figure,

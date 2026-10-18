@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import "./nintendoResearch.css";
+import "./userInterview.css";
+import "./userPersona.css";
+import "./journeyStrategy.css";
 
 const ArrowIcon = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -393,6 +396,142 @@ const competitorResearch = [
   },
 ];
 
+const userInterviews = [
+  {
+    key: "user-01",
+    number: "01",
+    profile: "24세 대학생",
+    focus: "취향별 게임 탐색",
+    summary: "취향에 맞는 게임과 신작 외 인기 게임을 발견하기 어렵다.",
+    finding:
+      "혼자 하기 좋은 게임, 아기자기한 게임처럼 취향과 플레이 맥락을 반영한 분류가 필요합니다.",
+    response:
+      "취향·캐릭터·시리즈를 교차하는 탐색 필터와 메인 캐릭터 경험을 강화합니다.",
+    pdf: "/images/nintendo/research/pdf/interview-01.pdf",
+  },
+  {
+    key: "user-02",
+    number: "02",
+    profile: "31세 자영업자",
+    focus: "캐릭터 접근성",
+    summary:
+      "동물의 숲 캐릭터 정보를 찾는 과정이 복잡하고 콘텐츠를 읽기 어렵다.",
+    finding:
+      "캐릭터의 개성과 일러스트를 더 선명하게 보여주고 정보의 가독성을 높일 필요가 있습니다.",
+    response:
+      "캐릭터 중심 진입점과 짧은 영상 콘텐츠를 결합해 탐색 단계와 읽기 부담을 줄입니다.",
+    pdf: "/images/nintendo/research/pdf/interview-02.pdf",
+  },
+  {
+    key: "user-03",
+    number: "03",
+    profile: "45세 직장인",
+    focus: "시리즈 중심 탐색",
+    summary: "젤다처럼 익숙한 시리즈와 관련 작품을 한 번에 찾기 어렵다.",
+    finding:
+      "캐릭터·시리즈 중심 분류와 장르·플레이 방식별 세분화가 함께 필요합니다.",
+    response:
+      "시리즈 역사와 라인업, 실제 플레이 영상을 연결해 작품 간 관계와 특징을 빠르게 이해하게 합니다.",
+    pdf: "/images/nintendo/research/pdf/interview-03.pdf",
+  },
+];
+
+const userPersonas = [
+  {
+    number: "01",
+    name: "정원희",
+    profile: "24세 / 대학생",
+    type: "탐색 효율형",
+    characteristic:
+      "게임 리뷰를 참고하며 취향에 맞는 게임을 효율적으로 찾고자 함",
+    goal: "신작과 기존 인기 게임을 빠르게 발견",
+    painPoint: "신작 중심 구조로 기존 인기 게임 탐색이 어려움",
+    need: "장르·취향·플레이 방식별 게임 탐색",
+    image: "/images/nintendo/research/persona-01.jpg",
+    avatar: "/images/nintendo/research/persona-avatar-01.png",
+  },
+  {
+    number: "02",
+    name: "김희선",
+    profile: "31세 / 자영업자",
+    type: "캐릭터 중심형",
+    characteristic: "캐릭터의 외형과 콘셉트를 중요하게 생각함",
+    goal: "좋아하는 캐릭터와 관련 콘텐츠를 빠르게 발견",
+    painPoint: "캐릭터 상세 정보까지 여러 단계의 탐색이 필요함",
+    need: "캐릭터별 설정, 일러스트, 직관적인 콘텐츠 탐색",
+    image: "/images/nintendo/research/persona-02.jpg",
+    avatar: "/images/nintendo/research/persona-avatar-02.png",
+  },
+  {
+    number: "03",
+    name: "최현석",
+    profile: "45세 / 직장인",
+    type: "시리즈 몰입형",
+    characteristic: "기존 게임 시리즈와 캐릭터에 대한 애정이 높음",
+    goal: "익숙한 시리즈의 정보와 라인업을 쉽게 탐색",
+    painPoint: "시리즈별 정보가 눈에 잘 띄지 않고 플레이 영상 접근이 어려움",
+    need: "시리즈별 탐색, 역사·라인업, 플레이 영상",
+    image: "/images/nintendo/research/persona-03.png",
+    avatar: "/images/nintendo/research/persona-avatar-03.png",
+  },
+];
+
+const journeyResearch = [
+  {
+    key: "wonhee",
+    number: "01",
+    name: "정원희",
+    profile: "24세 / 대학생",
+    type: "탐색 효율형",
+    scores: [3, 2, 1, 4, 5, 3],
+    pain: "원하는 게임과 캐릭터를 찾는 과정이 복잡함",
+    response: "장르·취향·플레이 방식별 탐색 구조, 캐릭터 태그와 필터",
+    journey: "/images/nintendo/research/journey-02.png",
+    canvas: "/images/nintendo/research/lean-canvas-02.png",
+  },
+  {
+    key: "heeseon",
+    number: "02",
+    name: "김희선",
+    profile: "31세 / 자영업자",
+    type: "캐릭터 중심형",
+    scores: [3, 2, 2, 3, 2, 3],
+    pain: "캐릭터 콘텐츠와 브랜드 경험이 부족함",
+    response: "캐릭터 IP 중심의 인터랙티브 콘텐츠, 캐릭터별 게임 연결",
+    journey: "/images/nintendo/research/journey-01.png",
+    canvas: "/images/nintendo/research/lean-canvas-01.png",
+  },
+  {
+    key: "hyunseok",
+    number: "03",
+    name: "최현석",
+    profile: "45세 / 직장인",
+    type: "시리즈 몰입형",
+    scores: [4, 3, 1, 5, 2, 4],
+    pain: "시리즈의 역사와 캐릭터 관계를 이해하기 어려움",
+    response: "시리즈 히스토리, 브랜드 아카이브, 스토리텔링 콘텐츠",
+    journey: "/images/nintendo/research/journey-03.png",
+    canvas: "/images/nintendo/research/lean-canvas-03.png",
+  },
+];
+
+const journeyStages = [
+  "유입",
+  "탐색",
+  "경험",
+  "게임 선택",
+  "상세 탐색",
+  "구매 고려",
+];
+
+const emotionScale = {
+  1: "매우 낮음",
+  2: "낮음",
+  3: "보통",
+  4: "높음",
+  5: "매우 높음",
+};
+
 const ResearchMedia = ({ src, alt, label }) => {
   const [hasError, setHasError] = useState(false);
 
@@ -441,6 +580,9 @@ function App() {
   const [activeNintendoResearch, setActiveNintendoResearch] = useState("brand");
   const [activeCompetitorResearch, setActiveCompetitorResearch] =
     useState("playstation");
+  const [activeUserInterview, setActiveUserInterview] = useState("user-01");
+  const [activeJourneyResearch, setActiveJourneyResearch] = useState("wonhee");
+  const [activeJourneyPoint, setActiveJourneyPoint] = useState(null);
   const [selectedPersonalityTrait, setSelectedPersonalityTrait] =
     useState("curious");
   const [previewPersonalityTrait, setPreviewPersonalityTrait] = useState(null);
@@ -845,6 +987,12 @@ function App() {
   );
   const selectedCompetitorResearch = competitorResearch.find(
     (item) => item.key === activeCompetitorResearch,
+  );
+  const selectedUserInterview = userInterviews.find(
+    (item) => item.key === activeUserInterview,
+  );
+  const selectedJourneyResearch = journeyResearch.find(
+    (item) => item.key === activeJourneyResearch,
   );
 
   return (
@@ -1823,7 +1971,7 @@ function App() {
               </div>
               <div className="research-section-header__title">
                 <h3 id="nintendo-analysis-title">
-                  BEYOND THE <em>SCREEN.</em>
+                  BEYOND THE <em>Screen.</em>
                 </h3>
                 <p>기존 닌텐도 사이트의 강점과 개선 가능성을 분석하다.</p>
               </div>
@@ -1851,7 +1999,7 @@ function App() {
                   </div>
                 </article>
               </div>
-              <p className="research-selector-label">SELECT A SCREEN ↓</p>
+              <p className="research-selector-label">CLICK TO EXPLORE ↓</p>
               <div
                 className="nintendo-analysis__tabs"
                 role="tablist"
@@ -1915,13 +2063,13 @@ function App() {
               </div>
               <div className="research-section-header__title">
                 <h3 id="competitive-research-title">
-                  LOOKING BEYOND <em>NINTENDO.</em>
+                  LOOKING BEYOND <em>Nintendo.</em>
                 </h3>
                 <p>세 가지 게임 플랫폼의 경험을 비교하다.</p>
               </div>
             </header>
             <p className="research-selector-label research-selector-label--dark">
-              SELECT A PLATFORM ↓
+              CLICK TO EXPLORE ↓
             </p>
             <div
               className="competitive-research__tabs"
@@ -2010,6 +2158,404 @@ function App() {
                 <span>SOURCE / COMPARISON BOARD</span>
                 <strong>VIEW ORIGINAL RESEARCH ↗</strong>
               </button>
+            </div>
+          </section>
+
+          <section
+            className="user-interview section"
+            id="user-interview"
+            aria-labelledby="user-interview-title"
+          >
+            <header className="user-interview__header">
+              <div className="user-interview__meta">
+                <span>12 / USER INTERVIEW</span>
+                <span>QUALITATIVE RESEARCH / N=3</span>
+              </div>
+              <div className="user-interview__heading">
+                <h3 id="user-interview-title">
+                  BEYOND THE <em>Answers.</em>
+                </h3>
+                <p>
+                  실제 사용자 3명의 경험을 통해 닌텐도 웹사이트의 개선 방향을
+                  확인했습니다.
+                </p>
+              </div>
+            </header>
+
+            <div className="user-interview__explorer">
+              <div
+                className="user-interview__tabs"
+                role="tablist"
+                aria-label="인터뷰 응답자 선택"
+              >
+                <p>SELECT A USER ↓</p>
+                {userInterviews.map((interview) => (
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeUserInterview === interview.key}
+                    aria-controls="user-interview-panel"
+                    tabIndex={activeUserInterview === interview.key ? 0 : -1}
+                    className={
+                      activeUserInterview === interview.key ? "is-active" : ""
+                    }
+                    key={interview.key}
+                    onClick={() => setActiveUserInterview(interview.key)}
+                    onKeyDown={(event) =>
+                      handleResearchTabKeyDown(
+                        event,
+                        userInterviews,
+                        activeUserInterview,
+                        setActiveUserInterview,
+                      )
+                    }
+                  >
+                    <span>{interview.number}</span>
+                    <strong>USER {interview.number}</strong>
+                    <small>{interview.profile}</small>
+                    <i aria-hidden="true">↗</i>
+                  </button>
+                ))}
+              </div>
+
+              <article
+                className="user-interview__detail"
+                id="user-interview-panel"
+                role="tabpanel"
+                key={selectedUserInterview.key}
+              >
+                <div className="user-interview__detail-copy">
+                  <div className="user-interview__detail-topline">
+                    <span>USER {selectedUserInterview.number}</span>
+                    <span>{selectedUserInterview.profile}</span>
+                  </div>
+                  <p className="user-interview__focus">
+                    {selectedUserInterview.focus}
+                  </p>
+                  <div className="user-interview__summary">
+                    <span>RESPONSE SUMMARY</span>
+                    <p>{selectedUserInterview.summary}</p>
+                  </div>
+                  <dl>
+                    <div>
+                      <dt>KEY FINDING</dt>
+                      <dd>{selectedUserInterview.finding}</dd>
+                    </div>
+                    <div>
+                      <dt>DESIGN RESPONSE</dt>
+                      <dd>{selectedUserInterview.response}</dd>
+                    </div>
+                  </dl>
+                  <a
+                    href={selectedUserInterview.pdf}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    VIEW FULL INTERVIEW <span aria-hidden="true">↗</span>
+                  </a>
+                </div>
+              </article>
+            </div>
+
+            <footer className="user-interview__insights">
+              <p>COMMON INSIGHTS</p>
+              <ol>
+                <li>
+                  <span>01 / GAME DISCOVERY</span>
+                  <strong>취향·캐릭터·시리즈 중심 탐색 개선</strong>
+                </li>
+                <li>
+                  <span>02 / CHARACTER IP</span>
+                  <strong>캐릭터와 세계관을 활용한 브랜드 경험 강화</strong>
+                </li>
+                <li>
+                  <span>03 / CONTENT EXPERIENCE</span>
+                  <strong>영상·애니메이션을 활용한 게임 이해도 향상</strong>
+                </li>
+              </ol>
+            </footer>
+          </section>
+
+          <section
+            className="user-persona section"
+            id="user-persona"
+            aria-labelledby="user-persona-title"
+          >
+            <div className="user-persona__inner">
+              <header className="user-persona__header">
+                <div className="user-persona__meta">
+                  <span>13 / USER PERSONA</span>
+                  <span>BEHAVIORAL ARCHETYPES / N=3</span>
+                </div>
+                <div className="user-persona__heading">
+                  <h3 id="user-persona-title">
+                    DESIGNING FOR <em>People.</em>
+                  </h3>
+                  <p>
+                    사용자 조사에서 발견한 탐색 방식과 핵심 니즈를 세 가지 행동
+                    유형으로 정리했습니다.
+                  </p>
+                </div>
+              </header>
+
+              <div className="user-persona__grid">
+                {userPersonas.map((persona) => (
+                  <article className="user-persona__card" key={persona.number}>
+                    <div className="user-persona__identity">
+                      <span>PERSONA {persona.number}</span>
+                      <p>{persona.profile}</p>
+                    </div>
+                    <div className="user-persona__visual" aria-hidden="true">
+                      <img src={persona.avatar} alt="" />
+                    </div>
+                    <div className="user-persona__name">
+                      <h4>{persona.name}</h4>
+                      <strong>{persona.type}</strong>
+                    </div>
+                    <p className="user-persona__characteristic">
+                      {persona.characteristic}
+                    </p>
+                    <dl>
+                      <div>
+                        <dt>GOAL</dt>
+                        <dd>{persona.goal}</dd>
+                      </div>
+                      <div className="user-persona__pain">
+                        <dt>PAIN POINT</dt>
+                        <dd>{persona.painPoint}</dd>
+                      </div>
+                      <div>
+                        <dt>NEED</dt>
+                        <dd>{persona.need}</dd>
+                      </div>
+                    </dl>
+                    <div className="user-persona__button-area">
+                      <button
+                        type="button"
+                        onClick={(event) =>
+                          openDocumentPreview(
+                            {
+                              src: persona.image,
+                              alt: `${persona.name} 사용자 퍼소나 원본 자료`,
+                            },
+                            event,
+                          )
+                        }
+                        aria-label={`${persona.name} 사용자 퍼소나 원본 보기`}
+                      >
+                        VIEW ORIGINAL <span aria-hidden="true">↗</span>
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              <footer className="user-persona__direction">
+                <span>DESIGN DIRECTION</span>
+                <p>
+                  취향으로 발견하고, 캐릭터로 연결되며, 시리즈의 세계로 몰입하는
+                  경험.
+                </p>
+              </footer>
+            </div>
+          </section>
+
+          <section
+            className="journey-strategy section"
+            id="journey-strategy"
+            aria-labelledby="journey-strategy-title"
+          >
+            <div className="journey-strategy__inner">
+              <header className="journey-strategy__header">
+                <div className="journey-strategy__meta">
+                  <span>14 / USER JOURNEY &amp; STRATEGY</span>
+                  <span>JOURNEY MAP · LEAN CANVAS</span>
+                </div>
+                <div className="journey-strategy__heading">
+                  <h3 id="journey-strategy-title">
+                    FROM <em>Friction.</em> TO DIRECTION.
+                  </h3>
+                  <p>
+                    탐색 과정의 감정 변화를 따라 핵심 마찰 지점을 발견하고,
+                    구체적인 디자인 방향으로 전환했습니다.
+                  </p>
+                </div>
+              </header>
+
+              <div
+                className="journey-strategy__tabs"
+                role="tablist"
+                aria-label="사용자 여정 선택"
+              >
+                {journeyResearch.map((research) => (
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeJourneyResearch === research.key}
+                    aria-controls="journey-strategy-panel"
+                    tabIndex={activeJourneyResearch === research.key ? 0 : -1}
+                    className={
+                      activeJourneyResearch === research.key ? "is-active" : ""
+                    }
+                    key={research.key}
+                    onClick={() => {
+                      setActiveJourneyResearch(research.key);
+                      setActiveJourneyPoint(null);
+                    }}
+                    onKeyDown={(event) =>
+                      handleResearchTabKeyDown(
+                        event,
+                        journeyResearch,
+                        activeJourneyResearch,
+                        (key) => {
+                          setActiveJourneyResearch(key);
+                          setActiveJourneyPoint(null);
+                        },
+                      )
+                    }
+                  >
+                    <span>{research.number}</span>
+                    <strong>{research.name}</strong>
+                    <small>{research.type}</small>
+                  </button>
+                ))}
+              </div>
+
+              <article
+                className="journey-strategy__panel"
+                id="journey-strategy-panel"
+                role="tabpanel"
+                key={selectedJourneyResearch.key}
+              >
+                <div className="journey-strategy__chart-head">
+                  <div>
+                    <span>EMOTION JOURNEY / 6 STEPS</span>
+                    <strong>
+                      {selectedJourneyResearch.name} · {selectedJourneyResearch.profile}
+                    </strong>
+                  </div>
+                  <p>SCORE 01—05 / ORIGINAL RESEARCH DATA</p>
+                </div>
+
+                <div className="journey-strategy__chart">
+                  <div className="journey-strategy__scale" aria-hidden="true">
+                    {[5, 4, 3, 2, 1].map((score) => (
+                      <span key={score}>{String(score).padStart(2, "0")}</span>
+                    ))}
+                  </div>
+                  <div className="journey-strategy__plot">
+                    <div className="journey-strategy__canvas">
+                      <svg
+                        viewBox="0 0 1000 230"
+                        role="img"
+                        aria-label={`${selectedJourneyResearch.name}의 6단계 감정 점수: ${selectedJourneyResearch.scores.join(", ")}`}
+                        preserveAspectRatio="none"
+                      >
+                        {[35, 75, 115, 155, 195].map((y) => (
+                          <line key={y} x1="0" y1={y} x2="1000" y2={y} />
+                        ))}
+                        <polygon
+                          className="journey-strategy__area"
+                          points={`83.333,230 ${selectedJourneyResearch.scores
+                            .map(
+                              (score, index) =>
+                                `${83.333 + index * 166.667},${235 - score * 40}`,
+                            )
+                            .join(" ")} 916.668,230`}
+                        />
+                        <polyline
+                          className="journey-strategy__line"
+                          points={selectedJourneyResearch.scores
+                            .map(
+                              (score, index) =>
+                                `${83.333 + index * 166.667},${235 - score * 40}`,
+                            )
+                            .join(" ")}
+                        />
+                      </svg>
+                      <div className="journey-strategy__points">
+                        {selectedJourneyResearch.scores.map((score, index) => (
+                          <button
+                            className={`journey-strategy__point${activeJourneyPoint === index ? " is-active" : ""}`}
+                            style={{
+                              "--point-x": `${((index + 0.5) / 6) * 100}%`,
+                              "--point-y": `${((235 - score * 40) / 230) * 100}%`,
+                            }}
+                            key={`${selectedJourneyResearch.key}-${journeyStages[index]}`}
+                            type="button"
+                            aria-label={`${journeyStages[index]} 단계, 감정 점수 ${score}점, ${emotionScale[score]}`}
+                            onMouseEnter={() => setActiveJourneyPoint(index)}
+                            onMouseLeave={() => setActiveJourneyPoint(null)}
+                            onFocus={() => setActiveJourneyPoint(index)}
+                            onBlur={() => setActiveJourneyPoint(null)}
+                            onClick={() => setActiveJourneyPoint(index)}
+                          >
+                            <span
+                              className="journey-strategy__emotion"
+                              aria-hidden="true"
+                            >
+                              {score}점 · {emotionScale[score]}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <ol>
+                      {journeyStages.map((stage, index) => (
+                        <li key={stage}>
+                          <span>0{index + 1}</span>
+                          <strong>{stage}</strong>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                </div>
+
+                <div className="journey-strategy__response">
+                  <div>
+                    <span>PAIN POINT</span>
+                    <p>{selectedJourneyResearch.pain}</p>
+                  </div>
+                  <i aria-hidden="true">→</i>
+                  <div>
+                    <span>DESIGN RESPONSE</span>
+                    <p>{selectedJourneyResearch.response}</p>
+                  </div>
+                </div>
+
+                <div className="journey-strategy__sources">
+                  <button
+                    type="button"
+                    onClick={(event) =>
+                      openDocumentPreview(
+                        {
+                          src: selectedJourneyResearch.journey,
+                          alt: `${selectedJourneyResearch.name} 사용자 여정 지도 원본`,
+                          isResearch: true,
+                        },
+                        event,
+                      )
+                    }
+                  >
+                    VIEW JOURNEY MAP <span aria-hidden="true">↗</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(event) =>
+                      openDocumentPreview(
+                        {
+                          src: selectedJourneyResearch.canvas,
+                          alt: `${selectedJourneyResearch.name} 린 캔버스 원본`,
+                          isResearch: true,
+                        },
+                        event,
+                      )
+                    }
+                  >
+                    VIEW LEAN CANVAS <span aria-hidden="true">↗</span>
+                  </button>
+                </div>
+              </article>
             </div>
           </section>
 
