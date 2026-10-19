@@ -70,8 +70,8 @@
 
 .user-persona__grid {
   display: grid;
-  height: clamp(510px, 52vh, 560px);
-  min-height: 0;
+  height: auto;
+  min-height: clamp(590px, 60vh, 640px);
   grid-template-columns: repeat(3, minmax(0, 1fr));
   border-top: 1px solid var(--persona-ink);
   border-bottom: 0;
@@ -211,9 +211,10 @@
 
 .user-persona__button-area {
   display: flex;
+  align-items: flex-end;
   justify-content: flex-end;
   margin-top: auto;
-  padding-top: 16px;
+  padding-top: 22px;
 }
 
 .user-persona__card button {
@@ -272,8 +273,14 @@
 
 @media (min-width: 901px) and (min-height: 900px) {
   .user-persona {
-    height: 100vh;
-    min-height: 0;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+
+  .user-persona__inner {
+    height: auto;
+    align-content: normal;
   }
 }
 

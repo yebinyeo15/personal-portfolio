@@ -1,0 +1,77 @@
+warning: in the working copy of 'src/App.jsx', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/src/App.jsx b/src/App.jsx[m
+[1mindex f7e423e..db1f03d 100644[m
+[1m--- a/src/App.jsx[m
+[1m+++ b/src/App.jsx[m
+[36m@@ -23,7 +23,7 @@[m [mconst EditorialProject = ({ number, projectNumber, name, tone, reverse = false }[m
+                 className={`editorial-project__title ${reverse ? 'editorial-project__title--reverse' : ''}`}[m
+             >[m
+                 <div>[m
+[31m-                <p className="eyebrow">Personal project · Brand website renewal</p>[m
+[32m+[m[32m                    <p className="eyebrow">Personal project · Brand website renewal</p>[m
+                     <h2>{name}</h2>[m
+                 </div>[m
+                 <p>개인 브랜드 웹사이트 리뉴얼 프로젝트</p>[m
+[36m@@ -187,7 +187,11 @@[m [mfunction App() {[m
+                             <span>01</span>[m
+                             <span>Selected works</span>[m
+                         </div>[m
+[31m-                        <h2>SELECTED<br />WORKS</h2>[m
+[32m+[m[32m                        <h2>[m
+[32m+[m[32m                            SELECTED[m
+[32m+[m[32m                            <br />[m
+[32m+[m[32m                            WORKS[m
+[32m+[m[32m                        </h2>[m
+                     </div>[m
+                     <div className="project-hero section">[m
+                         <div className="section-index section-index--light">[m
+[36m@@ -383,7 +387,10 @@[m [mfunction App() {[m
+                             </div>[m
+                         </article>[m
+                         <article className="archive-card archive-card--offset">[m
+[31m-                            <Placeholder label="WEB LAYOUT / PUBLISHING" className="archive-placeholder" />[m
+[32m+[m[32m                            <Placeholder[m
+[32m+[m[32m                                label="WEB LAYOUT / PUBLISHING"[m
+[32m+[m[32m                                className="archive-placeholder"[m
+[32m+[m[32m                            />[m
+                             <div className="archive-card__meta">[m
+                                 <span>02 / Practice</span>[m
+                                 <h3>웹 레이아웃 및 퍼블리싱</h3>[m
+[36m@@ -468,10 +475,16 @@[m [mfunction App() {[m
+                             <span className="detail-number">01</span>[m
+                             <h3>Design Journey</h3>[m
+                             <ul>[m
+[31m-                                <li>초대졸 <small>최종 학력: 2023.03 ~ 2025.02</small></li>[m
+[32m+[m[32m                                <li>[m
+[32m+[m[32m                                    초대졸 <small>최종 학력: 2023.03 ~ 2025.02</small>[m
+[32m+[m[32m                                </li>[m
+                                 <li>[m
+                                     Web Design &amp; Publishing[m
+[31m-                                    <small>2026.04 – 2026.10<br />K-Digital Training 웹디자인·퍼블리싱 교육 과정</small>[m
+[32m+[m[32m                                    <small>[m
+[32m+[m[32m                                        2026.04 – 2026.10[m
+[32m+[m[32m                                        <br />[m
+[32m+[m[32m                                        K-Digital Training 웹디자인·퍼블리싱 교육 과정[m
+[32m+[m[32m                                    </small>[m
+                                 </li>[m
+                             </ul>[m
+                             <div className="detail-line" />[m
+[36m@@ -480,9 +493,15 @@[m [mfunction App() {[m
+                             <span className="detail-number">02</span>[m
+                             <h3>Project Experience</h3>[m
+                             <ul>[m
+[31m-                                <li>Nintendo <small>Team Project</small></li>[m
+[31m-                                <li>Diptyque <small>Personal Renewal Project</small></li>[m
+[31m-                                <li>Swarovski <small>Personal Renewal Project</small></li>[m
+[32m+[m[32m                                <li>[m
+[32m+[m[32m                                    Nintendo <small>Team Project</small>[m
+[32m+[m[32m                                </li>[m
+[32m+[m[32m                                <li>[m
+[32m+[m[32m                                    Diptyque <small>Personal Renewal Project</small>[m
+[32m+[m[32m                                </li>[m
+[32m+[m[32m                                <li>[m
+[32m+[m[32m                                    Swarovski <small>Personal Renewal Project</small>[m
+[32m+[m[32m                                </li>[m
+                             </ul>[m
+                             <div className="detail-line" />[m
+                         </div>[m
