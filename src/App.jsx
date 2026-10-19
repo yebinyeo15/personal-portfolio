@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import './App.css';
 import './nintendoResearch.css';
@@ -146,8 +146,6 @@ const finalOutcomeViews = [
         label: 'DESKTOP',
         src: '/images/nintendo/research/nintendo-final-desktop.png',
         alt: 'Nintendo 리뉴얼 웹사이트 데스크톱 목업',
-        description:
-            '캐릭터 중심의 비주얼과 게임 탐색 경험을 데스크톱 환경에 구현했습니다.',
     },
     {
         key: 'mobile',
@@ -155,8 +153,33 @@ const finalOutcomeViews = [
         label: 'MOBILE',
         src: '/images/nintendo/research/nintendo-final-mobile.png',
         alt: 'Nintendo 리뉴얼 웹사이트 모바일 목업 세 대',
-        description:
-            '모바일 환경에서도 콘텐츠의 흐름과 캐릭터 중심의 탐색 경험이 자연스럽게 이어지도록 구성했습니다.',
+    },
+];
+
+const chromeStoryPaths = [
+    {
+        panel: 2,
+        d: 'M 70 735 C 300 690 390 545 610 555 C 850 565 900 300 1160 285 C 1330 275 1440 350 1530 245',
+    },
+    {
+        panel: 3,
+        d: 'M 75 255 C 280 170 430 245 575 405 C 730 575 900 650 1080 520 C 1260 390 1375 220 1530 285',
+    },
+    {
+        panel: 4,
+        d: 'M 65 690 C 265 610 390 650 565 735 C 760 830 880 575 1040 455 C 1220 320 1380 365 1535 245',
+    },
+    {
+        panel: 5,
+        d: 'M 65 315 C 255 210 415 250 590 390 C 770 535 905 630 1090 540 C 1280 445 1380 255 1535 320',
+    },
+    {
+        panel: 6,
+        d: 'M 70 735 C 275 690 420 545 610 575 C 815 610 900 355 1100 300 C 1280 250 1405 340 1530 225',
+    },
+    {
+        panel: 7,
+        d: 'M 70 285 C 280 190 430 265 585 430 C 735 590 900 665 1085 520 C 1260 385 1395 230 1530 300',
     },
 ];
 
@@ -662,6 +685,13 @@ function App() {
     const heroRef = useRef(null);
     const selectedWorksRef = useRef(null);
     const selectedWorksTitleRef = useRef(null);
+    const horizontalStoryRef = useRef(null);
+    const horizontalStoryStageRef = useRef(null);
+    const horizontalStoryTrackRef = useRef(null);
+    const chromeStoryOverlayRef = useRef(null);
+    const chromeStoryPathRefs = useRef(new Map());
+    const chromeStoryGroupRefs = useRef(new Map());
+    const chromeStoryStarRef = useRef(null);
     const nintendoOverviewRef = useRef(null);
     const uxArchitectureRef = useRef(null);
     const designDevelopmentRef = useRef(null);
@@ -706,7 +736,6 @@ function App() {
     const [developmentViewMode, setDevelopmentViewMode] = useState('fit');
     const [isDevelopmentImageReady, setIsDevelopmentImageReady] = useState(false);
     const [isDevelopmentVisible, setIsDevelopmentVisible] = useState(false);
-    const [activeFinalOutcome, setActiveFinalOutcome] = useState('desktop');
     const [activeNintendoResearch, setActiveNintendoResearch] = useState('brand');
     const [activeCompetitorResearch, setActiveCompetitorResearch] = useState('playstation');
     const [activeUserInterview, setActiveUserInterview] = useState('user-01');
@@ -1359,6 +1388,472 @@ function App() {
         return () => observer.disconnect();
     }, []);
 
+    useLayoutEffect(() => {
+        const story = horizontalStoryRef.current;
+        const stage = horizontalStoryStageRef.current;
+        const track = horizontalStoryTrackRef.current;
+        const chromeOverlay = chromeStoryOverlayRef.current;
+        const chromeStar = chromeStoryStarRef.current;
+
+        if (!story || !stage || !track || !chromeOverlay || !chromeStar) return undefined;
+
+        const desktopQuery = window.matchMedia('(min-width: 901px)');
+        const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const panels = Array.from(track.children);
+        let animationFrame = null;
+        let isHorizontal = false;
+        let storyStart = 0;
+        let horizontalTravelDistance = 0;
+        let verticalScrollDistance = 0;
+        let timeline = [];
+        let panelAlignmentDistances = [];
+        const chromePathLengths = new Map();
+        let activeChromePanel = null;
+        let activePanelIndex = -1;
+        let snapTimer = null;
+        let snapAnimationFrame = null;
+        let isSnapping = false;
+        let lastScrollY = window.scrollY;
+        let lastScrollDirection = 0;
+
+        const cancelSnap = () => {
+            if (snapTimer !== null) {
+                window.clearTimeout(snapTimer);
+                snapTimer = null;
+            }
+            if (snapAnimationFrame !== null) {
+                window.cancelAnimationFrame(snapAnimationFrame);
+                snapAnimationFrame = null;
+            }
+            isSnapping = false;
+            lastScrollY = window.scrollY;
+        };
+
+        const setActivePanel = (nextIndex) => {
+            if (nextIndex === activePanelIndex) return;
+            activePanelIndex = nextIndex;
+
+            panels.forEach((panel, index) => {
+                const shouldBeInert = index !== nextIndex;
+                if (shouldBeInert && panel.contains(document.activeElement)) {
+                    document.activeElement.blur();
+                }
+                panel.inert = shouldBeInert;
+            });
+        };
+
+        const hideChromeGuide = () => {
+            if (activeChromePanel !== null) {
+                chromeStoryGroupRefs.current.get(activeChromePanel)?.classList.remove('is-active');
+            }
+            activeChromePanel = null;
+            chromeOverlay.classList.remove('is-visible');
+            chromeStar.style.opacity = '0';
+        };
+
+        const updateChromeGuide = (position) => {
+            const phase = position.phase;
+            if (!phase || phase.type !== 'hold' || phase.panel < 2) {
+                hideChromeGuide();
+                return;
+            }
+
+            const panel = phase.panel;
+            const path = chromeStoryPathRefs.current.get(panel);
+            const group = chromeStoryGroupRefs.current.get(panel);
+            if (!path || !group) {
+                hideChromeGuide();
+                return;
+            }
+
+            if (activeChromePanel !== panel) {
+                if (activeChromePanel !== null) {
+                    chromeStoryGroupRefs.current
+                        .get(activeChromePanel)
+                        ?.classList.remove('is-active');
+                }
+                group.classList.add('is-active');
+                activeChromePanel = panel;
+            }
+
+            const progress = position.holdProgress;
+            group.style.setProperty('--chrome-path-progress', progress.toFixed(4));
+
+            let pathLength = chromePathLengths.get(panel);
+            if (!pathLength) {
+                pathLength = path.getTotalLength();
+                chromePathLengths.set(panel, pathLength);
+            }
+
+            const point = path.getPointAtLength(pathLength * progress);
+            const tangentDistance = Math.min(3, pathLength * 0.01);
+            const previousPoint = path.getPointAtLength(
+                Math.max(0, pathLength * progress - tangentDistance)
+            );
+            const nextPoint = path.getPointAtLength(
+                Math.min(pathLength, pathLength * progress + tangentDistance)
+            );
+            const angle =
+                (Math.atan2(nextPoint.y - previousPoint.y, nextPoint.x - previousPoint.x) *
+                    180) /
+                Math.PI;
+
+            chromeStar.setAttribute(
+                'transform',
+                `translate(${point.x} ${point.y}) rotate(${angle}) translate(-43 -43)`
+            );
+            chromeStar.style.opacity = '1';
+            chromeOverlay.classList.add('is-visible');
+        };
+
+        const resetStory = () => {
+            cancelSnap();
+            isHorizontal = false;
+            activePanelIndex = -1;
+            story.classList.remove('is-horizontal');
+            story.style.removeProperty('height');
+            story.style.removeProperty('--horizontal-panel-width');
+            story.style.removeProperty('--horizontal-hold-progress');
+            story.removeAttribute('data-horizontal-phase');
+            track.style.removeProperty('transform');
+            hideChromeGuide();
+            timeline = [];
+            panelAlignmentDistances = [];
+            panels.forEach((panel) => {
+                panel.inert = false;
+            });
+        };
+
+        const getTimelinePosition = (scrollDistance) => {
+            const clampedDistance = Math.min(verticalScrollDistance, Math.max(0, scrollDistance));
+            const phase =
+                timeline.find(({ end }) => clampedDistance < end) ?? timeline[timeline.length - 1];
+
+            if (!phase) {
+                return {
+                    activePanel: 0,
+                    holdProgress: 0,
+                    offset: 0,
+                    phase: null,
+                };
+            }
+
+            const phaseProgress = Math.min(
+                1,
+                Math.max(0, (clampedDistance - phase.start) / phase.distance)
+            );
+
+            if (phase.type === 'hold') {
+                return {
+                    activePanel: phase.panel,
+                    holdProgress: phaseProgress,
+                    offset: phase.offset,
+                    phase,
+                };
+            }
+
+            return {
+                activePanel: phaseProgress < 0.5 ? phase.from : phase.to,
+                holdProgress: phase.from >= 2 ? 1 : 0,
+                offset: phase.fromOffset + (phase.toOffset - phase.fromOffset) * phaseProgress,
+                phase,
+            };
+        };
+
+        const updateStory = () => {
+            animationFrame = null;
+            if (!isHorizontal) return;
+
+            const scrollDistance = window.scrollY - storyStart;
+            const position = getTimelinePosition(scrollDistance);
+            const offset = Math.min(horizontalTravelDistance, position.offset);
+            track.style.transform = `translate3d(${-offset}px, 0, 0)`;
+            story.style.setProperty('--horizontal-hold-progress', position.holdProgress.toFixed(4));
+            story.dataset.horizontalPhase = position.phase?.type ?? 'transition';
+            setActivePanel(position.activePanel);
+            if (scrollDistance > verticalScrollDistance) {
+                hideChromeGuide();
+            } else {
+                updateChromeGuide(position);
+            }
+        };
+
+        const scheduleUpdate = () => {
+            if (animationFrame === null) {
+                animationFrame = window.requestAnimationFrame(updateStory);
+            }
+        };
+
+        const snapToNearestPanel = () => {
+            snapTimer = null;
+            if (!isHorizontal || isSnapping) return;
+
+            const currentY = window.scrollY;
+            const storyEnd = storyStart + verticalScrollDistance;
+            if (currentY < storyStart || currentY > storyEnd) return;
+
+            const currentDistance = currentY - storyStart;
+            const { phase } = getTimelinePosition(currentDistance);
+            if (!phase || phase.type !== 'transition') return;
+
+            const distanceFromStart = currentDistance - phase.start;
+            const distanceToEnd = phase.end - currentDistance;
+            const targetDistance = distanceFromStart <= distanceToEnd ? phase.start : phase.end;
+            const targetY = storyStart + targetDistance;
+            const distance = targetY - currentY;
+            const absoluteDistance = Math.abs(distance);
+            const snapThreshold = phase.distance * 0.3;
+            const reverseCorrectionThreshold = phase.distance * 0.04;
+            const movesAgainstDirection =
+                (lastScrollDirection > 0 && distance < 0) ||
+                (lastScrollDirection < 0 && distance > 0);
+
+            if (
+                absoluteDistance < 1 ||
+                absoluteDistance > snapThreshold ||
+                (movesAgainstDirection && absoluteDistance > reverseCorrectionThreshold)
+            ) {
+                return;
+            }
+
+            const startY = currentY;
+            const distanceRatio = Math.min(1, absoluteDistance / snapThreshold);
+            const duration = Math.min(520, Math.max(320, 300 + Math.sqrt(distanceRatio) * 220));
+            let startTime = null;
+            isSnapping = true;
+
+            const animateSnap = (time) => {
+                if (!isSnapping) return;
+                if (startTime === null) startTime = time;
+
+                const progress = Math.min(1, (time - startTime) / duration);
+                const easedProgress =
+                    progress * progress * progress * (progress * (progress * 6 - 15) + 10);
+                window.scrollTo({
+                    top: startY + distance * easedProgress,
+                    behavior: 'instant',
+                });
+
+                if (progress < 1) {
+                    snapAnimationFrame = window.requestAnimationFrame(animateSnap);
+                    return;
+                }
+
+                snapAnimationFrame = null;
+                isSnapping = false;
+                lastScrollY = targetY;
+                updateStory();
+            };
+
+            snapAnimationFrame = window.requestAnimationFrame(animateSnap);
+        };
+
+        const scheduleSnap = () => {
+            if (!isHorizontal || isSnapping) return;
+            if (snapTimer !== null) window.clearTimeout(snapTimer);
+            snapTimer = window.setTimeout(snapToNearestPanel, 220);
+        };
+
+        const handleStoryScroll = () => {
+            const currentY = window.scrollY;
+            if (!isSnapping) {
+                const delta = currentY - lastScrollY;
+                if (Math.abs(delta) > 0.5) lastScrollDirection = Math.sign(delta);
+                scheduleSnap();
+            }
+            lastScrollY = currentY;
+            scheduleUpdate();
+        };
+
+        const handleScrollKeyInput = (event) => {
+            if (
+                ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(
+                    event.key
+                )
+            ) {
+                cancelSnap();
+            }
+        };
+
+        const measureStory = () => {
+            resetStory();
+
+            if (!desktopQuery.matches || reducedMotionQuery.matches || window.innerHeight < 820) {
+                return;
+            }
+
+            story.classList.add('is-horizontal');
+            chromePathLengths.clear();
+            const stageHeight = stage.clientHeight;
+            story.style.setProperty('--horizontal-panel-width', `${stage.clientWidth}px`);
+            const hasOverflowingPanel = panels.some(
+                (panel) => panel.scrollHeight > stageHeight + 2
+            );
+
+            if (hasOverflowingPanel) {
+                resetStory();
+                return;
+            }
+
+            horizontalTravelDistance = Math.max(0, track.scrollWidth - stage.clientWidth);
+            if (horizontalTravelDistance <= 0) {
+                resetStory();
+                return;
+            }
+
+            const stageWidth = stage.clientWidth;
+            const transitionDistance = stageWidth * 1.25;
+            const holdDistance = stageWidth * 0.75;
+            let timelineCursor = 0;
+
+            timeline = [];
+            panelAlignmentDistances = Array(panels.length).fill(0);
+
+            const addTransition = (from, to) => {
+                const start = timelineCursor;
+                const end = start + transitionDistance;
+                timeline.push({
+                    type: 'transition',
+                    from,
+                    to,
+                    fromOffset: panels[from].offsetLeft,
+                    toOffset: panels[to].offsetLeft,
+                    start,
+                    end,
+                    distance: transitionDistance,
+                });
+                timelineCursor = end;
+                panelAlignmentDistances[to] = end;
+            };
+
+            const addHold = (panel) => {
+                const start = timelineCursor;
+                const end = start + holdDistance;
+                timeline.push({
+                    type: 'hold',
+                    panel,
+                    offset: panels[panel].offsetLeft,
+                    start,
+                    end,
+                    distance: holdDistance,
+                });
+                timelineCursor = end;
+            };
+
+            addTransition(0, 1);
+            addTransition(1, 2);
+            for (let panel = 2; panel < panels.length; panel += 1) {
+                addHold(panel);
+                if (panel < panels.length - 1) addTransition(panel, panel + 1);
+            }
+
+            verticalScrollDistance = timelineCursor;
+            story.style.height = `${stageHeight + verticalScrollDistance}px`;
+            story.style.setProperty('--horizontal-panel-width', `${stage.clientWidth}px`);
+            if (panels.some((panel) => panel.scrollHeight > stageHeight + 2)) {
+                resetStory();
+                return;
+            }
+            horizontalTravelDistance = Math.max(0, track.scrollWidth - stage.clientWidth);
+            story.style.height = `${stageHeight + verticalScrollDistance}px`;
+            storyStart = story.offsetTop;
+            isHorizontal = true;
+            lastScrollY = window.scrollY;
+            updateStory();
+        };
+
+        const scrollToNintendoPanel = (behavior = 'auto') => {
+            if (!isHorizontal) return;
+            cancelSnap();
+            const target = track.querySelector('#nintendo');
+            if (!target) return;
+
+            const targetIndex = panels.indexOf(target);
+            const targetDistance = panelAlignmentDistances[targetIndex];
+            if (!Number.isFinite(targetDistance)) return;
+            window.scrollTo({
+                top: storyStart + targetDistance,
+                behavior,
+            });
+        };
+
+        const handleDocumentClick = (event) => {
+            const link = event.target.closest('a[href="#nintendo"]');
+            if (!link || !isHorizontal) return;
+
+            event.preventDefault();
+            if (window.location.hash !== '#nintendo') {
+                window.history.pushState(null, '', '#nintendo');
+            }
+            scrollToNintendoPanel('smooth');
+        };
+
+        const handleHistoryNavigation = () => {
+            if (window.location.hash === '#nintendo') {
+                scrollToNintendoPanel('auto');
+            }
+        };
+
+        const handleResize = () => {
+            const currentY = window.scrollY;
+            const shouldPreserveTimelinePosition =
+                isHorizontal &&
+                currentY >= storyStart &&
+                currentY <= storyStart + verticalScrollDistance;
+            const previousTimelineProgress = shouldPreserveTimelinePosition
+                ? (currentY - storyStart) / verticalScrollDistance
+                : null;
+
+            cancelSnap();
+            if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+            animationFrame = window.requestAnimationFrame(() => {
+                animationFrame = null;
+                measureStory();
+                if (window.location.hash === '#nintendo') {
+                    handleHistoryNavigation();
+                } else if (isHorizontal && previousTimelineProgress !== null) {
+                    window.scrollTo({
+                        top: storyStart + previousTimelineProgress * verticalScrollDistance,
+                        behavior: 'instant',
+                    });
+                    updateStory();
+                }
+            });
+        };
+
+        measureStory();
+        if (window.location.hash === '#nintendo') {
+            window.requestAnimationFrame(handleHistoryNavigation);
+        }
+
+        window.addEventListener('scroll', handleStoryScroll, { passive: true });
+        window.addEventListener('wheel', cancelSnap, { passive: true });
+        window.addEventListener('touchstart', cancelSnap, { passive: true });
+        window.addEventListener('pointerdown', cancelSnap, { passive: true });
+        window.addEventListener('keydown', handleScrollKeyInput);
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('popstate', handleHistoryNavigation);
+        desktopQuery.addEventListener('change', handleResize);
+        reducedMotionQuery.addEventListener('change', handleResize);
+        document.addEventListener('click', handleDocumentClick);
+
+        return () => {
+            window.removeEventListener('scroll', handleStoryScroll);
+            window.removeEventListener('wheel', cancelSnap);
+            window.removeEventListener('touchstart', cancelSnap);
+            window.removeEventListener('pointerdown', cancelSnap);
+            window.removeEventListener('keydown', handleScrollKeyInput);
+            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('popstate', handleHistoryNavigation);
+            desktopQuery.removeEventListener('change', handleResize);
+            reducedMotionQuery.removeEventListener('change', handleResize);
+            document.removeEventListener('click', handleDocumentClick);
+            if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+            cancelSnap();
+            resetStory();
+        };
+    }, []);
+
     useEffect(() => {
         const section = nintendoOverviewRef.current;
 
@@ -1474,9 +1969,6 @@ function App() {
     );
     const selectedDevelopmentImage = developmentPreview?.modalImages.find(
         (item) => item.key === activeDevelopmentImage
-    );
-    const selectedFinalOutcome = finalOutcomeViews.find(
-        (item) => item.key === activeFinalOutcome
     );
 
     return (
@@ -1642,628 +2134,782 @@ function App() {
                 </section>
 
                 <section className="project" id="work">
-                    <div
-                        className={`selected-works-heading section${isSelectedWorksTitleVisible ? ' is-visible' : ''}`}
-                        ref={selectedWorksRef}
-                    >
-                        <div className="section-index section-index--light">
-                            <span>02</span>
-                            <span>Selected works</span>
-                        </div>
-                        <div className="selected-works-layout">
-                            <h2 ref={selectedWorksTitleRef}>
-                                <span className="selected-works-title-primary">SELECTED</span>
-                                <span className="selected-works-title-serif">WORKS</span>
-                            </h2>
-                            <div className="selected-works-intro">
-                                <p className="selected-works-intro__lead">
-                                    아이디어를 실제 웹 경험으로 연결한 프로젝트들.
-                                </p>
-                                <p className="selected-works-intro__meta">
-                                    UI DESIGN · WEB PUBLISHING
-                                </p>
-                                <div className="selected-works-intro__line" />
-                                <ol className="selected-works-intro__list">
-                                    <li>
-                                        <a href="#nintendo">
-                                            <span>01</span>
-                                            <span>Nintendo</span>
-                                            <span aria-hidden="true">↗</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#diptyque">
-                                            <span>02</span>
-                                            <span>Diptyque</span>
-                                            <span aria-hidden="true">↗</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#swarovski">
-                                            <span>03</span>
-                                            <span>Swarovski</span>
-                                            <span aria-hidden="true">↗</span>
-                                        </a>
-                                    </li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="project-hero section" id="nintendo">
-                        <div className="section-index section-index--light">
-                            <span>01</span>
-                            <span>Team Project</span>
-                        </div>
-                        <div className="nintendo-intro">
-                            <div className="nintendo-intro__visual">
-                                <span className="nintendo-intro__orbit" aria-hidden="true" />
-                                <span className="nintendo-intro__sparkle" aria-hidden="true">
-                                    ✦
-                                </span>
-                                <img
-                                    src="/images/nintendo/nintendo-macbook.png"
-                                    alt="닌텐도 리뉴얼 메인 페이지가 표시된 맥북 목업"
-                                />
-                            </div>
-                            <div className="nintendo-intro__content">
-                                <div className="nintendo-intro__title">
-                                    <p className="eyebrow">01 / Team Project</p>
-                                    <h2>NINTENDO</h2>
-                                    <p>Website Renewal</p>
-                                </div>
-
-                                <div className="nintendo-intro__block">
-                                    <h3>Project Brief</h3>
-                                    <p>
-                                        닌텐도의 다양한 캐릭터 IP를 중심으로 브랜드 경험을 강화하고,
-                                        게임 탐색 구조와 인터랙션을 개선한 웹사이트 리뉴얼
-                                        프로젝트입니다.
-                                    </p>
-                                </div>
-
-                                <div className="nintendo-intro__block">
-                                    <h3>Project Information</h3>
-                                    <dl className="nintendo-info-list">
-                                        <div>
-                                            <dt>Type</dt>
-                                            <dd>Team Project</dd>
-                                        </div>
-                                        <div>
-                                            <dt>Period</dt>
-                                            <dd>2026.09.02 – 2026.09.30 · 4 Weeks</dd>
-                                        </div>
-                                        <div>
-                                            <dt>Role</dt>
-                                            <dd>
-                                                UI/UX Design · Frontend Development · Team
-                                                Collaboration
-                                            </dd>
-                                        </div>
-                                    </dl>
-                                </div>
-
-                                <div className="nintendo-intro__block">
-                                    <h3>Project Keywords</h3>
-                                    <ul className="nintendo-keyword-list">
-                                        <li>Character IP</li>
-                                        <li>Game Discovery</li>
-                                        <li>Interactive Experience</li>
-                                    </ul>
-                                </div>
-
-                                <div className="nintendo-intro__actions">
-                                    <a
-                                        href="https://mbc-teamproject-red.vercel.app/"
-                                        target="_blank"
-                                        rel="noreferrer"
-                                    >
-                                        Website <span aria-hidden="true">↗</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="nintendo-experience section">
-                        <div className="nintendo-experience__visual">
-                            <div className="nintendo-experience__backdrops" aria-hidden="true">
-                                <img
-                                    className="nintendo-experience__backdrop nintendo-experience__backdrop--one"
-                                    src="/images/nintendo/nintendo-amiibo.png"
-                                    alt=""
-                                />
-                                <img
-                                    className="nintendo-experience__backdrop nintendo-experience__backdrop--two"
-                                    src="/images/nintendo/nintendo-game.png"
-                                    alt=""
-                                />
-                            </div>
-                            <div className="nintendo-video-mockup">
-                                <div className="nintendo-video-mockup__screen">
-                                    <video
-                                        autoPlay
-                                        muted
-                                        loop
-                                        playsInline
-                                        preload="metadata"
-                                        aria-label="닌텐도 리뉴얼 웹사이트 메인 페이지 시연 영상"
-                                    >
-                                        <source
-                                            src="/videos/nintendo/nintendo-main.mp4"
-                                            type="video/mp4"
-                                        />
-                                        브라우저에서 영상을 재생할 수 없습니다.
-                                    </video>
-                                </div>
-                                <img
-                                    className="nintendo-video-mockup__frame"
-                                    src="/images/nintendo/nintendo-macbook-frame.png"
-                                    alt=""
-                                    aria-hidden="true"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="nintendo-experience__copy">
-                            <p className="eyebrow">02 / Design Experience</p>
-                            <h3>
-                                <span className="nintendo-experience__title-primary">
-                                    PLAYFUL WORLDS,
-                                </span>
-                                <span className="nintendo-experience__title-serif">
-                                    Reimagined.
-                                </span>
-                            </h3>
-                            <p className="nintendo-experience__lead">
-                                게임을 탐색하는 순간부터 시작되는 즐거움.
-                            </p>
-                            <p className="nintendo-experience__description">
-                                캐릭터 IP를 중심으로 콘텐츠를 재구성하고, 게임 탐색부터 다양한
-                                인터랙션까지 닌텐도만의 즐거움을 웹 경험 전반에 담아냈습니다.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="nintendo-character section">
-                        <div className="nintendo-character__inner">
-                            <div className="nintendo-character__copy">
-                                <p className="eyebrow">03 / Character Interaction</p>
-                                <h3>
-                                    <span className="nintendo-character__title-primary">
-                                        CHARACTER
-                                    </span>
-                                    <span className="nintendo-character__title-serif">
-                                        interaction.
-                                    </span>
-                                </h3>
-                                <p className="nintendo-character__lead">
-                                    캐릭터를 선택하는 순간,
-                                    <br className="nintendo-character__lead-break" /> 새로운
-                                    플레이가 시작됩니다.
-                                </p>
-                                <p className="nintendo-character__description">
-                                    마리오와 친구들을 직접 선택하고, 아이템에 따라 변화하는 캐릭터를
-                                    경험할 수 있도록 구성했습니다. 스크롤과 선택 인터랙션을 통해
-                                    게임 속 플레이의 즐거움을 웹에서도 느낄 수 있도록 설계했습니다.
-                                </p>
-                            </div>
-
-                            <div className="nintendo-character__visual">
-                                <div className="nintendo-character__imac">
-                                    <div className="nintendo-character__imac-screen">
-                                        <video
-                                            autoPlay
-                                            muted
-                                            loop
-                                            playsInline
-                                            preload="metadata"
-                                            aria-label="마리오 서브페이지 캐릭터 인터랙션 시연 영상"
-                                        >
-                                            <source
-                                                src="/videos/nintendo/mario-interaction.mp4"
-                                                type="video/mp4"
-                                            />
-                                            브라우저에서 영상을 재생할 수 없습니다.
-                                        </video>
-                                    </div>
-                                    <img
-                                        className="nintendo-character__imac-frame"
-                                        src="/images/nintendo/nintendo-imac-frame.png"
-                                        alt=""
-                                        aria-hidden="true"
-                                    />
-                                </div>
-                                <ul
-                                    className="nintendo-character__keywords"
-                                    aria-label="캐릭터 인터랙션 키워드"
-                                >
-                                    <li>Character Select</li>
-                                    <li>Power-Up</li>
-                                    <li>Scroll Interaction</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="nintendo-comparison section">
-                        <div className="nintendo-comparison__main">
-                            <div className="nintendo-comparison__header">
-                                <p className="eyebrow">04 / Before &amp; After</p>
-                                <h3>
-                                    <span className="nintendo-comparison__title-primary">
-                                        BEFORE &amp;
-                                    </span>
-                                    <span className="nintendo-comparison__title-serif">After.</span>
-                                </h3>
-                                <div className="nintendo-comparison__copy">
-                                    <p>정보를 전달하는 웹에서, 캐릭터를 경험하는 웹으로.</p>
-                                    <p>
-                                        기존 닌텐도 웹사이트의 게임별 배너와 소식 중심 구성을 캐릭터
-                                        IP 중심의 경험으로 재구성했습니다. 직관적인 게임 탐색과
-                                        스크롤 인터랙션을 더해, 정보를 확인하는 과정을 브랜드를 직접
-                                        경험하는 순간으로 확장했습니다.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="nintendo-comparison__visual">
+                    <div className="horizontal-story" ref={horizontalStoryRef}>
+                        <div className="horizontal-story__stage" ref={horizontalStoryStageRef}>
+                            <div className="horizontal-story__track" ref={horizontalStoryTrackRef}>
                                 <div
-                                    className="nintendo-comparison__frame"
-                                    style={{
-                                        '--comparison-position': `${nintendoComparePosition}%`,
-                                    }}
+                                    className={`selected-works-heading section${isSelectedWorksTitleVisible ? ' is-visible' : ''}`}
+                                    ref={selectedWorksRef}
                                 >
-                                    <img
-                                        className="nintendo-comparison__image nintendo-comparison__image--before"
-                                        src="/images/nintendo/nintendo-before.png"
-                                        alt="리뉴얼 이전 닌텐도 웹사이트"
-                                        draggable="false"
-                                    />
-                                    <img
-                                        className="nintendo-comparison__image nintendo-comparison__image--after"
-                                        src="/images/nintendo/nintendo-after.png"
-                                        alt="리뉴얼 이후 닌텐도 웹사이트"
-                                        draggable="false"
-                                    />
-                                    <span className="nintendo-comparison__label nintendo-comparison__label--before">
-                                        Before
-                                    </span>
-                                    <span className="nintendo-comparison__label nintendo-comparison__label--after">
-                                        After
-                                    </span>
-                                    <div
-                                        className="nintendo-comparison__divider"
-                                        aria-hidden="true"
-                                    >
-                                        <span>↔</span>
+                                    <div className="section-index section-index--light">
+                                        <span>02</span>
+                                        <span>Selected works</span>
                                     </div>
-                                    <input
-                                        className="nintendo-comparison__range"
-                                        type="range"
-                                        min="0"
-                                        max="100"
-                                        step="1"
-                                        value={nintendoComparePosition}
-                                        onChange={(event) =>
-                                            setNintendoComparePosition(Number(event.target.value))
-                                        }
-                                        aria-label="Before와 After 이미지 비교 위치"
-                                    />
+                                    <div className="selected-works-layout">
+                                        <h2 ref={selectedWorksTitleRef}>
+                                            <span className="selected-works-title-primary">
+                                                SELECTED
+                                            </span>
+                                            <span className="selected-works-title-serif">
+                                                WORKS
+                                            </span>
+                                        </h2>
+                                        <div className="selected-works-intro">
+                                            <p className="selected-works-intro__lead">
+                                                아이디어를 실제 웹 경험으로 연결한 프로젝트들.
+                                            </p>
+                                            <p className="selected-works-intro__meta">
+                                                UI DESIGN · WEB PUBLISHING
+                                            </p>
+                                            <div className="selected-works-intro__line" />
+                                            <ol className="selected-works-intro__list">
+                                                <li>
+                                                    <a href="#nintendo">
+                                                        <span>01</span>
+                                                        <span>Nintendo</span>
+                                                        <span aria-hidden="true">↗</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="#diptyque">
+                                                        <span>02</span>
+                                                        <span>Diptyque</span>
+                                                        <span aria-hidden="true">↗</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="#swarovski">
+                                                        <span>03</span>
+                                                        <span>Swarovski</span>
+                                                        <span aria-hidden="true">↗</span>
+                                                    </a>
+                                                </li>
+                                            </ol>
+                                        </div>
+                                    </div>
                                 </div>
-                                <p className="nintendo-comparison__hint">
-                                    Drag to compare <span aria-hidden="true">↔</span>
-                                </p>
-                            </div>
-                        </div>
-
-                        <ol className="nintendo-comparison__points">
-                            <li>
-                                <span>01</span>
-                                <div>
-                                    <strong>Character IP</strong>
-                                    <h4>캐릭터 중심의 브랜드 경험</h4>
-                                    <p>
-                                        게임별 정보 중심에서 벗어나, 닌텐도의 캐릭터를 전면에 배치해
-                                        브랜드의 개성을 강화했습니다.
-                                    </p>
-                                </div>
-                            </li>
-                            <li>
-                                <span>02</span>
-                                <div>
-                                    <strong>Game Discovery</strong>
-                                    <h4>더 직관적인 게임 탐색</h4>
-                                    <p>
-                                        게임을 시각적으로 탐색할 수 있도록 콘텐츠를 재구성해 원하는
-                                        게임을 발견하는 과정을 개선했습니다.
-                                    </p>
-                                </div>
-                            </li>
-                            <li>
-                                <span>03</span>
-                                <div>
-                                    <strong>Interactive Experience</strong>
-                                    <h4>스크롤로 이어지는 플레이 경험</h4>
-                                    <p>
-                                        스크롤에 반응하는 캐릭터와 콘텐츠 연출을 통해 탐색 과정에도
-                                        즐거움을 더했습니다.
-                                    </p>
-                                </div>
-                            </li>
-                        </ol>
-                    </div>
-
-                    <div className="nintendo-contribution section">
-                        <header className="nintendo-contribution__header">
-                            <p className="eyebrow">05 / My Contribution</p>
-                            <div className="nintendo-contribution__heading">
-                                <h3>
-                                    <span>WHAT I</span> <em>did.</em>
-                                </h3>
-                                <p>프로젝트 속에서 직접 참여한 디자인과 구현 작업</p>
-                            </div>
-                        </header>
-
-                        <div className="nintendo-contribution__content">
-                            <article className="nintendo-contribution__featured">
-                                <div className="nintendo-contribution__featured-media">
-                                    <a
-                                        className="nintendo-contribution__media-link nintendo-contribution__media-link--featured"
-                                        href={nintendoContributionItems[0].href}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        aria-label="마리오 서브페이지 새 탭에서 보기"
-                                    >
-                                        <video
-                                            autoPlay
-                                            muted
-                                            loop
-                                            playsInline
-                                            preload="metadata"
-                                            aria-label={nintendoContributionItems[0].media.label}
-                                        >
-                                            <source
-                                                src={nintendoContributionItems[0].media.src}
-                                                type="video/mp4"
+                                <div className="project-hero section" id="nintendo">
+                                    <div className="section-index section-index--light">
+                                        <span>01</span>
+                                        <span>Team Project</span>
+                                    </div>
+                                    <div className="nintendo-intro">
+                                        <div className="nintendo-intro__visual">
+                                            <span
+                                                className="nintendo-intro__orbit"
+                                                aria-hidden="true"
                                             />
-                                            브라우저에서 영상을 재생할 수 없습니다.
-                                        </video>
-                                        <span className="nintendo-contribution__view-project">
-                                            View Project ↗
-                                        </span>
-                                    </a>
-                                </div>
-                                <div className="nintendo-contribution__featured-copy">
-                                    <p className="nintendo-contribution__index">
-                                        {nintendoContributionItems[0].number} /{' '}
-                                        {nintendoContributionItems[0].label}
-                                    </p>
-                                    <h4>{nintendoContributionItems[0].title}</h4>
-                                    <ul className="nintendo-contribution__tags">
-                                        {nintendoContributionItems[0].tags.map((tag) => (
-                                            <li key={tag}>{tag}</li>
-                                        ))}
-                                    </ul>
-                                    <p className="nintendo-contribution__description">
-                                        {nintendoContributionItems[0].description}
-                                    </p>
-                                </div>
-                            </article>
+                                            <span
+                                                className="nintendo-intro__sparkle"
+                                                aria-hidden="true"
+                                            >
+                                                ✦
+                                            </span>
+                                            <img
+                                                src="/images/nintendo/nintendo-macbook.png"
+                                                alt="닌텐도 리뉴얼 메인 페이지가 표시된 맥북 목업"
+                                            />
+                                        </div>
+                                        <div className="nintendo-intro__content">
+                                            <div className="nintendo-intro__title">
+                                                <p className="eyebrow">01 / Team Project</p>
+                                                <h2>NINTENDO</h2>
+                                                <p>Website Renewal</p>
+                                            </div>
 
-                            <div className="nintendo-contribution__details">
-                                {nintendoContributionItems.slice(1).map((item) => (
-                                    <article
-                                        className="nintendo-contribution__detail"
-                                        key={item.label}
-                                    >
-                                        <div className="nintendo-contribution__detail-media">
-                                            {item.media ? (
+                                            <div className="nintendo-intro__block">
+                                                <h3>Project Brief</h3>
+                                                <p>
+                                                    닌텐도의 다양한 캐릭터 IP를 중심으로 브랜드
+                                                    경험을 강화하고, 게임 탐색 구조와 인터랙션을
+                                                    개선한 웹사이트 리뉴얼 프로젝트입니다.
+                                                </p>
+                                            </div>
+
+                                            <div className="nintendo-intro__block">
+                                                <h3>Project Information</h3>
+                                                <dl className="nintendo-info-list">
+                                                    <div>
+                                                        <dt>Type</dt>
+                                                        <dd>Team Project</dd>
+                                                    </div>
+                                                    <div>
+                                                        <dt>Period</dt>
+                                                        <dd>2026.09.02 – 2026.09.30 · 4 Weeks</dd>
+                                                    </div>
+                                                    <div>
+                                                        <dt>Role</dt>
+                                                        <dd>
+                                                            UI/UX Design · Frontend Development ·
+                                                            Team Collaboration
+                                                        </dd>
+                                                    </div>
+                                                </dl>
+                                            </div>
+
+                                            <div className="nintendo-intro__block">
+                                                <h3>Project Keywords</h3>
+                                                <ul className="nintendo-keyword-list">
+                                                    <li>Character IP</li>
+                                                    <li>Game Discovery</li>
+                                                    <li>Interactive Experience</li>
+                                                </ul>
+                                            </div>
+
+                                            <div className="nintendo-intro__actions">
                                                 <a
-                                                    className="nintendo-contribution__media-link"
-                                                    href={item.href}
+                                                    href="https://mbc-teamproject-red.vercel.app/"
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                >
+                                                    Website <span aria-hidden="true">↗</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="nintendo-experience section">
+                                    <div className="nintendo-experience__visual">
+                                        <div
+                                            className="nintendo-experience__backdrops"
+                                            aria-hidden="true"
+                                        >
+                                            <img
+                                                className="nintendo-experience__backdrop nintendo-experience__backdrop--one"
+                                                src="/images/nintendo/nintendo-amiibo.png"
+                                                alt=""
+                                            />
+                                            <img
+                                                className="nintendo-experience__backdrop nintendo-experience__backdrop--two"
+                                                src="/images/nintendo/nintendo-game.png"
+                                                alt=""
+                                            />
+                                        </div>
+                                        <div className="nintendo-video-mockup">
+                                            <div className="nintendo-video-mockup__screen">
+                                                <video
+                                                    autoPlay
+                                                    muted
+                                                    loop
+                                                    playsInline
+                                                    preload="metadata"
+                                                    aria-label="닌텐도 리뉴얼 웹사이트 메인 페이지 시연 영상"
+                                                >
+                                                    <source
+                                                        src="/videos/nintendo/nintendo-main.mp4"
+                                                        type="video/mp4"
+                                                    />
+                                                    브라우저에서 영상을 재생할 수 없습니다.
+                                                </video>
+                                            </div>
+                                            <img
+                                                className="nintendo-video-mockup__frame"
+                                                src="/images/nintendo/nintendo-macbook-frame.png"
+                                                alt=""
+                                                aria-hidden="true"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="nintendo-experience__copy">
+                                        <p className="eyebrow">02 / Design Experience</p>
+                                        <h3>
+                                            <span className="nintendo-experience__title-primary">
+                                                PLAYFUL WORLDS,
+                                            </span>
+                                            <span className="nintendo-experience__title-serif">
+                                                Reimagined.
+                                            </span>
+                                        </h3>
+                                        <p className="nintendo-experience__lead">
+                                            게임을 탐색하는 순간부터 시작되는 즐거움.
+                                        </p>
+                                        <p className="nintendo-experience__description">
+                                            캐릭터 IP를 중심으로 콘텐츠를 재구성하고, 게임 탐색부터
+                                            다양한 인터랙션까지 닌텐도만의 즐거움을 웹 경험 전반에
+                                            담아냈습니다.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="nintendo-character section">
+                                    <div className="nintendo-character__inner">
+                                        <div className="nintendo-character__copy">
+                                            <p className="eyebrow">03 / Character Interaction</p>
+                                            <h3>
+                                                <span className="nintendo-character__title-primary">
+                                                    CHARACTER
+                                                </span>
+                                                <span className="nintendo-character__title-serif">
+                                                    interaction.
+                                                </span>
+                                            </h3>
+                                            <p className="nintendo-character__lead">
+                                                캐릭터를 선택하는 순간,
+                                                <br className="nintendo-character__lead-break" />{' '}
+                                                새로운 플레이가 시작됩니다.
+                                            </p>
+                                            <p className="nintendo-character__description">
+                                                마리오와 친구들을 직접 선택하고, 아이템에 따라
+                                                변화하는 캐릭터를 경험할 수 있도록 구성했습니다.
+                                                스크롤과 선택 인터랙션을 통해 게임 속 플레이의
+                                                즐거움을 웹에서도 느낄 수 있도록 설계했습니다.
+                                            </p>
+                                        </div>
+
+                                        <div className="nintendo-character__visual">
+                                            <div className="nintendo-character__imac">
+                                                <div className="nintendo-character__imac-screen">
+                                                    <video
+                                                        autoPlay
+                                                        muted
+                                                        loop
+                                                        playsInline
+                                                        preload="metadata"
+                                                        aria-label="마리오 서브페이지 캐릭터 인터랙션 시연 영상"
+                                                    >
+                                                        <source
+                                                            src="/videos/nintendo/mario-interaction.mp4"
+                                                            type="video/mp4"
+                                                        />
+                                                        브라우저에서 영상을 재생할 수 없습니다.
+                                                    </video>
+                                                </div>
+                                                <img
+                                                    className="nintendo-character__imac-frame"
+                                                    src="/images/nintendo/nintendo-imac-frame.png"
+                                                    alt=""
+                                                    aria-hidden="true"
+                                                />
+                                            </div>
+                                            <ul
+                                                className="nintendo-character__keywords"
+                                                aria-label="캐릭터 인터랙션 키워드"
+                                            >
+                                                <li>Character Select</li>
+                                                <li>Power-Up</li>
+                                                <li>Scroll Interaction</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="nintendo-comparison section">
+                                    <div className="nintendo-comparison__main">
+                                        <div className="nintendo-comparison__header">
+                                            <p className="eyebrow">04 / Before &amp; After</p>
+                                            <h3>
+                                                <span className="nintendo-comparison__title-primary">
+                                                    BEFORE &amp;
+                                                </span>
+                                                <span className="nintendo-comparison__title-serif">
+                                                    After.
+                                                </span>
+                                            </h3>
+                                            <div className="nintendo-comparison__copy">
+                                                <p>
+                                                    정보를 전달하는 웹에서, 캐릭터를 경험하는
+                                                    웹으로.
+                                                </p>
+                                                <p>
+                                                    기존 닌텐도 웹사이트의 게임별 배너와 소식 중심
+                                                    구성을 캐릭터 IP 중심의 경험으로 재구성했습니다.
+                                                    직관적인 게임 탐색과 스크롤 인터랙션을 더해,
+                                                    정보를 확인하는 과정을 브랜드를 직접 경험하는
+                                                    순간으로 확장했습니다.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="nintendo-comparison__visual">
+                                            <div
+                                                className="nintendo-comparison__frame"
+                                                style={{
+                                                    '--comparison-position': `${nintendoComparePosition}%`,
+                                                }}
+                                            >
+                                                <img
+                                                    className="nintendo-comparison__image nintendo-comparison__image--before"
+                                                    src="/images/nintendo/nintendo-before.png"
+                                                    alt="리뉴얼 이전 닌텐도 웹사이트"
+                                                    draggable="false"
+                                                />
+                                                <img
+                                                    className="nintendo-comparison__image nintendo-comparison__image--after"
+                                                    src="/images/nintendo/nintendo-after.png"
+                                                    alt="리뉴얼 이후 닌텐도 웹사이트"
+                                                    draggable="false"
+                                                />
+                                                <span className="nintendo-comparison__label nintendo-comparison__label--before">
+                                                    Before
+                                                </span>
+                                                <span className="nintendo-comparison__label nintendo-comparison__label--after">
+                                                    After
+                                                </span>
+                                                <div
+                                                    className="nintendo-comparison__divider"
+                                                    aria-hidden="true"
+                                                >
+                                                    <span>↔</span>
+                                                </div>
+                                                <input
+                                                    className="nintendo-comparison__range"
+                                                    type="range"
+                                                    min="0"
+                                                    max="100"
+                                                    step="1"
+                                                    value={nintendoComparePosition}
+                                                    onChange={(event) =>
+                                                        setNintendoComparePosition(
+                                                            Number(event.target.value)
+                                                        )
+                                                    }
+                                                    aria-label="Before와 After 이미지 비교 위치"
+                                                />
+                                            </div>
+                                            <p className="nintendo-comparison__hint">
+                                                Drag to compare <span aria-hidden="true">↔</span>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <ol className="nintendo-comparison__points">
+                                        <li>
+                                            <span>01</span>
+                                            <div>
+                                                <strong>Character IP</strong>
+                                                <h4>캐릭터 중심의 브랜드 경험</h4>
+                                                <p>
+                                                    게임별 정보 중심에서 벗어나, 닌텐도의 캐릭터를
+                                                    전면에 배치해 브랜드의 개성을 강화했습니다.
+                                                </p>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <span>02</span>
+                                            <div>
+                                                <strong>Game Discovery</strong>
+                                                <h4>더 직관적인 게임 탐색</h4>
+                                                <p>
+                                                    게임을 시각적으로 탐색할 수 있도록 콘텐츠를
+                                                    재구성해 원하는 게임을 발견하는 과정을
+                                                    개선했습니다.
+                                                </p>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <span>03</span>
+                                            <div>
+                                                <strong>Interactive Experience</strong>
+                                                <h4>스크롤로 이어지는 플레이 경험</h4>
+                                                <p>
+                                                    스크롤에 반응하는 캐릭터와 콘텐츠 연출을 통해
+                                                    탐색 과정에도 즐거움을 더했습니다.
+                                                </p>
+                                            </div>
+                                        </li>
+                                    </ol>
+                                </div>
+
+                                <div className="nintendo-contribution section">
+                                    <header className="nintendo-contribution__header">
+                                        <p className="eyebrow">05 / My Contribution</p>
+                                        <div className="nintendo-contribution__heading">
+                                            <h3>
+                                                <span>WHAT I</span> <em>did.</em>
+                                            </h3>
+                                            <p>프로젝트 속에서 직접 참여한 디자인과 구현 작업</p>
+                                        </div>
+                                    </header>
+
+                                    <div className="nintendo-contribution__content">
+                                        <article className="nintendo-contribution__featured">
+                                            <div className="nintendo-contribution__featured-media">
+                                                <a
+                                                    className="nintendo-contribution__media-link nintendo-contribution__media-link--featured"
+                                                    href={nintendoContributionItems[0].href}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    aria-label={`${item.title} 새 탭에서 보기`}
+                                                    aria-label="마리오 서브페이지 새 탭에서 보기"
                                                 >
-                                                    {item.media.type === 'video' ? (
-                                                        <video
-                                                            autoPlay
-                                                            muted
-                                                            loop
-                                                            playsInline
-                                                            preload="metadata"
-                                                            aria-label={item.media.label}
-                                                        >
-                                                            <source
-                                                                src={item.media.src}
-                                                                type="video/mp4"
-                                                            />
-                                                            브라우저에서 영상을 재생할 수 없습니다.
-                                                        </video>
-                                                    ) : (
-                                                        <img
-                                                            src={item.media.src}
-                                                            alt={item.media.label}
+                                                    <video
+                                                        autoPlay
+                                                        muted
+                                                        loop
+                                                        playsInline
+                                                        preload="metadata"
+                                                        aria-label={
+                                                            nintendoContributionItems[0].media.label
+                                                        }
+                                                    >
+                                                        <source
+                                                            src={
+                                                                nintendoContributionItems[0].media
+                                                                    .src
+                                                            }
+                                                            type="video/mp4"
                                                         />
-                                                    )}
+                                                        브라우저에서 영상을 재생할 수 없습니다.
+                                                    </video>
                                                     <span className="nintendo-contribution__view-project">
                                                         View Project ↗
                                                     </span>
                                                 </a>
-                                            ) : (
-                                                <span>Image Slot</span>
-                                            )}
-                                        </div>
-                                        <div className="nintendo-contribution__detail-copy">
-                                            <p className="nintendo-contribution__index">
-                                                {item.number} / {item.label}
-                                            </p>
-                                            <h4>{item.title}</h4>
-                                            {item.tags.length > 0 && (
+                                            </div>
+                                            <div className="nintendo-contribution__featured-copy">
+                                                <p className="nintendo-contribution__index">
+                                                    {nintendoContributionItems[0].number} /{' '}
+                                                    {nintendoContributionItems[0].label}
+                                                </p>
+                                                <h4>{nintendoContributionItems[0].title}</h4>
                                                 <ul className="nintendo-contribution__tags">
-                                                    {item.tags.map((tag) => (
-                                                        <li key={tag}>{tag}</li>
-                                                    ))}
+                                                    {nintendoContributionItems[0].tags.map(
+                                                        (tag) => (
+                                                            <li key={tag}>{tag}</li>
+                                                        )
+                                                    )}
                                                 </ul>
-                                            )}
-                                            <p className="nintendo-contribution__description">
-                                                {item.description}
-                                            </p>
+                                                <p className="nintendo-contribution__description">
+                                                    {nintendoContributionItems[0].description}
+                                                </p>
+                                            </div>
+                                        </article>
+
+                                        <div className="nintendo-contribution__details">
+                                            {nintendoContributionItems.slice(1).map((item) => (
+                                                <article
+                                                    className="nintendo-contribution__detail"
+                                                    key={item.label}
+                                                >
+                                                    <div className="nintendo-contribution__detail-media">
+                                                        {item.media ? (
+                                                            <a
+                                                                className="nintendo-contribution__media-link"
+                                                                href={item.href}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                aria-label={`${item.title} 새 탭에서 보기`}
+                                                            >
+                                                                {item.media.type === 'video' ? (
+                                                                    <video
+                                                                        autoPlay
+                                                                        muted
+                                                                        loop
+                                                                        playsInline
+                                                                        preload="metadata"
+                                                                        aria-label={
+                                                                            item.media.label
+                                                                        }
+                                                                    >
+                                                                        <source
+                                                                            src={item.media.src}
+                                                                            type="video/mp4"
+                                                                        />
+                                                                        브라우저에서 영상을 재생할
+                                                                        수 없습니다.
+                                                                    </video>
+                                                                ) : (
+                                                                    <img
+                                                                        src={item.media.src}
+                                                                        alt={item.media.label}
+                                                                    />
+                                                                )}
+                                                                <span className="nintendo-contribution__view-project">
+                                                                    View Project ↗
+                                                                </span>
+                                                            </a>
+                                                        ) : (
+                                                            <span>Image Slot</span>
+                                                        )}
+                                                    </div>
+                                                    <div className="nintendo-contribution__detail-copy">
+                                                        <p className="nintendo-contribution__index">
+                                                            {item.number} / {item.label}
+                                                        </p>
+                                                        <h4>{item.title}</h4>
+                                                        {item.tags.length > 0 && (
+                                                            <ul className="nintendo-contribution__tags">
+                                                                {item.tags.map((tag) => (
+                                                                    <li key={tag}>{tag}</li>
+                                                                ))}
+                                                            </ul>
+                                                        )}
+                                                        <p className="nintendo-contribution__description">
+                                                            {item.description}
+                                                        </p>
+                                                    </div>
+                                                </article>
+                                            ))}
                                         </div>
-                                    </article>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+                                    </div>
+                                </div>
 
-                    <div className="nintendo-collaboration section">
-                        <header className="nintendo-collaboration__header">
-                            <p className="eyebrow">06 / Team Collaboration</p>
-                            <div className="nintendo-collaboration__heading">
-                                <h3>
-                                    <span className="nintendo-collaboration__title-primary">
-                                        BETTER
-                                    </span>
-                                    <span className="nintendo-collaboration__title-serif">
-                                        Together.
-                                    </span>
-                                </h3>
-                                <div className="nintendo-collaboration__copy">
-                                    <p>서로의 아이디어를 연결해 하나의 경험을 완성하다.</p>
-                                    <p>
-                                        팀원들과 디자인 방향을 논의하고, 작업 과정을 공유하며
-                                        피드백을 반영했습니다.
+                                <div className="nintendo-collaboration section">
+                                    <header className="nintendo-collaboration__header">
+                                        <p className="eyebrow">06 / Team Collaboration</p>
+                                        <div className="nintendo-collaboration__heading">
+                                            <h3>
+                                                <span className="nintendo-collaboration__title-primary">
+                                                    BETTER
+                                                </span>
+                                                <span className="nintendo-collaboration__title-serif">
+                                                    Together.
+                                                </span>
+                                            </h3>
+                                            <div className="nintendo-collaboration__copy">
+                                                <p>
+                                                    서로의 아이디어를 연결해 하나의 경험을 완성하다.
+                                                </p>
+                                                <p>
+                                                    팀원들과 디자인 방향을 논의하고, 작업 과정을
+                                                    공유하며 피드백을 반영했습니다.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </header>
+
+                                    <div className="nintendo-collaboration__gallery">
+                                        <figure className="nintendo-collaboration__photo nintendo-collaboration__photo--main">
+                                            <div className="nintendo-collaboration__photo-frame">
+                                                <div className="nintendo-collaboration__photo-image">
+                                                    <img
+                                                        src="/images/nintendo/nintendo-team-01.jpg"
+                                                        alt="팀원들이 노트북 화면을 보며 프로젝트를 논의하는 모습"
+                                                    />
+                                                </div>
+                                                <figcaption>
+                                                    <span>01 / Team Discussion</span>
+                                                    <p>
+                                                        함께 논의하며 디자인 방향을 구체화했습니다.
+                                                    </p>
+                                                </figcaption>
+                                            </div>
+                                        </figure>
+                                        <figure className="nintendo-collaboration__photo nintendo-collaboration__photo--ideas">
+                                            <div className="nintendo-collaboration__photo-frame">
+                                                <div className="nintendo-collaboration__photo-image">
+                                                    <img
+                                                        src="/images/nintendo/nintendo-team-02.jpg"
+                                                        alt="팀원들이 아이디어를 함께 확인하는 모습"
+                                                    />
+                                                </div>
+                                                <figcaption>
+                                                    <span>02 / Sharing Ideas</span>
+                                                    <p>
+                                                        서로의 의견을 공유하고 작업 방향을
+                                                        조율했습니다.
+                                                    </p>
+                                                </figcaption>
+                                            </div>
+                                        </figure>
+                                        <figure className="nintendo-collaboration__photo nintendo-collaboration__photo--review">
+                                            <div className="nintendo-collaboration__photo-frame">
+                                                <div className="nintendo-collaboration__photo-image">
+                                                    <img
+                                                        src="/images/nintendo/nintendo-team-03.jpg"
+                                                        alt="노트북을 중심으로 결과물을 검토하고 피드백하는 모습"
+                                                    />
+                                                </div>
+                                                <figcaption>
+                                                    <span>03 / Review &amp; Feedback</span>
+                                                    <p>
+                                                        결과물을 함께 검토하며 개선점을
+                                                        찾아갔습니다.
+                                                    </p>
+                                                </figcaption>
+                                            </div>
+                                        </figure>
+                                    </div>
+
+                                    <p className="nintendo-collaboration__keywords">
+                                        Discuss <span>/</span> Share <span>/</span> Refine
                                     </p>
                                 </div>
-                            </div>
-                        </header>
 
-                        <div className="nintendo-collaboration__gallery">
-                            <figure className="nintendo-collaboration__photo nintendo-collaboration__photo--main">
-                                <div className="nintendo-collaboration__photo-frame">
-                                    <div className="nintendo-collaboration__photo-image">
-                                        <img
-                                            src="/images/nintendo/nintendo-team-01.jpg"
-                                            alt="팀원들이 노트북 화면을 보며 프로젝트를 논의하는 모습"
-                                        />
-                                    </div>
-                                    <figcaption>
-                                        <span>01 / Team Discussion</span>
-                                        <p>함께 논의하며 디자인 방향을 구체화했습니다.</p>
-                                    </figcaption>
-                                </div>
-                            </figure>
-                            <figure className="nintendo-collaboration__photo nintendo-collaboration__photo--ideas">
-                                <div className="nintendo-collaboration__photo-frame">
-                                    <div className="nintendo-collaboration__photo-image">
-                                        <img
-                                            src="/images/nintendo/nintendo-team-02.jpg"
-                                            alt="팀원들이 아이디어를 함께 확인하는 모습"
-                                        />
-                                    </div>
-                                    <figcaption>
-                                        <span>02 / Sharing Ideas</span>
-                                        <p>서로의 의견을 공유하고 작업 방향을 조율했습니다.</p>
-                                    </figcaption>
-                                </div>
-                            </figure>
-                            <figure className="nintendo-collaboration__photo nintendo-collaboration__photo--review">
-                                <div className="nintendo-collaboration__photo-frame">
-                                    <div className="nintendo-collaboration__photo-image">
-                                        <img
-                                            src="/images/nintendo/nintendo-team-03.jpg"
-                                            alt="노트북을 중심으로 결과물을 검토하고 피드백하는 모습"
-                                        />
-                                    </div>
-                                    <figcaption>
-                                        <span>03 / Review &amp; Feedback</span>
-                                        <p>결과물을 함께 검토하며 개선점을 찾아갔습니다.</p>
-                                    </figcaption>
-                                </div>
-                            </figure>
-                        </div>
+                                <div className="nintendo-documentation section">
+                                    <header className="nintendo-documentation__header">
+                                        <p className="eyebrow">07 / Team Documentation</p>
+                                        <div className="nintendo-documentation__heading">
+                                            <h3>
+                                                <span className="nintendo-documentation__title-primary">
+                                                    IDEAS INTO
+                                                </span>
+                                                <span className="nintendo-documentation__title-serif">
+                                                    Records.
+                                                </span>
+                                            </h3>
+                                            <div className="nintendo-documentation__copy">
+                                                <p className="nintendo-documentation__role">
+                                                    <span>MY ROLE</span> / TEAM SECRETARY ·
+                                                    DOCUMENTATION
+                                                </p>
+                                                <p className="nintendo-documentation__copy-lead">
+                                                    아이디어를 기록하고, 팀의 작업을 연결하다.
+                                                </p>
+                                                <p className="nintendo-documentation__copy-body">
+                                                    팀 프로젝트의 서기를 맡아 매일 회의 내용을
+                                                    기록하고, 팀원별 역할 분담과 아이디어, 피드백을
+                                                    체계적으로 정리해 공유했습니다.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </header>
 
-                        <p className="nintendo-collaboration__keywords">
-                            Discuss <span>/</span> Share <span>/</span> Refine
-                        </p>
-                    </div>
-
-                    <div className="nintendo-documentation section">
-                        <header className="nintendo-documentation__header">
-                            <p className="eyebrow">07 / Team Documentation</p>
-                            <div className="nintendo-documentation__heading">
-                                <h3>
-                                    <span className="nintendo-documentation__title-primary">
-                                        IDEAS INTO
-                                    </span>
-                                    <span className="nintendo-documentation__title-serif">
-                                        Records.
-                                    </span>
-                                </h3>
-                                <div className="nintendo-documentation__copy">
-                                    <p className="nintendo-documentation__role">
-                                        <span>MY ROLE</span> / TEAM SECRETARY · DOCUMENTATION
-                                    </p>
-                                    <p className="nintendo-documentation__copy-lead">
-                                        아이디어를 기록하고, 팀의 작업을 연결하다.
-                                    </p>
-                                    <p className="nintendo-documentation__copy-body">
-                                        팀 프로젝트의 서기를 맡아 매일 회의 내용을 기록하고, 팀원별
-                                        역할 분담과 아이디어, 피드백을 체계적으로 정리해
-                                        공유했습니다.
-                                    </p>
-                                </div>
-                            </div>
-                        </header>
-
-                        <div className="nintendo-documentation__archives">
-                            {nintendoDocumentationArchives.map((archive) => (
-                                <article
-                                    className={`nintendo-documentation__archive nintendo-documentation__archive--${archive.key}`}
-                                    key={archive.key}
-                                >
-                                    <div className="nintendo-documentation__archive-heading">
-                                        <p>{archive.label}</p>
-                                        <h4>{archive.title}</h4>
-                                        <span>{archive.description}</span>
-                                    </div>
-                                    <div className="nintendo-documentation__media">
-                                        {archive.images.map((item, index) => (
-                                            <button
-                                                className={`nintendo-documentation__image${index === 0 ? ' nintendo-documentation__image--main' : ' nintendo-documentation__image--detail'}`}
-                                                type="button"
-                                                key={item.src}
-                                                onClick={(event) =>
-                                                    openDocumentPreview(
-                                                        {
-                                                            ...item,
-                                                            isDetail: index > 0,
-                                                        },
-                                                        event
-                                                    )
-                                                }
-                                                aria-label={`${item.alt} 확대 보기`}
+                                    <div className="nintendo-documentation__archives">
+                                        {nintendoDocumentationArchives.map((archive) => (
+                                            <article
+                                                className={`nintendo-documentation__archive nintendo-documentation__archive--${archive.key}`}
+                                                key={archive.key}
                                             >
-                                                <img
-                                                    src={item.src}
-                                                    alt={item.alt}
-                                                    loading="lazy"
-                                                    decoding="async"
-                                                />
-                                                {index > 0 && (
-                                                    <span className="nintendo-documentation__preview-label">
-                                                        <span>
-                                                            Document{' '}
-                                                            {String(index).padStart(2, '0')}
-                                                        </span>
-                                                        <strong>Open ↗</strong>
-                                                    </span>
-                                                )}
-                                            </button>
+                                                <div className="nintendo-documentation__archive-heading">
+                                                    <p>{archive.label}</p>
+                                                    <h4>{archive.title}</h4>
+                                                    <span>{archive.description}</span>
+                                                </div>
+                                                <div className="nintendo-documentation__media">
+                                                    {archive.images.map((item, index) => (
+                                                        <button
+                                                            className={`nintendo-documentation__image${index === 0 ? ' nintendo-documentation__image--main' : ' nintendo-documentation__image--detail'}`}
+                                                            type="button"
+                                                            key={item.src}
+                                                            onClick={(event) =>
+                                                                openDocumentPreview(
+                                                                    {
+                                                                        ...item,
+                                                                        isDetail: index > 0,
+                                                                    },
+                                                                    event
+                                                                )
+                                                            }
+                                                            aria-label={`${item.alt} 확대 보기`}
+                                                        >
+                                                            <img
+                                                                src={item.src}
+                                                                alt={item.alt}
+                                                                loading="lazy"
+                                                                decoding="async"
+                                                            />
+                                                            {index > 0 && (
+                                                                <span className="nintendo-documentation__preview-label">
+                                                                    <span>
+                                                                        Document{' '}
+                                                                        {String(index).padStart(
+                                                                            2,
+                                                                            '0'
+                                                                        )}
+                                                                    </span>
+                                                                    <strong>Open ↗</strong>
+                                                                </span>
+                                                            )}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </article>
                                         ))}
                                     </div>
-                                </article>
-                            ))}
+                                </div>
+                            </div>
+                            <div
+                                className="horizontal-story__chrome-guide"
+                                ref={chromeStoryOverlayRef}
+                                aria-hidden="true"
+                            >
+                                <svg
+                                    viewBox="0 0 1600 900"
+                                    preserveAspectRatio="none"
+                                    focusable="false"
+                                >
+                                    <defs>
+                                        <linearGradient
+                                            id="chrome-story-silver"
+                                            x1="0"
+                                            y1="0"
+                                            x2="1"
+                                            y2="1"
+                                        >
+                                            <stop offset="0" stopColor="#6f7b8c" />
+                                            <stop offset="0.22" stopColor="#f8fbff" />
+                                            <stop offset="0.43" stopColor="#9fb7d1" />
+                                            <stop offset="0.65" stopColor="#eee9ff" />
+                                            <stop offset="0.84" stopColor="#7d8999" />
+                                            <stop offset="1" stopColor="#f9fbff" />
+                                        </linearGradient>
+                                        <filter
+                                            id="chrome-story-soft-shadow"
+                                            x="-20%"
+                                            y="-20%"
+                                            width="140%"
+                                            height="140%"
+                                        >
+                                            <feDropShadow
+                                                dx="0"
+                                                dy="4"
+                                                stdDeviation="5"
+                                                floodColor="#02050b"
+                                                floodOpacity="0.42"
+                                            />
+                                        </filter>
+                                    </defs>
+
+                                    {chromeStoryPaths.map((item) => (
+                                        <g
+                                            className="chrome-story-path"
+                                            data-panel={item.panel}
+                                            key={item.panel}
+                                            ref={(node) => {
+                                                if (node) {
+                                                    chromeStoryGroupRefs.current.set(
+                                                        item.panel,
+                                                        node
+                                                    );
+                                                } else {
+                                                    chromeStoryGroupRefs.current.delete(
+                                                        item.panel
+                                                    );
+                                                }
+                                            }}
+                                        >
+                                            <path
+                                                className="chrome-story-path__shadow"
+                                                d={item.d}
+                                                pathLength="1"
+                                            />
+                                            <path
+                                                className="chrome-story-path__silver"
+                                                d={item.d}
+                                                pathLength="1"
+                                                ref={(node) => {
+                                                    if (node) {
+                                                        chromeStoryPathRefs.current.set(
+                                                            item.panel,
+                                                            node
+                                                        );
+                                                    } else {
+                                                        chromeStoryPathRefs.current.delete(
+                                                            item.panel
+                                                        );
+                                                    }
+                                                }}
+                                            />
+                                            <path
+                                                className="chrome-story-path__highlight"
+                                                d={item.d}
+                                                pathLength="1"
+                                            />
+                                        </g>
+                                    ))}
+
+                                    <image
+                                        className="chrome-story-star"
+                                        ref={chromeStoryStarRef}
+                                        href="/images/chrome-star.png"
+                                        width="86"
+                                        height="86"
+                                        preserveAspectRatio="xMidYMid meet"
+                                    />
+                                </svg>
+                            </div>
                         </div>
                     </div>
 
@@ -3190,7 +3836,8 @@ function App() {
                                         className="ux-architecture__reveal"
                                         style={{ '--delay': '.16s' }}
                                     >
-                                        와이어프레임부터 무드보드, 디자인 시스템까지 일관된 브랜드 경험을 설계했습니다.
+                                        와이어프레임부터 무드보드, 디자인 시스템까지 일관된 브랜드
+                                        경험을 설계했습니다.
                                     </p>
                                 </div>
                             </header>
@@ -3224,7 +3871,9 @@ function App() {
                                         role="tabpanel"
                                         key={`development-copy-${selectedDevelopment.key}`}
                                     >
-                                        <span>{selectedDevelopment.number} / DESIGN DEVELOPMENT</span>
+                                        <span>
+                                            {selectedDevelopment.number} / DESIGN DEVELOPMENT
+                                        </span>
                                         <h4>{selectedDevelopment.title}</h4>
                                         <p>{selectedDevelopment.description}</p>
                                         <small>{selectedDevelopment.keywords}</small>
@@ -3277,7 +3926,7 @@ function App() {
                             <header className="final-outcome__header">
                                 <div className="final-outcome__meta">
                                     <span>17 / FINAL OUTCOME</span>
-                                    <span>NINTENDO / RESPONSIVE WEBSITE</span>
+                                    <span>DESKTOP &amp; MOBILE</span>
                                 </div>
                                 <div className="final-outcome__heading">
                                     <h3 id="final-outcome-title">
@@ -3285,71 +3934,38 @@ function App() {
                                         <em>Experience.</em>
                                     </h3>
                                     <p>
-                                        기획부터 디자인, 인터랙션 구현까지. 디바이스에 맞춰 완성한 닌텐도 웹사이트 리뉴얼 프로젝트.
+                                        기획부터 디자인, 인터랙션 구현까지. 디바이스에 맞춰 완성한
+                                        닌텐도 웹사이트 리뉴얼 프로젝트.
                                     </p>
                                 </div>
                             </header>
 
-                            <div
-                                className="final-outcome__tabs"
-                                role="tablist"
-                                aria-label="최종 결과물 디바이스 선택"
-                            >
+                            <div className="final-outcome__gallery">
                                 {finalOutcomeViews.map((item) => (
-                                    <button
-                                        type="button"
-                                        role="tab"
-                                        aria-selected={activeFinalOutcome === item.key}
-                                        aria-controls="final-outcome-panel"
-                                        tabIndex={activeFinalOutcome === item.key ? 0 : -1}
-                                        className={
-                                            activeFinalOutcome === item.key ? 'is-active' : ''
-                                        }
+                                    <article
+                                        className={`final-outcome__card final-outcome__card--${item.key}`}
                                         key={item.key}
-                                        onClick={() => setActiveFinalOutcome(item.key)}
-                                        onKeyDown={(event) =>
-                                            handleResearchTabKeyDown(
-                                                event,
-                                                finalOutcomeViews,
-                                                activeFinalOutcome,
-                                                setActiveFinalOutcome
-                                            )
-                                        }
                                     >
-                                        <span>{item.number}</span>
-                                        <strong>{item.label}</strong>
-                                    </button>
+                                        <div className="final-outcome__card-label">
+                                            <span>{item.number}</span>
+                                            <strong>{item.label}</strong>
+                                        </div>
+                                        <div className="final-outcome__media">
+                                            <img src={item.src} alt={item.alt} />
+                                        </div>
+                                    </article>
                                 ))}
                             </div>
 
-                            <div
-                                className={`final-outcome__panel final-outcome__panel--${selectedFinalOutcome.key}`}
-                                id="final-outcome-panel"
-                                role="tabpanel"
-                                key={selectedFinalOutcome.key}
-                            >
-                                <div className="final-outcome__visual">
-                                    <div className="final-outcome__media">
-                                        <img
-                                            src={selectedFinalOutcome.src}
-                                            alt={selectedFinalOutcome.alt}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <footer className="final-outcome__footer">
-                                <p key={`final-copy-${selectedFinalOutcome.key}`}>
-                                    {selectedFinalOutcome.description}
-                                </p>
+                            <div className="final-outcome__action">
                                 <a
                                     href="https://mbc-teamproject-red.vercel.app/"
                                     target="_blank"
                                     rel="noreferrer"
                                 >
-                                    VISIT WEBSITE <span aria-hidden="true">↗</span>
+                                    WEBSITE <span aria-hidden="true">↗</span>
                                 </a>
-                            </footer>
+                            </div>
                         </div>
                     </section>
 
@@ -4566,7 +5182,8 @@ function App() {
                     </div>,
                     document.body
                 )}
-            {developmentPreview && selectedDevelopmentImage &&
+            {developmentPreview &&
+                selectedDevelopmentImage &&
                 createPortal(
                     <div
                         className="architecture-preview development-preview"
@@ -4659,9 +5276,7 @@ function App() {
                                     >
                                         <img
                                             key={selectedDevelopmentImage.key}
-                                            className={
-                                                isDevelopmentImageReady ? 'is-ready' : ''
-                                            }
+                                            className={isDevelopmentImageReady ? 'is-ready' : ''}
                                             src={selectedDevelopmentImage.src}
                                             alt={selectedDevelopmentImage.alt}
                                             draggable="false"
@@ -4721,18 +5336,14 @@ function App() {
                                                     Math.max(0.1, developmentZoom * 0.25)
                                             )
                                         }
-                                        disabled={
-                                            !isDevelopmentImageReady || developmentZoom >= 3
-                                        }
+                                        disabled={!isDevelopmentImageReady || developmentZoom >= 3}
                                         aria-label="확대"
                                     >
                                         +
                                     </button>
                                     <button
                                         type="button"
-                                        className={
-                                            developmentViewMode === 'fit' ? 'is-active' : ''
-                                        }
+                                        className={developmentViewMode === 'fit' ? 'is-active' : ''}
                                         onClick={() => fitDevelopmentImage()}
                                         disabled={!isDevelopmentImageReady}
                                     >
