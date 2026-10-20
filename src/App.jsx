@@ -1,10 +1,8 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import './App.css';
 import './nintendoResearch.css';
 import './userInterview.css';
-import './userPersona.css';
-import './journeyStrategy.css';
 import './uxArchitecture.css';
 import './designDevelopment.css';
 import './finalOutcome.css';
@@ -56,6 +54,16 @@ const uxArchitectureArtifacts = [
         previewSrc: '/images/nintendo/research/nintendo-flowchart-preview.png',
         alt: '닌텐도 웹사이트 사용자 플로우차트',
     },
+];
+
+const designStructureArtifacts = [
+    { ...uxArchitectureArtifacts.find((item) => item.key === 'ia'), number: '01' },
+    {
+        ...uxArchitectureArtifacts.find((item) => item.key === 'flow'),
+        number: '02',
+        title: 'USER FLOW',
+    },
+    { ...uxArchitectureArtifacts.find((item) => item.key === 'mindmap'), number: '03' },
 ];
 
 const designDevelopmentArtifacts = [
@@ -139,28 +147,70 @@ const designDevelopmentArtifacts = [
     },
 ];
 
-const finalOutcomeViews = [
+const researchArchiveCategories = [
     {
-        key: 'desktop',
-        number: '01',
-        label: 'DESKTOP',
-        src: '/images/nintendo/research/nintendo-final-desktop.png',
-        alt: 'Nintendo 리뉴얼 웹사이트 데스크톱 목업',
+        key: 'nintendo',
+        label: 'NINTENDO ANALYSIS',
+        images: [
+            {
+                key: 'nintendo-analysis',
+                label: 'OVERVIEW',
+                src: '/images/nintendo/research/nintendo-analysis.png',
+                alt: '닌텐도 공식 사이트 분석을 정리한 리서치 보드',
+            },
+            {
+                key: 'nintendo-home',
+                label: 'HOME',
+                src: '/images/nintendo/research/nintendo-home.png',
+                alt: '닌텐도 공식 사이트 메인 화면 분석 자료',
+            },
+            {
+                key: 'nintendo-store',
+                label: 'STORE',
+                src: '/images/nintendo/research/nintendo-store.png',
+                alt: '닌텐도 공식 사이트 스토어 화면 분석 자료',
+            },
+            {
+                key: 'nintendo-character',
+                label: 'CHARACTER',
+                src: '/images/nintendo/research/nintendo-character.png',
+                alt: '닌텐도 공식 사이트 캐릭터 화면 분석 자료',
+            },
+        ],
     },
     {
-        key: 'mobile',
-        number: '02',
-        label: 'MOBILE',
-        src: '/images/nintendo/research/nintendo-final-mobile.png',
-        alt: 'Nintendo 리뉴얼 웹사이트 모바일 목업 세 대',
+        key: 'competitor',
+        label: 'COMPETITOR RESEARCH',
+        images: [
+            {
+                key: 'competitive-research',
+                label: 'OVERVIEW',
+                src: '/images/nintendo/research/competitive-research.png',
+                alt: '경쟁 게임 플랫폼 분석을 정리한 비교 리서치 보드',
+            },
+            {
+                key: 'playstation',
+                label: 'PLAYSTATION',
+                src: '/images/nintendo/research/PlayStation.png',
+                alt: 'PlayStation 공식 사이트 분석 자료',
+            },
+            {
+                key: 'xbox',
+                label: 'XBOX',
+                src: '/images/nintendo/research/Xbox.png',
+                alt: 'Xbox 공식 사이트 분석 자료',
+            },
+            {
+                key: 'steam-deck',
+                label: 'STEAM DECK',
+                src: '/images/nintendo/research/Steam Deck.png',
+                alt: 'Steam Deck 공식 사이트 분석 자료',
+            },
+        ],
     },
 ];
 
 const chromeStoryPaths = [
-    {
-        panel: 2,
-        d: 'M 70 735 C 300 690 390 545 610 555 C 850 565 900 300 1160 285 C 1330 275 1440 350 1530 245',
-    },
     {
         panel: 3,
         d: 'M 75 255 C 280 170 430 245 575 405 C 730 575 900 650 1080 520 C 1260 390 1375 220 1530 285',
@@ -478,66 +528,6 @@ const nintendoDocumentationArchives = [
     },
 ];
 
-const nintendoResearchInsights = [
-    {
-        key: 'brand',
-        label: 'Brand Experience',
-        title: '캐릭터보다 정보가 먼저 보이는 메인',
-        description:
-            '게임과 제품 정보 중심의 구성으로 캐릭터 IP의 개성과 세계관을 충분히 경험하기 어려웠습니다.',
-        direction: '캐릭터 중심의 몰입형 브랜드 경험 강화',
-        image: '/images/nintendo/research/nintendo-home.png',
-        alt: '기존 닌텐도 공식 사이트 메인 화면',
-    },
-    {
-        key: 'discovery',
-        label: 'Game Discovery',
-        title: '취향에 따른 게임 탐색의 한계',
-        description:
-            '게임 정보는 풍부하지만 관심사와 플레이 방식에 따라 게임을 발견할 수 있는 탐색 경로가 제한적이었습니다.',
-        direction: '관심사와 플레이 스타일에 따른 탐색 구조 개선',
-        image: '/images/nintendo/research/nintendo-store.png',
-        alt: '기존 닌텐도 스토어 화면',
-    },
-    {
-        key: 'interaction',
-        label: 'Interactive Experience',
-        title: '참여보다 탐색에 집중된 경험',
-        description:
-            '캐릭터와 게임을 소개하는 콘텐츠는 있지만, 사용자가 직접 반응하고 참여할 수 있는 인터랙션은 제한적이었습니다.',
-        direction: '캐릭터 IP를 활용한 참여형 인터랙션 강화',
-        image: '/images/nintendo/research/nintendo-character.png',
-        alt: '기존 닌텐도 공식 사이트 캐릭터 메뉴 화면',
-    },
-];
-
-const competitorResearch = [
-    {
-        key: 'playstation',
-        label: 'PlayStation',
-        image: '/images/nintendo/research/PlayStation.png',
-        alt: 'PlayStation 공식 사이트 화면',
-        feature: '게임 비주얼과 프로모션의 강한 시각적 전달',
-        implication: '게임과 캐릭터 IP의 매력을 시각적으로 드러내는 구성',
-    },
-    {
-        key: 'xbox',
-        label: 'Xbox',
-        image: '/images/nintendo/research/Xbox.png',
-        alt: 'Xbox 공식 사이트 화면',
-        feature: 'Game Pass 중심의 게임 탐색과 검색·필터 기능',
-        implication: '관심사와 플레이 방식에 따른 게임 탐색 경로 강화',
-    },
-    {
-        key: 'steamdeck',
-        label: 'Steam Deck',
-        image: '/images/nintendo/research/Steam Deck.png',
-        alt: 'Steam Deck 공식 사이트 화면',
-        feature: '제품의 특성과 플레이 경험을 명확히 소개하는 구성',
-        implication: '콘텐츠의 특징을 이해하기 쉬운 정보 구조',
-    },
-];
-
 const userInterviews = [
     {
         key: 'user-01',
@@ -653,30 +643,105 @@ const journeyResearch = [
     },
 ];
 
-const journeyStages = ['유입', '탐색', '경험', '게임 선택', '상세 탐색', '구매 고려'];
-
-const emotionScale = {
-    1: '매우 낮음',
-    2: '낮음',
-    3: '보통',
-    4: '높음',
-    5: '매우 높음',
+const interviewEditorial = {
+    '01': {
+        name: '정원희',
+        summary: [
+            '유튜브 리뷰를 참고해 게임을 비교하며, 기존에 즐기던 게임을 다시 구매하기도 합니다.',
+            '신작 외 인기 게임이 메인에서 잘 보이지 않아 취향에 맞는 게임을 찾기 어렵다고 답했습니다.',
+        ],
+        needs: '장르·연령·플레이 방식과 취향을 반영한 게임 분류',
+        pain: '신작 중심의 메인 화면으로 기존 인기 게임 탐색이 어려움',
+        insight: '캐릭터와 게임의 특징을 짧은 영상과 직관적인 정보로 연결',
+    },
+    '02': {
+        name: '김희선',
+        summary: [
+            '업데이트 확인과 관심 캐릭터 탐색을 위해 사이트를 이용합니다.',
+            '인기 캐릭터를 찾으려면 여러 페이지를 이동해야 하고 원하는 정보가 쉽게 드러나지 않는다고 답했습니다.',
+        ],
+        needs: '인기·성향별 캐릭터 분류와 빠른 캐릭터 탐색 경로',
+        pain: '캐릭터 정보가 여러 화면에 흩어져 탐색 단계가 길어짐',
+        insight: '캐릭터의 개성과 세계관을 메인에서 시각적으로 선명하게 전달',
+    },
+    '03': {
+        name: '최현석',
+        summary: [
+            '정확한 정보를 확인하기 위해 공식 사이트와 게임 커뮤니티를 함께 이용합니다.',
+            '시리즈와 캐릭터 정보를 찾기 위해 여러 페이지를 방문했고 플레이 영상을 확인하기 어려웠다고 답했습니다.',
+        ],
+        needs: '시리즈·캐릭터 중심 탐색과 장르·플레이 방식별 세분화',
+        pain: '시리즈 정보가 분산되고 실제 게임 플레이 영상 접근이 부족함',
+        insight: '시리즈 역사와 라인업, 플레이 콘텐츠를 하나의 흐름으로 연결',
+    },
 };
 
-const ResearchMedia = ({ src, alt, label }) => {
-    const [hasError, setHasError] = useState(false);
+const userInsightCategories = [
+    {
+        key: 'interview',
+        label: 'USER INTERVIEW',
+        images: userInterviews.map((user) => ({
+            key: `interview-${user.number}`,
+            label: `USER ${user.number}`,
+            src: `/images/nintendo/research/interview-${user.number}.png`,
+            alt: `${user.profile} 사용자 인터뷰 자료`,
+            pdf: user.pdf,
+            ...interviewEditorial[user.number],
+        })),
+    },
+    {
+        key: 'persona',
+        label: 'PERSONA',
+        images: userPersonas.map((user) => ({
+            key: `persona-${user.number}`,
+            label: `USER ${user.number}`,
+            src: user.image,
+            alt: `${user.name} 사용자 페르소나 자료`,
+        })),
+    },
+    {
+        key: 'journey',
+        label: 'USER JOURNEY',
+        images: journeyResearch.map((user) => ({
+            key: `journey-${user.number}`,
+            label: `USER ${user.number}`,
+            src: user.journey,
+            alt: `${user.name} 사용자 여정 지도`,
+        })),
+    },
+    {
+        key: 'canvas',
+        label: 'LEAN CANVAS',
+        images: journeyResearch.map((user) => ({
+            key: `canvas-${user.number}`,
+            label: `USER ${user.number}`,
+            src: user.canvas,
+            alt: `${user.name} 린 캔버스 자료`,
+        })),
+    },
+];
 
-    if (hasError) {
-        return (
-            <div className="nintendo-research__placeholder" role="img" aria-label={alt}>
-                <span>IMAGE PENDING</span>
-                <strong>{label}</strong>
-            </div>
-        );
-    }
-
-    return <img src={src} alt={alt} onError={() => setHasError(true)} />;
-};
+const InterviewEditorialCard = ({ interview, className = '' }) => (
+    <article
+        className={`nintendo-user-insight__interview-card ${className}`.trim()}
+        data-number={interview.label.slice(-2)}
+    >
+        <header>
+            <span>USER INTERVIEW / {interview.label.slice(-2)}</span>
+            <strong>{interview.name}</strong>
+            <small>RESEARCH DOCUMENT</small>
+        </header>
+        <section>
+            <span>INTERVIEW SUMMARY</span>
+            {interview.summary.map((summary) => <p key={summary}>{summary}</p>)}
+        </section>
+        <dl>
+            <div><dt>NEEDS</dt><dd>{interview.needs}</dd></div>
+            <div><dt>PAIN POINT</dt><dd>{interview.pain}</dd></div>
+            <div><dt>INSIGHT</dt><dd>{interview.insight}</dd></div>
+        </dl>
+    </article>
+);
 
 function App() {
     const aboutRef = useRef(null);
@@ -692,9 +757,21 @@ function App() {
     const chromeStoryPathRefs = useRef(new Map());
     const chromeStoryGroupRefs = useRef(new Map());
     const chromeStoryStarRef = useRef(null);
-    const nintendoOverviewRef = useRef(null);
-    const uxArchitectureRef = useRef(null);
-    const designDevelopmentRef = useRef(null);
+    const researchArchiveRef = useRef(null);
+    const userInsightRef = useRef(null);
+    const designStructureRef = useRef(null);
+    const designDevelopmentArchiveRef = useRef(null);
+    const activeResearchArchiveRef = useRef('nintendo');
+    const activeResearchArchiveImageRef = useRef('nintendo-analysis');
+    const researchArchiveTransitionTimerRef = useRef(null);
+    const activeUserInsightRef = useRef('interview');
+    const activeUserInsightImageRef = useRef('interview-01');
+    const userInsightTransitionTimerRef = useRef(null);
+    const activeDesignStructureRef = useRef('ia');
+    const designStructureTransitionTimerRef = useRef(null);
+    const activeDesignDevelopmentArchiveRef = useRef('wireframe');
+    const activeDesignDevelopmentArchiveImageRef = useRef('main');
+    const designDevelopmentArchiveTransitionTimerRef = useRef(null);
     const architectureDragRef = useRef(null);
     const architectureViewportRef = useRef(null);
     const architectureDialogRef = useRef(null);
@@ -718,16 +795,27 @@ function App() {
     const [isTopButtonVisible, setIsTopButtonVisible] = useState(false);
     const [isSelectedWorksTitleVisible, setIsSelectedWorksTitleVisible] = useState(false);
     const [nintendoComparePosition, setNintendoComparePosition] = useState(50);
-    const [visibleNintendoOverviewCards, setVisibleNintendoOverviewCards] = useState(0);
+    const [activeResearchArchive, setActiveResearchArchive] = useState('nintendo');
+    const [activeResearchArchiveImage, setActiveResearchArchiveImage] =
+        useState('nintendo-analysis');
+    const [previousResearchArchive, setPreviousResearchArchive] = useState(null);
+    const [activeUserInsight, setActiveUserInsight] = useState('interview');
+    const [activeUserInsightImage, setActiveUserInsightImage] = useState('interview-01');
+    const [previousUserInsight, setPreviousUserInsight] = useState(null);
+    const [activeDesignStructure, setActiveDesignStructure] = useState('ia');
+    const [previousDesignStructure, setPreviousDesignStructure] = useState(null);
+    const [activeDesignDevelopmentArchive, setActiveDesignDevelopmentArchive] =
+        useState('wireframe');
+    const [activeDesignDevelopmentArchiveImage, setActiveDesignDevelopmentArchiveImage] =
+        useState('main');
+    const [previousDesignDevelopmentArchive, setPreviousDesignDevelopmentArchive] =
+        useState(null);
     const [documentPreview, setDocumentPreview] = useState(null);
     const [architecturePreview, setArchitecturePreview] = useState(null);
     const [architectureZoom, setArchitectureZoom] = useState(1);
     const [architectureFitZoom, setArchitectureFitZoom] = useState(1);
     const [architectureImageSize, setArchitectureImageSize] = useState({ width: 0, height: 0 });
     const [architectureViewMode, setArchitectureViewMode] = useState('fit');
-    const [activeArchitecture, setActiveArchitecture] = useState('ia');
-    const [isArchitectureVisible, setIsArchitectureVisible] = useState(false);
-    const [activeDevelopment, setActiveDevelopment] = useState('wireframe');
     const [developmentPreview, setDevelopmentPreview] = useState(null);
     const [activeDevelopmentImage, setActiveDevelopmentImage] = useState('main');
     const [developmentZoom, setDevelopmentZoom] = useState(1);
@@ -735,12 +823,7 @@ function App() {
     const [developmentImageSize, setDevelopmentImageSize] = useState({ width: 0, height: 0 });
     const [developmentViewMode, setDevelopmentViewMode] = useState('fit');
     const [isDevelopmentImageReady, setIsDevelopmentImageReady] = useState(false);
-    const [isDevelopmentVisible, setIsDevelopmentVisible] = useState(false);
-    const [activeNintendoResearch, setActiveNintendoResearch] = useState('brand');
-    const [activeCompetitorResearch, setActiveCompetitorResearch] = useState('playstation');
     const [activeUserInterview, setActiveUserInterview] = useState('user-01');
-    const [activeJourneyResearch, setActiveJourneyResearch] = useState('wonhee');
-    const [activeJourneyPoint, setActiveJourneyPoint] = useState(null);
     const [selectedPersonalityTrait, setSelectedPersonalityTrait] = useState('curious');
     const [previewPersonalityTrait, setPreviewPersonalityTrait] = useState(null);
     const [activeLoveCategory, setActiveLoveCategory] = useState('travel');
@@ -936,10 +1019,10 @@ function App() {
         setDevelopmentViewMode('fit');
     };
 
-    const openDevelopmentPreview = (item, event) => {
+    const openDevelopmentPreview = (item, event, imageKey = item.modalImages[0].key) => {
         previewTriggerRef.current = event.currentTarget;
         setDevelopmentPreview(item);
-        selectDevelopmentModalImage(item.modalImages[0].key);
+        selectDevelopmentModalImage(imageKey);
     };
 
     const closeDevelopmentPreview = () => setDevelopmentPreview(null);
@@ -1142,38 +1225,6 @@ function App() {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, [developmentPreview, developmentViewMode, developmentImageSize]);
-
-    useEffect(() => {
-        const section = uxArchitectureRef.current;
-        if (!section) return undefined;
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    setIsArchitectureVisible(true);
-                    observer.disconnect();
-                }
-            },
-            { threshold: 0.12 }
-        );
-        observer.observe(section);
-        return () => observer.disconnect();
-    }, []);
-
-    useEffect(() => {
-        const section = designDevelopmentRef.current;
-        if (!section) return undefined;
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    setIsDevelopmentVisible(true);
-                    observer.disconnect();
-                }
-            },
-            { threshold: 0.12 }
-        );
-        observer.observe(section);
-        return () => observer.disconnect();
-    }, []);
 
     useEffect(() => {
         const aboutSection = aboutRef.current;
@@ -1394,12 +1445,24 @@ function App() {
         const track = horizontalStoryTrackRef.current;
         const chromeOverlay = chromeStoryOverlayRef.current;
         const chromeStar = chromeStoryStarRef.current;
+        const chromePathPreview = track?.querySelector('.nintendo-chrome-path-preview');
 
-        if (!story || !stage || !track || !chromeOverlay || !chromeStar) return undefined;
+        if (
+            !story ||
+            !stage ||
+            !track ||
+            !chromeOverlay ||
+            !chromeStar ||
+            !chromePathPreview
+        ) {
+            return undefined;
+        }
 
         const desktopQuery = window.matchMedia('(min-width: 901px)');
         const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-        const panels = Array.from(track.children);
+        const panels = Array.from(track.children).filter((panel) =>
+            panel.classList.contains('section')
+        );
         let animationFrame = null;
         let isHorizontal = false;
         let storyStart = 0;
@@ -1448,7 +1511,46 @@ function App() {
             }
             activeChromePanel = null;
             chromeOverlay.classList.remove('is-visible');
+            chromeOverlay.removeAttribute('data-chrome-panel');
             chromeStar.style.opacity = '0';
+            chromeOverlay.style.setProperty('--nintendo-02-trail-progress', '0');
+            chromeOverlay.style.setProperty('--nintendo-02-star-progress', '0');
+        };
+
+        const updateChromePathPreview = (position) => {
+            const phase = position.phase;
+            const holdReveal = 0.8;
+            const arrivalReveal = 0.42;
+            let progress = 0;
+
+            if (phase?.type === 'hold' && phase.panel >= 2 && phase.panel <= 7) {
+                const segment = phase.panel - 2;
+                const segmentStart = segment === 0 ? 0 : segment + arrivalReveal;
+                const segmentEnd = segment + (phase.panel === 7 ? 1 : holdReveal);
+                progress =
+                    (segmentStart +
+                        (segmentEnd - segmentStart) * position.phaseProgress) /
+                    6;
+            } else if (
+                phase?.type === 'transition' &&
+                phase.from >= 2 &&
+                phase.from < 7
+            ) {
+                const segment = phase.from - 2;
+                const transitionStart = segment + holdReveal;
+                const transitionEnd = segment + 1 + arrivalReveal;
+                progress =
+                    (transitionStart +
+                        (transitionEnd - transitionStart) * position.phaseProgress) /
+                    6;
+            } else if (phase?.type === 'complete') {
+                progress = 1;
+            }
+
+            chromePathPreview.style.setProperty(
+                '--chrome-preview-progress',
+                Math.min(1, Math.max(0, progress)).toFixed(4)
+            );
         };
 
         const updateChromeGuide = (position) => {
@@ -1459,12 +1561,40 @@ function App() {
             }
 
             const panel = phase.panel;
+
+            if (panel === 2) {
+                if (activeChromePanel !== null) {
+                    chromeStoryGroupRefs.current
+                        .get(activeChromePanel)
+                        ?.classList.remove('is-active');
+                    activeChromePanel = null;
+                }
+
+                const progress = position.holdProgress;
+                const trailProgress = Math.min(1, progress / 0.68);
+                const starProgress = Math.min(1, Math.max(0, (progress - 0.68) / 0.32));
+                chromeOverlay.style.setProperty(
+                    '--nintendo-02-trail-progress',
+                    trailProgress.toFixed(4)
+                );
+                chromeOverlay.style.setProperty(
+                    '--nintendo-02-star-progress',
+                    starProgress.toFixed(4)
+                );
+                chromeStar.style.opacity = '0';
+                chromeOverlay.dataset.chromePanel = '2';
+                chromeOverlay.classList.add('is-visible');
+                return;
+            }
+
             const path = chromeStoryPathRefs.current.get(panel);
             const group = chromeStoryGroupRefs.current.get(panel);
             if (!path || !group) {
                 hideChromeGuide();
                 return;
             }
+
+            chromeOverlay.dataset.chromePanel = String(panel);
 
             if (activeChromePanel !== panel) {
                 if (activeChromePanel !== null) {
@@ -1516,6 +1646,7 @@ function App() {
             story.style.removeProperty('--horizontal-hold-progress');
             story.removeAttribute('data-horizontal-phase');
             track.style.removeProperty('transform');
+            chromePathPreview.style.removeProperty('--chrome-preview-progress');
             hideChromeGuide();
             timeline = [];
             panelAlignmentDistances = [];
@@ -1533,6 +1664,7 @@ function App() {
                 return {
                     activePanel: 0,
                     holdProgress: 0,
+                    phaseProgress: 0,
                     offset: 0,
                     phase: null,
                 };
@@ -1547,6 +1679,17 @@ function App() {
                 return {
                     activePanel: phase.panel,
                     holdProgress: phaseProgress,
+                    phaseProgress,
+                    offset: phase.offset,
+                    phase,
+                };
+            }
+
+            if (phase.type === 'complete') {
+                return {
+                    activePanel: phase.panel,
+                    holdProgress: 1,
+                    phaseProgress,
                     offset: phase.offset,
                     phase,
                 };
@@ -1555,6 +1698,7 @@ function App() {
             return {
                 activePanel: phaseProgress < 0.5 ? phase.from : phase.to,
                 holdProgress: phase.from >= 2 ? 1 : 0,
+                phaseProgress,
                 offset: phase.fromOffset + (phase.toOffset - phase.fromOffset) * phaseProgress,
                 phase,
             };
@@ -1571,6 +1715,7 @@ function App() {
             story.style.setProperty('--horizontal-hold-progress', position.holdProgress.toFixed(4));
             story.dataset.horizontalPhase = position.phase?.type ?? 'transition';
             setActivePanel(position.activePanel);
+            updateChromePathPreview(position);
             if (scrollDistance > verticalScrollDistance) {
                 hideChromeGuide();
             } else {
@@ -1678,7 +1823,7 @@ function App() {
         const measureStory = () => {
             resetStory();
 
-            if (!desktopQuery.matches || reducedMotionQuery.matches || window.innerHeight < 820) {
+            if (!desktopQuery.matches || reducedMotionQuery.matches || window.innerHeight < 760) {
                 return;
             }
 
@@ -1704,6 +1849,7 @@ function App() {
             const stageWidth = stage.clientWidth;
             const transitionDistance = stageWidth * 1.25;
             const holdDistance = stageWidth * 0.75;
+            const completionDistance = stageWidth * 0.32;
             let timelineCursor = 0;
 
             timeline = [];
@@ -1746,6 +1892,17 @@ function App() {
                 addHold(panel);
                 if (panel < panels.length - 1) addTransition(panel, panel + 1);
             }
+
+            const completionStart = timelineCursor;
+            timelineCursor += completionDistance;
+            timeline.push({
+                type: 'complete',
+                panel: panels.length - 1,
+                offset: panels[panels.length - 1].offsetLeft,
+                start: completionStart,
+                end: timelineCursor,
+                distance: completionDistance,
+            });
 
             verticalScrollDistance = timelineCursor;
             story.style.height = `${stageHeight + verticalScrollDistance}px`;
@@ -1854,50 +2011,265 @@ function App() {
         };
     }, []);
 
-    useEffect(() => {
-        const section = nintendoOverviewRef.current;
+    const selectResearchArchive = useCallback((key) => {
+        const category = researchArchiveCategories.find((item) => item.key === key);
+        if (!category || activeResearchArchiveRef.current === key) return;
 
+        setPreviousResearchArchive({
+            categoryKey: activeResearchArchiveRef.current,
+            imageKey: activeResearchArchiveImageRef.current,
+        });
+
+        activeResearchArchiveRef.current = key;
+        activeResearchArchiveImageRef.current = category.images[0].key;
+        setActiveResearchArchive(key);
+        setActiveResearchArchiveImage(category.images[0].key);
+
+        if (researchArchiveTransitionTimerRef.current !== null) {
+            window.clearTimeout(researchArchiveTransitionTimerRef.current);
+        }
+        researchArchiveTransitionTimerRef.current = window.setTimeout(() => {
+            setPreviousResearchArchive(null);
+            researchArchiveTransitionTimerRef.current = null;
+        }, 700);
+    }, []);
+
+    const selectUserInsight = useCallback((key) => {
+        const category = userInsightCategories.find((item) => item.key === key);
+        if (!category || activeUserInsightRef.current === key) return;
+
+        setPreviousUserInsight({
+            categoryKey: activeUserInsightRef.current,
+            imageKey: activeUserInsightImageRef.current,
+        });
+        activeUserInsightRef.current = key;
+        activeUserInsightImageRef.current = category.images[0].key;
+        setActiveUserInsight(key);
+        setActiveUserInsightImage(category.images[0].key);
+
+        if (userInsightTransitionTimerRef.current !== null) {
+            window.clearTimeout(userInsightTransitionTimerRef.current);
+        }
+        userInsightTransitionTimerRef.current = window.setTimeout(() => {
+            setPreviousUserInsight(null);
+            userInsightTransitionTimerRef.current = null;
+        }, 700);
+    }, []);
+
+    const selectDesignStructure = useCallback((key) => {
+        if (
+            !designStructureArtifacts.some((item) => item.key === key) ||
+            activeDesignStructureRef.current === key
+        ) {
+            return;
+        }
+        setPreviousDesignStructure(activeDesignStructureRef.current);
+        activeDesignStructureRef.current = key;
+        setActiveDesignStructure(key);
+
+        if (designStructureTransitionTimerRef.current !== null) {
+            window.clearTimeout(designStructureTransitionTimerRef.current);
+        }
+        designStructureTransitionTimerRef.current = window.setTimeout(() => {
+            setPreviousDesignStructure(null);
+            designStructureTransitionTimerRef.current = null;
+        }, 700);
+    }, []);
+
+    const selectDesignDevelopmentArchive = useCallback((key) => {
+        const category = designDevelopmentArtifacts.find((item) => item.key === key);
+        if (!category || activeDesignDevelopmentArchiveRef.current === key) return;
+
+        setPreviousDesignDevelopmentArchive({
+            categoryKey: activeDesignDevelopmentArchiveRef.current,
+            imageKey: activeDesignDevelopmentArchiveImageRef.current,
+        });
+        activeDesignDevelopmentArchiveRef.current = key;
+        activeDesignDevelopmentArchiveImageRef.current = category.modalImages[0].key;
+        setActiveDesignDevelopmentArchive(key);
+        setActiveDesignDevelopmentArchiveImage(category.modalImages[0].key);
+
+        if (designDevelopmentArchiveTransitionTimerRef.current !== null) {
+            window.clearTimeout(designDevelopmentArchiveTransitionTimerRef.current);
+        }
+        designDevelopmentArchiveTransitionTimerRef.current = window.setTimeout(() => {
+            setPreviousDesignDevelopmentArchive(null);
+            designDevelopmentArchiveTransitionTimerRef.current = null;
+        }, 700);
+    }, []);
+
+    useEffect(() => {
+        const section = researchArchiveRef.current;
         if (!section) return undefined;
 
-        const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
         let animationFrame = null;
+        let scrollCategory = null;
 
-        const updateOverviewCards = () => {
-            if (reducedMotionQuery.matches) {
-                setVisibleNintendoOverviewCards(2);
-                animationFrame = null;
-                return;
+        const updateResearchArchive = () => {
+            const rect = section.getBoundingClientRect();
+            const scrollRange = Math.max(rect.height - window.innerHeight, 1);
+            const progress = Math.min(1, Math.max(0, -rect.top / scrollRange));
+            const nextCategory = progress >= 0.5 ? 'competitor' : 'nintendo';
+
+            if (nextCategory !== scrollCategory) {
+                scrollCategory = nextCategory;
+                selectResearchArchive(nextCategory);
             }
 
-            const rect = section.getBoundingClientRect();
-            const scrollRange = Math.max(section.offsetHeight - window.innerHeight, 1);
-            const progress = Math.min(Math.max(-rect.top / scrollRange, 0), 1);
-            const nextVisibleCards = progress < 0.1 ? 0 : progress < 0.45 ? 1 : 2;
+            animationFrame = null;
+        };
 
-            setVisibleNintendoOverviewCards((currentCount) =>
-                currentCount === nextVisibleCards ? currentCount : nextVisibleCards
+        const scheduleResearchArchiveUpdate = () => {
+            if (animationFrame === null) {
+                animationFrame = window.requestAnimationFrame(updateResearchArchive);
+            }
+        };
+
+        window.addEventListener('scroll', scheduleResearchArchiveUpdate, { passive: true });
+        window.addEventListener('resize', scheduleResearchArchiveUpdate);
+        updateResearchArchive();
+
+        return () => {
+            window.removeEventListener('scroll', scheduleResearchArchiveUpdate);
+            window.removeEventListener('resize', scheduleResearchArchiveUpdate);
+            if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+        };
+    }, [selectResearchArchive]);
+
+    useEffect(
+        () => () => {
+            if (researchArchiveTransitionTimerRef.current !== null) {
+                window.clearTimeout(researchArchiveTransitionTimerRef.current);
+            }
+            if (userInsightTransitionTimerRef.current !== null) {
+                window.clearTimeout(userInsightTransitionTimerRef.current);
+            }
+            if (designStructureTransitionTimerRef.current !== null) {
+                window.clearTimeout(designStructureTransitionTimerRef.current);
+            }
+            if (designDevelopmentArchiveTransitionTimerRef.current !== null) {
+                window.clearTimeout(designDevelopmentArchiveTransitionTimerRef.current);
+            }
+        },
+        []
+    );
+
+    useEffect(() => {
+        const section = userInsightRef.current;
+        if (!section) return undefined;
+
+        let animationFrame = null;
+        let scrollCategory = null;
+
+        const updateUserInsight = () => {
+            const rect = section.getBoundingClientRect();
+            const scrollRange = Math.max(rect.height - window.innerHeight, 1);
+            const progress = Math.min(1, Math.max(0, -rect.top / scrollRange));
+            const categoryIndex = Math.min(
+                userInsightCategories.length - 1,
+                Math.floor(progress * userInsightCategories.length)
             );
+            const nextCategory = userInsightCategories[categoryIndex].key;
+
+            if (nextCategory !== scrollCategory) {
+                scrollCategory = nextCategory;
+                selectUserInsight(nextCategory);
+            }
+            animationFrame = null;
+        };
+
+        const scheduleUserInsightUpdate = () => {
+            if (animationFrame === null) {
+                animationFrame = window.requestAnimationFrame(updateUserInsight);
+            }
+        };
+
+        window.addEventListener('scroll', scheduleUserInsightUpdate, { passive: true });
+        window.addEventListener('resize', scheduleUserInsightUpdate);
+        updateUserInsight();
+
+        return () => {
+            window.removeEventListener('scroll', scheduleUserInsightUpdate);
+            window.removeEventListener('resize', scheduleUserInsightUpdate);
+            if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+        };
+    }, [selectUserInsight]);
+
+    useEffect(() => {
+        const section = designStructureRef.current;
+        if (!section) return undefined;
+        let animationFrame = null;
+        let scrollCategory = null;
+
+        const updateDesignStructure = () => {
+            const rect = section.getBoundingClientRect();
+            const scrollRange = Math.max(rect.height - window.innerHeight, 1);
+            const progress = Math.min(1, Math.max(0, -rect.top / scrollRange));
+            const index = Math.min(
+                designStructureArtifacts.length - 1,
+                Math.floor(progress * designStructureArtifacts.length)
+            );
+            const nextCategory = designStructureArtifacts[index].key;
+            if (nextCategory !== scrollCategory) {
+                scrollCategory = nextCategory;
+                selectDesignStructure(nextCategory);
+            }
             animationFrame = null;
         };
 
         const scheduleUpdate = () => {
             if (animationFrame === null) {
-                animationFrame = window.requestAnimationFrame(updateOverviewCards);
+                animationFrame = window.requestAnimationFrame(updateDesignStructure);
             }
         };
 
         window.addEventListener('scroll', scheduleUpdate, { passive: true });
         window.addEventListener('resize', scheduleUpdate);
-        reducedMotionQuery.addEventListener('change', scheduleUpdate);
-        updateOverviewCards();
-
+        updateDesignStructure();
         return () => {
             window.removeEventListener('scroll', scheduleUpdate);
             window.removeEventListener('resize', scheduleUpdate);
-            reducedMotionQuery.removeEventListener('change', scheduleUpdate);
             if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
         };
-    }, []);
+    }, [selectDesignStructure]);
+
+    useEffect(() => {
+        const section = designDevelopmentArchiveRef.current;
+        if (!section) return undefined;
+        let animationFrame = null;
+        let scrollCategory = null;
+
+        const updateDesignDevelopmentArchive = () => {
+            const rect = section.getBoundingClientRect();
+            const scrollRange = Math.max(rect.height - window.innerHeight, 1);
+            const progress = Math.min(1, Math.max(0, -rect.top / scrollRange));
+            const index = Math.min(
+                designDevelopmentArtifacts.length - 1,
+                Math.floor(progress * designDevelopmentArtifacts.length)
+            );
+            const nextCategory = designDevelopmentArtifacts[index].key;
+            if (nextCategory !== scrollCategory) {
+                scrollCategory = nextCategory;
+                selectDesignDevelopmentArchive(nextCategory);
+            }
+            animationFrame = null;
+        };
+
+        const scheduleUpdate = () => {
+            if (animationFrame === null) {
+                animationFrame = window.requestAnimationFrame(updateDesignDevelopmentArchive);
+            }
+        };
+
+        window.addEventListener('scroll', scheduleUpdate, { passive: true });
+        window.addEventListener('resize', scheduleUpdate);
+        updateDesignDevelopmentArchive();
+        return () => {
+            window.removeEventListener('scroll', scheduleUpdate);
+            window.removeEventListener('resize', scheduleUpdate);
+            if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+        };
+    }, [selectDesignDevelopmentArchive]);
 
     const showNavigation = () => {
         isPointerOverNavRef.current = true;
@@ -1950,23 +2322,121 @@ function App() {
     const activePersonalityTrait = previewPersonalityTrait || selectedPersonalityTrait;
     const activeLove = loveCategories[activeLoveCategory];
     const activeTravelImage = travelArchive[selectedTravelIndex];
+    const selectedResearchArchive = researchArchiveCategories.find(
+        (category) => category.key === activeResearchArchive
+    );
+    const selectedResearchArchiveImage = selectedResearchArchive.images.find(
+        (image) => image.key === activeResearchArchiveImage
+    );
+    const previousResearchArchiveCategory = previousResearchArchive
+        ? researchArchiveCategories.find(
+              (category) => category.key === previousResearchArchive.categoryKey
+          )
+        : null;
+    const previousResearchArchiveImage = previousResearchArchiveCategory?.images.find(
+        (image) => image.key === previousResearchArchive.imageKey
+    );
 
-    const selectedNintendoResearch = nintendoResearchInsights.find(
-        (item) => item.key === activeNintendoResearch
+    const selectResearchArchiveImage = (key) => {
+        activeResearchArchiveImageRef.current = key;
+        setActiveResearchArchiveImage(key);
+    };
+    const selectedUserInsight = userInsightCategories.find(
+        (category) => category.key === activeUserInsight
     );
-    const selectedCompetitorResearch = competitorResearch.find(
-        (item) => item.key === activeCompetitorResearch
+    const selectedUserInsightImage = selectedUserInsight.images.find(
+        (image) => image.key === activeUserInsightImage
     );
+    const previousUserInsightCategory = previousUserInsight
+        ? userInsightCategories.find(
+              (category) => category.key === previousUserInsight.categoryKey
+          )
+        : null;
+    const previousUserInsightImage = previousUserInsightCategory?.images.find(
+        (image) => image.key === previousUserInsight.imageKey
+    );
+    const selectUserInsightImage = (key) => {
+        activeUserInsightImageRef.current = key;
+        setActiveUserInsightImage(key);
+    };
+    const selectUserInsightFromControl = (key) => {
+        const section = userInsightRef.current;
+        const categoryIndex = userInsightCategories.findIndex((item) => item.key === key);
+        if (!section || categoryIndex < 0) return;
+
+        const scrollRange = Math.max(section.offsetHeight - window.innerHeight, 1);
+        const categoryCenter = (categoryIndex + 0.5) / userInsightCategories.length;
+        window.scrollTo({
+            top: section.offsetTop + scrollRange * categoryCenter,
+            behavior: 'auto',
+        });
+        selectUserInsight(key);
+    };
+    const selectedDesignStructure = designStructureArtifacts.find(
+        (item) => item.key === activeDesignStructure
+    );
+    const previousDesignStructureItem = previousDesignStructure
+        ? designStructureArtifacts.find((item) => item.key === previousDesignStructure)
+        : null;
+    const selectDesignStructureFromControl = (key) => {
+        const section = designStructureRef.current;
+        const index = designStructureArtifacts.findIndex((item) => item.key === key);
+        if (!section || index < 0) return;
+        const scrollRange = Math.max(section.offsetHeight - window.innerHeight, 1);
+        window.scrollTo({
+            top: section.offsetTop + scrollRange * ((index + 0.5) / designStructureArtifacts.length),
+            behavior: 'auto',
+        });
+        selectDesignStructure(key);
+    };
+
+    const selectedDesignDevelopmentArchive = designDevelopmentArtifacts.find(
+        (item) => item.key === activeDesignDevelopmentArchive
+    );
+    const selectedDesignDevelopmentArchiveImage =
+        selectedDesignDevelopmentArchive.modalImages.find(
+            (image) => image.key === activeDesignDevelopmentArchiveImage
+        );
+    const previousDesignDevelopmentArchiveCategory = previousDesignDevelopmentArchive
+        ? designDevelopmentArtifacts.find(
+              (item) => item.key === previousDesignDevelopmentArchive.categoryKey
+          )
+        : null;
+    const previousDesignDevelopmentArchiveImage =
+        previousDesignDevelopmentArchiveCategory?.modalImages.find(
+            (image) => image.key === previousDesignDevelopmentArchive.imageKey
+        );
+    const selectDesignDevelopmentArchiveImage = (key) => {
+        if (activeDesignDevelopmentArchiveImageRef.current === key) return;
+        setPreviousDesignDevelopmentArchive({
+            categoryKey: activeDesignDevelopmentArchiveRef.current,
+            imageKey: activeDesignDevelopmentArchiveImageRef.current,
+        });
+        activeDesignDevelopmentArchiveImageRef.current = key;
+        setActiveDesignDevelopmentArchiveImage(key);
+        if (designDevelopmentArchiveTransitionTimerRef.current !== null) {
+            window.clearTimeout(designDevelopmentArchiveTransitionTimerRef.current);
+        }
+        designDevelopmentArchiveTransitionTimerRef.current = window.setTimeout(() => {
+            setPreviousDesignDevelopmentArchive(null);
+            designDevelopmentArchiveTransitionTimerRef.current = null;
+        }, 700);
+    };
+    const selectDesignDevelopmentArchiveFromControl = (key) => {
+        const section = designDevelopmentArchiveRef.current;
+        const index = designDevelopmentArtifacts.findIndex((item) => item.key === key);
+        if (!section || index < 0) return;
+        const scrollRange = Math.max(section.offsetHeight - window.innerHeight, 1);
+        window.scrollTo({
+            top:
+                section.offsetTop +
+                scrollRange * ((index + 0.5) / designDevelopmentArtifacts.length),
+            behavior: 'auto',
+        });
+        selectDesignDevelopmentArchive(key);
+    };
+
     const selectedUserInterview = userInterviews.find((item) => item.key === activeUserInterview);
-    const selectedJourneyResearch = journeyResearch.find(
-        (item) => item.key === activeJourneyResearch
-    );
-    const selectedArchitecture = uxArchitectureArtifacts.find(
-        (item) => item.key === activeArchitecture
-    );
-    const selectedDevelopment = designDevelopmentArtifacts.find(
-        (item) => item.key === activeDevelopment
-    );
     const selectedDevelopmentImage = developmentPreview?.modalImages.find(
         (item) => item.key === activeDevelopmentImage
     );
@@ -2809,6 +3279,21 @@ function App() {
                                         ))}
                                     </div>
                                 </div>
+                                <div
+                                    className="nintendo-chrome-path-preview"
+                                    aria-hidden="true"
+                                >
+                                    <svg
+                                        viewBox="0 0 9600 900"
+                                        preserveAspectRatio="none"
+                                        focusable="false"
+                                    >
+                                        <path
+                                            d="M 60 830 C 430 795 1340 770 1600 760 C 1860 750 2940 835 3200 850 C 3460 865 4540 855 4800 860 C 5060 865 5380 848 5700 846 C 6020 844 6140 851 6400 850 C 6660 849 6940 842 7220 844 C 7500 846 7740 846 8000 848 C 8260 850 8500 832 8720 830 C 8940 828 9280 822 9580 812"
+                                            pathLength="1"
+                                        />
+                                    </svg>
+                                </div>
                             </div>
                             <div
                                 className="horizontal-story__chrome-guide"
@@ -2821,6 +3306,35 @@ function App() {
                                     focusable="false"
                                 >
                                     <defs>
+                                        <mask
+                                            id="nintendo-02-trail-mask"
+                                            maskUnits="userSpaceOnUse"
+                                            x="0"
+                                            y="0"
+                                            width="1600"
+                                            height="900"
+                                        >
+                                            <path
+                                                className="nintendo-02-chrome__trail-mask"
+                                                d="M 43 794 C 210 730 310 690 451 691 C 620 695 700 700 820 620 C 950 535 1120 515 1338 558"
+                                                pathLength="1"
+                                            />
+                                        </mask>
+                                        <mask
+                                            id="nintendo-02-star-mask"
+                                            maskUnits="userSpaceOnUse"
+                                            x="1320"
+                                            y="493"
+                                            width="238"
+                                            height="180"
+                                        >
+                                            <rect
+                                                className="nintendo-02-chrome__star-mask"
+                                                x="1320"
+                                                y="493"
+                                                height="180"
+                                            />
+                                        </mask>
                                         <linearGradient
                                             id="chrome-story-silver"
                                             x1="0"
@@ -2851,6 +3365,29 @@ function App() {
                                             />
                                         </filter>
                                     </defs>
+
+                                    <g className="nintendo-02-chrome">
+                                        <image
+                                            className="nintendo-02-chrome__trail"
+                                            href="/images/chrome-trail-only.png"
+                                            x="28"
+                                            y="425"
+                                            width="1312"
+                                            height="438"
+                                            preserveAspectRatio="xMidYMid meet"
+                                            mask="url(#nintendo-02-trail-mask)"
+                                        />
+                                        <image
+                                            className="nintendo-02-chrome__star"
+                                            href="/images/chrome-shooting-star.png"
+                                            x="1320"
+                                            y="493"
+                                            width="238"
+                                            height="180"
+                                            preserveAspectRatio="xMidYMid meet"
+                                            mask="url(#nintendo-02-star-mask)"
+                                        />
+                                    </g>
 
                                     {chromeStoryPaths.map((item) => (
                                         <g
@@ -2969,322 +3506,528 @@ function App() {
                     </section>
 
                     <section
-                        className="nintendo-project-overview section is-reveal-ready"
-                        aria-labelledby="nintendo-overview-title"
-                        ref={nintendoOverviewRef}
+                        ref={researchArchiveRef}
+                        className="nintendo-research-archive section"
+                        aria-labelledby="nintendo-research-archive-title"
                     >
-                        <div className="nintendo-project-overview__stage">
-                            <header className="nintendo-project-overview__header">
-                                <p className="nintendo-project-overview__label">
-                                    09 / PROJECT OVERVIEW
-                                </p>
-                                <p>NINTENDO RESEARCH ARCHIVE</p>
-                                <p className="nintendo-project-overview__status">
-                                    <span aria-hidden="true" /> SYSTEM ONLINE
-                                </p>
+                        <div className="nintendo-research-archive__inner">
+                            <header className="nintendo-research-archive__meta">
+                                <p>09 / RESEARCH ARCHIVE</p>
+                                <span>ANALYSIS FILES · NINTENDO RENEWAL</span>
                             </header>
 
-                            <div className="nintendo-project-overview__workspace">
-                                <div className="nintendo-project-overview__title-block">
-                                    <p aria-hidden="true">FILE 09 — PROJECT DEFINITION</p>
-                                    <h3 id="nintendo-overview-title">
-                                        <span>FROM INFORMATION</span>
-                                        <em>to Experience.</em>
-                                    </h3>
-                                    <div
-                                        className="nintendo-project-overview__title-rule"
-                                        aria-hidden="true"
-                                    >
-                                        <span>WEB RENEWAL</span>
-                                        <i />
-                                        <span>4 WEEKS</span>
-                                    </div>
-                                </div>
-
-                                <div className="nintendo-project-overview__briefs">
-                                    <article
-                                        className={`nintendo-project-overview__card nintendo-project-overview__card--background${visibleNintendoOverviewCards >= 1 ? ' is-visible' : ''}`}
-                                    >
-                                        <div className="nintendo-project-overview__window-bar">
-                                            <div aria-hidden="true">
-                                                <i />
-                                                <i />
-                                                <i />
-                                            </div>
-                                            <span>BACKGROUND.TXT</span>
-                                            <span>01</span>
-                                        </div>
-                                        <div className="nintendo-project-overview__card-body">
-                                            <div className="nintendo-project-overview__card-index">
-                                                <span>01</span>
-                                                <p>BACKGROUND</p>
-                                            </div>
-                                            <p className="nintendo-project-overview__brief-copy">
-                                                기존 닌텐도 웹사이트는 게임 및 제품 정보를
-                                                제공하지만, 캐릭터 IP를 중심으로 브랜드의 개성을
-                                                경험하거나 원하는 게임을 직관적으로 탐색하는 데
-                                                아쉬움이 있었습니다.
-                                            </p>
-                                        </div>
-                                        <p
-                                            className="nintendo-project-overview__file-status"
-                                            aria-hidden="true"
-                                        >
-                                            READ ONLY <span>●</span> ARCHIVE 01/02
-                                        </p>
-                                    </article>
-
-                                    <article
-                                        className={`nintendo-project-overview__card nintendo-project-overview__card--objective${visibleNintendoOverviewCards >= 2 ? ' is-visible' : ''}`}
-                                    >
-                                        <div className="nintendo-project-overview__window-bar">
-                                            <div aria-hidden="true">
-                                                <i />
-                                                <i />
-                                                <i />
-                                            </div>
-                                            <span>OBJECTIVE.TXT</span>
-                                            <span>02</span>
-                                        </div>
-                                        <div className="nintendo-project-overview__card-body">
-                                            <div className="nintendo-project-overview__card-index">
-                                                <span>02</span>
-                                                <p>OBJECTIVE</p>
-                                            </div>
-                                            <p className="nintendo-project-overview__brief-copy">
-                                                캐릭터 IP 중심으로 브랜드 경험을 강화하고, 게임 탐색
-                                                구조와 인터랙션을 개선하여 정보 탐색 자체가 즐거운
-                                                경험이 되는 웹사이트를 제안합니다.
-                                            </p>
-                                        </div>
-                                        <p
-                                            className="nintendo-project-overview__file-status"
-                                            aria-hidden="true"
-                                        >
-                                            ACTIVE FILE <span>●</span> ARCHIVE 02/02
-                                        </p>
-                                    </article>
-                                </div>
-
-                                <footer className="nintendo-project-overview__keywords">
-                                    <span>CORE KEYWORDS</span>
-                                    <ul>
-                                        <li>
-                                            <span>01</span> CHARACTER IP
-                                        </li>
-                                        <li>
-                                            <span>02</span> GAME DISCOVERY
-                                        </li>
-                                        <li>
-                                            <span>03</span> INTERACTIVE EXPERIENCE
-                                        </li>
-                                    </ul>
-                                    <span aria-hidden="true">END OF FILE ↵</span>
-                                </footer>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section
-                        className="nintendo-analysis section"
-                        aria-labelledby="nintendo-analysis-title"
-                    >
-                        <header className="research-section-header">
-                            <div className="research-section-header__meta">
-                                <span>10 / NINTENDO ANALYSIS</span>
-                                <span>OFFICIAL SITE · ANALYSIS LOG</span>
-                            </div>
-                            <div className="research-section-header__title">
-                                <h3 id="nintendo-analysis-title">
-                                    BEYOND THE <em>Screen.</em>
-                                </h3>
-                                <p>기존 닌텐도 사이트의 강점과 개선 가능성을 분석하다.</p>
-                            </div>
-                        </header>
-                        <div className="nintendo-analysis__editorial">
-                            <div
-                                className="nintendo-analysis__viewer"
-                                id="nintendo-analysis-viewer"
-                                role="tabpanel"
-                            >
-                                <figure key={selectedNintendoResearch.key}>
-                                    <ResearchMedia
-                                        src={selectedNintendoResearch.image}
-                                        alt={selectedNintendoResearch.alt}
-                                        label={selectedNintendoResearch.label}
-                                    />
-                                </figure>
-                                <article key={'copy-' + selectedNintendoResearch.key}>
-                                    <span>ANALYSIS / {selectedNintendoResearch.label}</span>
-                                    <h4>{selectedNintendoResearch.title}</h4>
-                                    <p>{selectedNintendoResearch.description}</p>
-                                    <div>
-                                        <span>DESIGN DIRECTION</span>
-                                        <strong>{selectedNintendoResearch.direction}</strong>
-                                    </div>
-                                </article>
-                            </div>
-                            <p className="research-selector-label">CLICK TO EXPLORE ↓</p>
-                            <div
-                                className="nintendo-analysis__tabs"
-                                role="tablist"
-                                aria-label="닌텐도 사이트 분석 화면 선택"
-                            >
-                                {nintendoResearchInsights.map((item, index) => (
+                            <div className="nintendo-research-archive__layout">
+                                <div className="nintendo-research-archive__media">
                                     <button
+                                        className="nintendo-research-archive__main"
                                         type="button"
-                                        role="tab"
-                                        aria-controls="nintendo-analysis-viewer"
-                                        aria-selected={activeNintendoResearch === item.key}
-                                        tabIndex={activeNintendoResearch === item.key ? 0 : -1}
-                                        className={
-                                            activeNintendoResearch === item.key ? 'is-active' : ''
-                                        }
-                                        key={item.key}
-                                        onClick={() => setActiveNintendoResearch(item.key)}
-                                        onKeyDown={(event) =>
-                                            handleResearchTabKeyDown(
-                                                event,
-                                                nintendoResearchInsights,
-                                                activeNintendoResearch,
-                                                setActiveNintendoResearch
+                                        onClick={(event) =>
+                                            openDocumentPreview(
+                                                {
+                                                    src: selectedResearchArchiveImage.src,
+                                                    alt: selectedResearchArchiveImage.alt,
+                                                    isResearch: true,
+                                                },
+                                                event
                                             )
                                         }
+                                        aria-label={`${selectedResearchArchiveImage.label} 원본 이미지 확대 보기`}
                                     >
-                                        <span>{String(index + 1).padStart(2, '0')}</span>
-                                        {index === 0 ? 'MAIN' : index === 1 ? 'STORE' : 'CHARACTER'}
-                                        <i aria-hidden="true">↗</i>
+                                        {previousResearchArchiveImage && (
+                                            <img
+                                                className="is-leaving"
+                                                src={previousResearchArchiveImage.src}
+                                                alt=""
+                                                aria-hidden="true"
+                                            />
+                                        )}
+                                        <img
+                                            className="is-entering"
+                                            key={selectedResearchArchiveImage.key}
+                                            src={selectedResearchArchiveImage.src}
+                                            alt={selectedResearchArchiveImage.alt}
+                                        />
+                                        <span>
+                                            VIEW FULL IMAGE <i aria-hidden="true">↗</i>
+                                        </span>
                                     </button>
-                                ))}
+
+                                    <div
+                                        className="nintendo-research-archive__thumbnails"
+                                        role="group"
+                                        aria-label={`${selectedResearchArchive.label} 세부 이미지 선택`}
+                                    >
+                                        {previousResearchArchiveCategory && (
+                                            <div
+                                                className="nintendo-research-archive__thumbnail-set is-leaving"
+                                                aria-hidden="true"
+                                            >
+                                                {previousResearchArchiveCategory.images.map((image) => (
+                                                    <div key={image.key}>
+                                                        <img src={image.src} alt="" />
+                                                        <span>{image.label}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                        <div
+                                            className="nintendo-research-archive__thumbnail-set is-entering"
+                                            key={selectedResearchArchive.key}
+                                        >
+                                            {selectedResearchArchive.images.map((image) => (
+                                                <button
+                                                    type="button"
+                                                    aria-pressed={activeResearchArchiveImage === image.key}
+                                                    className={activeResearchArchiveImage === image.key ? 'is-active' : ''}
+                                                    key={image.key}
+                                                    onClick={() => selectResearchArchiveImage(image.key)}
+                                                >
+                                                    <img src={image.src} alt="" />
+                                                    <span>{image.label}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="nintendo-research-archive__content">
+                                    <p className="nintendo-research-archive__eyebrow">
+                                        ARCHIVE 01 / 02
+                                    </p>
+                                    <h3 id="nintendo-research-archive-title">
+                                        <span>Beyond the</span>
+                                        <em>Screen.</em>
+                                    </h3>
+                                    <p className="nintendo-research-archive__description">
+                                        익숙한 닌텐도의 화면을 다시 바라보고, 다른 게임 플랫폼과의
+                                        차이를 살펴봤습니다.
+                                    </p>
+
+                                    <div
+                                        className="nintendo-research-archive__categories"
+                                        role="tablist"
+                                        aria-label="리서치 자료 카테고리"
+                                    >
+                                        {researchArchiveCategories.map((category, index) => (
+                                            <button
+                                                type="button"
+                                                role="tab"
+                                                aria-selected={activeResearchArchive === category.key}
+                                                tabIndex={activeResearchArchive === category.key ? 0 : -1}
+                                                className={activeResearchArchive === category.key ? 'is-active' : ''}
+                                                key={category.key}
+                                                onClick={() => selectResearchArchive(category.key)}
+                                                onKeyDown={(event) =>
+                                                    handleResearchTabKeyDown(
+                                                        event,
+                                                        researchArchiveCategories,
+                                                        activeResearchArchive,
+                                                        selectResearchArchive
+                                                    )
+                                                }
+                                            >
+                                                <span>{String(index + 1).padStart(2, '0')}</span>
+                                                <strong>{category.label}</strong>
+                                                <i aria-hidden="true">↗</i>
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                </div>
                             </div>
-                            <button
-                                className="research-source-link research-source-link--light"
-                                type="button"
-                                onClick={(event) =>
-                                    openDocumentPreview(
-                                        {
-                                            src: '/images/nintendo/research/nintendo-analysis.png',
-                                            alt: '닌텐도 공식 사이트의 여섯 가지 분석 기준을 정리한 원본 자료',
-                                            isResearch: true,
-                                        },
-                                        event
-                                    )
-                                }
-                            >
-                                <span>SOURCE / ANALYSIS BOARD</span>
-                                <strong>VIEW ORIGINAL RESEARCH ↗</strong>
-                            </button>
                         </div>
                     </section>
 
                     <section
-                        className="competitive-research section"
-                        aria-labelledby="competitive-research-title"
+                        ref={userInsightRef}
+                        className="nintendo-research-archive nintendo-user-insight section"
+                        aria-labelledby="nintendo-user-insight-title"
                     >
-                        <header className="research-section-header research-section-header--dark">
-                            <div className="research-section-header__meta">
-                                <span>11 / COMPETITIVE RESEARCH</span>
-                                <span>03 PLATFORMS · COMPARATIVE VIEW</span>
-                            </div>
-                            <div className="research-section-header__title">
-                                <h3 id="competitive-research-title">
-                                    LOOKING BEYOND <em>Nintendo.</em>
-                                </h3>
-                                <p>세 가지 게임 플랫폼의 경험을 비교하다.</p>
-                            </div>
-                        </header>
-                        <p className="research-selector-label research-selector-label--dark">
-                            CLICK TO EXPLORE ↓
-                        </p>
-                        <div
-                            className="competitive-research__tabs"
-                            role="tablist"
-                            aria-label="경쟁 플랫폼 선택"
-                        >
-                            {competitorResearch.map((item, index) => (
-                                <button
-                                    type="button"
-                                    role="tab"
-                                    aria-controls="competitive-research-viewer"
-                                    aria-selected={activeCompetitorResearch === item.key}
-                                    tabIndex={activeCompetitorResearch === item.key ? 0 : -1}
-                                    className={
-                                        activeCompetitorResearch === item.key ? 'is-active' : ''
-                                    }
-                                    key={item.key}
-                                    onClick={() => setActiveCompetitorResearch(item.key)}
-                                    onKeyDown={(event) =>
-                                        handleResearchTabKeyDown(
-                                            event,
-                                            competitorResearch,
-                                            activeCompetitorResearch,
-                                            setActiveCompetitorResearch
-                                        )
-                                    }
-                                >
-                                    <span>{String(index + 1).padStart(2, '0')}</span>
-                                    {item.label}
-                                    <i aria-hidden="true">↗</i>
-                                </button>
-                            ))}
-                        </div>
-                        <div
-                            className="competitive-research__viewer"
-                            id="competitive-research-viewer"
-                            role="tabpanel"
-                        >
-                            <figure key={selectedCompetitorResearch.key}>
-                                <ResearchMedia
-                                    src={selectedCompetitorResearch.image}
-                                    alt={selectedCompetitorResearch.alt}
-                                    label={selectedCompetitorResearch.label}
-                                />
-                            </figure>
-                            <article key={'competitor-' + selectedCompetitorResearch.key}>
-                                <span>SELECTED PLATFORM / {selectedCompetitorResearch.label}</span>
-                                <h4>{selectedCompetitorResearch.label}</h4>
-                                <dl>
-                                    <div>
-                                        <dt>FEATURE</dt>
-                                        <dd>{selectedCompetitorResearch.feature}</dd>
+                        <div className="nintendo-research-archive__inner">
+                            <header className="nintendo-research-archive__meta">
+                                <p>10 / USER INSIGHT</p>
+                                <span>PROCESS ARCHIVE · NINTENDO RENEWAL</span>
+                            </header>
+
+                            <div className="nintendo-research-archive__layout">
+                                <div className="nintendo-research-archive__media">
+                                    <div
+                                        className={`nintendo-research-archive__main${activeUserInsight === 'interview' ? ' is-editorial' : ''}`}
+                                    >
+                                        {previousUserInsightCategory?.key === 'interview' ? (
+                                            <InterviewEditorialCard
+                                                interview={previousUserInsightImage}
+                                                className="is-leaving"
+                                            />
+                                        ) : previousUserInsightImage ? (
+                                            <img className="is-leaving" src={previousUserInsightImage.src} alt="" aria-hidden="true" />
+                                        ) : null}
+                                        {activeUserInsight === 'interview' ? (
+                                            <InterviewEditorialCard
+                                                key={selectedUserInsightImage.key}
+                                                interview={selectedUserInsightImage}
+                                                className="is-entering"
+                                            />
+                                        ) : (
+                                            <button
+                                                className="nintendo-user-insight__image-trigger"
+                                                type="button"
+                                                onClick={(event) =>
+                                                    openDocumentPreview(
+                                                        {
+                                                            src: selectedUserInsightImage.src,
+                                                            alt: selectedUserInsightImage.alt,
+                                                            isResearch: true,
+                                                        },
+                                                        event
+                                                    )
+                                                }
+                                                aria-label={`${selectedUserInsightImage.label} 자료 확대 보기`}
+                                            >
+                                                <img className="is-entering" key={selectedUserInsightImage.key} src={selectedUserInsightImage.src} alt={selectedUserInsightImage.alt} />
+                                                <span>VIEW FULL IMAGE <i aria-hidden="true">↗</i></span>
+                                            </button>
+                                        )}
                                     </div>
-                                    <div>
-                                        <dt>INSIGHT</dt>
-                                        <dd>{selectedCompetitorResearch.implication}</dd>
+
+                                    <div
+                                        className="nintendo-research-archive__thumbnails"
+                                        role="group"
+                                        aria-label={`${selectedUserInsight.label} 사용자 자료 선택`}
+                                    >
+                                        {previousUserInsightCategory && (
+                                            <div
+                                                className="nintendo-research-archive__thumbnail-set is-leaving"
+                                                aria-hidden="true"
+                                            >
+                                                {previousUserInsightCategory.images.map((image) => (
+                                                    <div className={previousUserInsightCategory.key === 'interview' ? 'is-person' : ''} key={image.key}>
+                                                        {previousUserInsightCategory.key !== 'interview' && <img src={image.src} alt="" />}
+                                                        <span>{image.label}</span>
+                                                        {previousUserInsightCategory.key === 'interview' && <strong>{image.name}</strong>}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                        <div
+                                            className="nintendo-research-archive__thumbnail-set is-entering"
+                                            key={selectedUserInsight.key}
+                                        >
+                                            {selectedUserInsight.images.map((image) => (
+                                                <button
+                                                    type="button"
+                                                    aria-pressed={activeUserInsightImage === image.key}
+                                                    className={`${activeUserInsight === 'interview' ? 'is-person ' : ''}${activeUserInsightImage === image.key ? 'is-active' : ''}`.trim()}
+                                                    key={image.key}
+                                                    onClick={() => selectUserInsightImage(image.key)}
+                                                >
+                                                    {activeUserInsight !== 'interview' && <img src={image.src} alt="" />}
+                                                    <span>{image.label}</span>
+                                                    {activeUserInsight === 'interview' && <strong>{image.name}</strong>}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
-                                </dl>
-                            </article>
-                        </div>
-                        <div className="competitive-research__footer">
-                            <aside className="competitive-research__takeaway">
-                                <span>RESEARCH TAKEAWAY</span>
-                                <p>
-                                    브랜드의 개성을 전달하는 시각적 경험과 사용자가 원하는 게임을
-                                    쉽게 발견할 수 있는 탐색 구조를 함께 강화하고자 했습니다.
-                                </p>
-                            </aside>
-                            <button
-                                className="research-source-link research-source-link--dark"
-                                type="button"
-                                onClick={(event) =>
-                                    openDocumentPreview(
-                                        {
-                                            src: '/images/nintendo/research/competitive-research.png',
-                                            alt: 'PlayStation, Xbox, Steam Deck의 화면과 특징을 비교한 경쟁사 리서치 원본 자료',
-                                            isResearch: true,
-                                        },
-                                        event
-                                    )
-                                }
-                                aria-label="경쟁사 리서치 원본 자료 확대 보기"
-                            >
-                                <span>SOURCE / COMPARISON BOARD</span>
-                                <strong>VIEW ORIGINAL RESEARCH ↗</strong>
-                            </button>
+
+                                    <div
+                                        className={`nintendo-user-insight__source-actions${activeUserInsight === 'interview' ? '' : ' is-placeholder'}`}
+                                        aria-hidden={activeUserInsight !== 'interview'}
+                                    >
+                                        {activeUserInsight === 'interview' && selectedUserInsightImage.pdf && (
+                                            <>
+                                                <a href={selectedUserInsightImage.pdf} target="_blank" rel="noreferrer">
+                                                    VIEW ORIGINAL PDF <span aria-hidden="true">↗</span>
+                                                </a>
+                                                <button
+                                                    type="button"
+                                                    onClick={(event) => openDocumentPreview(
+                                                        {
+                                                            src: selectedUserInsightImage.src,
+                                                            alt: selectedUserInsightImage.alt,
+                                                            isResearch: true,
+                                                        },
+                                                        event
+                                                    )}
+                                                >
+                                                    VIEW ORIGINAL IMAGE <span aria-hidden="true">↗</span>
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="nintendo-research-archive__content">
+                                    <p className="nintendo-research-archive__eyebrow">ARCHIVE 01 / 04</p>
+                                    <h3 id="nintendo-user-insight-title">
+                                        <span>Understanding</span>
+                                        <em>the Players.</em>
+                                    </h3>
+                                    <p className="nintendo-research-archive__description">
+                                        사용자의 목소리에서 출발해, 경험의 흐름을 구체화했습니다.
+                                    </p>
+                                    <div
+                                        className="nintendo-research-archive__categories"
+                                        role="tablist"
+                                        aria-label="사용자 인사이트 자료 카테고리"
+                                    >
+                                        {userInsightCategories.map((category, index) => (
+                                            <button
+                                                type="button"
+                                                role="tab"
+                                                aria-selected={activeUserInsight === category.key}
+                                                tabIndex={activeUserInsight === category.key ? 0 : -1}
+                                                className={activeUserInsight === category.key ? 'is-active' : ''}
+                                                key={category.key}
+                                                onClick={() => selectUserInsightFromControl(category.key)}
+                                                onKeyDown={(event) =>
+                                                    handleResearchTabKeyDown(
+                                                        event,
+                                                        userInsightCategories,
+                                                        activeUserInsight,
+                                                        selectUserInsightFromControl
+                                                    )
+                                                }
+                                            >
+                                                <span>{String(index + 1).padStart(2, '0')}</span>
+                                                <strong>{category.label}</strong>
+                                                <i aria-hidden="true">↗</i>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </section>
 
                     <section
+                        ref={designStructureRef}
+                        className="nintendo-research-archive nintendo-user-insight nintendo-design-structure section"
+                        aria-labelledby="nintendo-design-structure-title"
+                    >
+                        <div className="nintendo-research-archive__inner">
+                            <header className="nintendo-research-archive__meta">
+                                <p>11 / DESIGN STRUCTURE</p>
+                                <span>PROCESS ARCHIVE · NINTENDO RENEWAL</span>
+                            </header>
+                            <div className="nintendo-research-archive__layout">
+                                <div className="nintendo-research-archive__media">
+                                    <div className="nintendo-research-archive__main">
+                                        {previousDesignStructureItem && (
+                                            <img className="is-leaving" src={previousDesignStructureItem.src} alt="" aria-hidden="true" />
+                                        )}
+                                        <button
+                                            className="nintendo-user-insight__image-trigger"
+                                            type="button"
+                                            onClick={(event) => openArchitecturePreview(selectedDesignStructure, event)}
+                                            aria-label={`${selectedDesignStructure.title} 원본 이미지 확대 보기`}
+                                        >
+                                            <img className="is-entering" key={selectedDesignStructure.key} src={selectedDesignStructure.src} alt={selectedDesignStructure.alt} />
+                                            <span>VIEW FULL IMAGE <i aria-hidden="true">↗</i></span>
+                                        </button>
+                                    </div>
+                                    <div className="nintendo-research-archive__thumbnails" role="group" aria-label="디자인 구조 자료 선택">
+                                        <div className="nintendo-research-archive__thumbnail-set is-entering" key={activeDesignStructure}>
+                                            {designStructureArtifacts.map((item) => (
+                                                <button
+                                                    type="button"
+                                                    aria-pressed={activeDesignStructure === item.key}
+                                                    className={activeDesignStructure === item.key ? 'is-active' : ''}
+                                                    key={item.key}
+                                                    onClick={() => selectDesignStructureFromControl(item.key)}
+                                                >
+                                                    <img src={item.previewSrc} alt="" />
+                                                    <span>{item.key === 'ia' ? 'IA' : item.key === 'flow' ? 'USER FLOW' : 'MIND MAP'}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="nintendo-user-insight__source-actions is-placeholder" aria-hidden="true" />
+                                </div>
+                                <div className="nintendo-research-archive__content">
+                                    <p className="nintendo-research-archive__eyebrow">ARCHIVE 01 / 03</p>
+                                    <h3 id="nintendo-design-structure-title">
+                                        <span>From Insight</span>
+                                        <em>to Structure.</em>
+                                    </h3>
+                                    <p className="nintendo-research-archive__description">
+                                        사용자의 니즈를 바탕으로 정보의 흐름과 사이트 구조를 설계했습니다.
+                                    </p>
+                                    <div className="nintendo-research-archive__categories" role="tablist" aria-label="디자인 구조 자료 카테고리">
+                                        {designStructureArtifacts.map((item) => (
+                                            <button
+                                                type="button"
+                                                role="tab"
+                                                aria-selected={activeDesignStructure === item.key}
+                                                tabIndex={activeDesignStructure === item.key ? 0 : -1}
+                                                className={activeDesignStructure === item.key ? 'is-active' : ''}
+                                                key={item.key}
+                                                onClick={() => selectDesignStructureFromControl(item.key)}
+                                                onKeyDown={(event) => handleResearchTabKeyDown(event, designStructureArtifacts, activeDesignStructure, selectDesignStructureFromControl)}
+                                            >
+                                                <span>{item.number}</span>
+                                                <strong>{item.title}</strong>
+                                                <i aria-hidden="true">↗</i>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section
+                        ref={designDevelopmentArchiveRef}
+                        className="nintendo-research-archive nintendo-user-insight nintendo-design-structure nintendo-design-development-archive section"
+                        aria-labelledby="nintendo-design-development-title"
+                    >
+                        <div className="nintendo-research-archive__inner">
+                            <header className="nintendo-research-archive__meta">
+                                <p>12 / DESIGN DEVELOPMENT</p>
+                                <span>PROCESS ARCHIVE · NINTENDO RENEWAL</span>
+                            </header>
+                            <div className="nintendo-research-archive__layout">
+                                <div className="nintendo-research-archive__media">
+                                    <div className="nintendo-research-archive__main">
+                                        {previousDesignDevelopmentArchiveImage && (
+                                            <img
+                                                className="is-leaving"
+                                                src={previousDesignDevelopmentArchiveImage.src}
+                                                alt=""
+                                                aria-hidden="true"
+                                            />
+                                        )}
+                                        <button
+                                            className="nintendo-user-insight__image-trigger"
+                                            type="button"
+                                            onClick={(event) =>
+                                                openDevelopmentPreview(
+                                                    selectedDesignDevelopmentArchive,
+                                                    event,
+                                                    selectedDesignDevelopmentArchiveImage.key
+                                                )
+                                            }
+                                            aria-label={`${selectedDesignDevelopmentArchiveImage.label} 원본 이미지 확대 보기`}
+                                        >
+                                            <img
+                                                className="is-entering"
+                                                key={`${activeDesignDevelopmentArchive}-${activeDesignDevelopmentArchiveImage}`}
+                                                src={selectedDesignDevelopmentArchiveImage.src}
+                                                alt={selectedDesignDevelopmentArchiveImage.alt}
+                                            />
+                                            <span>VIEW FULL IMAGE <i aria-hidden="true">↗</i></span>
+                                        </button>
+                                    </div>
+                                    <div
+                                        className="nintendo-research-archive__thumbnails"
+                                        role="group"
+                                        aria-label="디자인 개발 자료 선택"
+                                    >
+                                        {previousDesignDevelopmentArchiveCategory &&
+                                            previousDesignDevelopmentArchiveCategory.key !==
+                                                selectedDesignDevelopmentArchive.key && (
+                                                <div className="nintendo-research-archive__thumbnail-set is-leaving">
+                                                    {previousDesignDevelopmentArchiveCategory.modalImages.map(
+                                                        (image) => (
+                                                            <button type="button" key={image.key} tabIndex={-1}>
+                                                                <img src={image.src} alt="" />
+                                                                <span>{image.label}</span>
+                                                            </button>
+                                                        )
+                                                    )}
+                                                </div>
+                                            )}
+                                        <div
+                                            className="nintendo-research-archive__thumbnail-set is-entering"
+                                            key={activeDesignDevelopmentArchive}
+                                        >
+                                            {selectedDesignDevelopmentArchive.modalImages.map((image) => (
+                                                <button
+                                                    type="button"
+                                                    aria-pressed={
+                                                        activeDesignDevelopmentArchiveImage === image.key
+                                                    }
+                                                    className={
+                                                        activeDesignDevelopmentArchiveImage === image.key
+                                                            ? 'is-active'
+                                                            : ''
+                                                    }
+                                                    key={image.key}
+                                                    onClick={() =>
+                                                        selectDesignDevelopmentArchiveImage(image.key)
+                                                    }
+                                                >
+                                                    <img src={image.src} alt="" />
+                                                    <span>{image.label}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div
+                                        className="nintendo-user-insight__source-actions is-placeholder"
+                                        aria-hidden="true"
+                                    />
+                                </div>
+                                <div className="nintendo-research-archive__content">
+                                    <p className="nintendo-research-archive__eyebrow">
+                                        ARCHIVE {selectedDesignDevelopmentArchive.number} / 03
+                                    </p>
+                                    <h3 id="nintendo-design-development-title">
+                                        <span>Shaping the</span>
+                                        <em>Experience.</em>
+                                    </h3>
+                                    <p className="nintendo-research-archive__description">
+                                        아이디어를 구체적인 화면과 시각적 디자인 시스템으로 발전시켰습니다.
+                                    </p>
+                                    <div
+                                        className="nintendo-research-archive__categories"
+                                        role="tablist"
+                                        aria-label="디자인 개발 자료 카테고리"
+                                    >
+                                        {designDevelopmentArtifacts.map((item) => (
+                                            <button
+                                                type="button"
+                                                role="tab"
+                                                aria-selected={
+                                                    activeDesignDevelopmentArchive === item.key
+                                                }
+                                                tabIndex={
+                                                    activeDesignDevelopmentArchive === item.key
+                                                        ? 0
+                                                        : -1
+                                                }
+                                                className={
+                                                    activeDesignDevelopmentArchive === item.key
+                                                        ? 'is-active'
+                                                        : ''
+                                                }
+                                                key={item.key}
+                                                onClick={() =>
+                                                    selectDesignDevelopmentArchiveFromControl(
+                                                        item.key
+                                                    )
+                                                }
+                                                onKeyDown={(event) =>
+                                                    handleResearchTabKeyDown(
+                                                        event,
+                                                        designDevelopmentArtifacts,
+                                                        activeDesignDevelopmentArchive,
+                                                        selectDesignDevelopmentArchiveFromControl
+                                                    )
+                                                }
+                                            >
+                                                <span>{item.number}</span>
+                                                <strong>{item.title}</strong>
+                                                <i aria-hidden="true">●</i>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section
+                        hidden
                         className="user-interview section"
                         id="user-interview"
                         aria-labelledby="user-interview-title"
@@ -3400,536 +4143,18 @@ function App() {
                     </section>
 
                     <section
-                        className="user-persona section"
-                        id="user-persona"
-                        aria-labelledby="user-persona-title"
+                        className="nintendo-final-outcome-13 section"
+                        id="nintendo-final-outcome-13"
+                        aria-labelledby="nintendo-final-outcome-13-title"
                     >
-                        <div className="user-persona__inner">
-                            <header className="user-persona__header">
-                                <div className="user-persona__meta">
-                                    <span>13 / USER PERSONA</span>
-                                    <span>BEHAVIORAL ARCHETYPES / N=3</span>
+                        <div className="nintendo-final-outcome-13__inner">
+                            <header className="nintendo-final-outcome-13__header">
+                                <div className="nintendo-final-outcome-13__meta">
+                                    <span>13 / FINAL OUTCOME</span>
+                                    <span>NINTENDO RENEWAL · FINAL RESULT</span>
                                 </div>
-                                <div className="user-persona__heading">
-                                    <h3 id="user-persona-title">
-                                        DESIGNING FOR <em>People.</em>
-                                    </h3>
-                                    <p>
-                                        사용자 조사에서 발견한 탐색 방식과 핵심 니즈를 세 가지 행동
-                                        유형으로 정리했습니다.
-                                    </p>
-                                </div>
-                            </header>
-
-                            <div className="user-persona__grid">
-                                {userPersonas.map((persona) => (
-                                    <article className="user-persona__card" key={persona.number}>
-                                        <div className="user-persona__identity">
-                                            <span>PERSONA {persona.number}</span>
-                                            <p>{persona.profile}</p>
-                                        </div>
-                                        <div className="user-persona__visual" aria-hidden="true">
-                                            <img src={persona.avatar} alt="" />
-                                        </div>
-                                        <div className="user-persona__name">
-                                            <h4>{persona.name}</h4>
-                                            <strong>{persona.type}</strong>
-                                        </div>
-                                        <p className="user-persona__characteristic">
-                                            {persona.characteristic}
-                                        </p>
-                                        <dl>
-                                            <div>
-                                                <dt>GOAL</dt>
-                                                <dd>{persona.goal}</dd>
-                                            </div>
-                                            <div className="user-persona__pain">
-                                                <dt>PAIN POINT</dt>
-                                                <dd>{persona.painPoint}</dd>
-                                            </div>
-                                            <div>
-                                                <dt>NEED</dt>
-                                                <dd>{persona.need}</dd>
-                                            </div>
-                                        </dl>
-                                        <div className="user-persona__button-area">
-                                            <button
-                                                type="button"
-                                                onClick={(event) =>
-                                                    openDocumentPreview(
-                                                        {
-                                                            src: persona.image,
-                                                            alt: `${persona.name} 사용자 퍼소나 원본 자료`,
-                                                        },
-                                                        event
-                                                    )
-                                                }
-                                                aria-label={`${persona.name} 사용자 퍼소나 원본 보기`}
-                                            >
-                                                VIEW ORIGINAL <span aria-hidden="true">↗</span>
-                                            </button>
-                                        </div>
-                                    </article>
-                                ))}
-                            </div>
-
-                            <footer className="user-persona__direction">
-                                <span>DESIGN DIRECTION</span>
-                                <p>
-                                    취향으로 발견하고, 캐릭터로 연결되며, 시리즈의 세계로 몰입하는
-                                    경험.
-                                </p>
-                            </footer>
-                        </div>
-                    </section>
-
-                    <section
-                        className="journey-strategy section"
-                        id="journey-strategy"
-                        aria-labelledby="journey-strategy-title"
-                    >
-                        <div className="journey-strategy__inner">
-                            <header className="journey-strategy__header">
-                                <div className="journey-strategy__meta">
-                                    <span>14 / USER JOURNEY &amp; STRATEGY</span>
-                                    <span>JOURNEY MAP · LEAN CANVAS</span>
-                                </div>
-                                <div className="journey-strategy__heading">
-                                    <h3 id="journey-strategy-title">
-                                        FROM <em>Friction.</em> TO DIRECTION.
-                                    </h3>
-                                    <p>
-                                        탐색 과정의 감정 변화를 따라 핵심 마찰 지점을 발견하고,
-                                        구체적인 디자인 방향으로 전환했습니다.
-                                    </p>
-                                </div>
-                            </header>
-
-                            <div
-                                className="journey-strategy__tabs"
-                                role="tablist"
-                                aria-label="사용자 여정 선택"
-                            >
-                                {journeyResearch.map((research) => (
-                                    <button
-                                        type="button"
-                                        role="tab"
-                                        aria-selected={activeJourneyResearch === research.key}
-                                        aria-controls="journey-strategy-panel"
-                                        tabIndex={activeJourneyResearch === research.key ? 0 : -1}
-                                        className={
-                                            activeJourneyResearch === research.key
-                                                ? 'is-active'
-                                                : ''
-                                        }
-                                        key={research.key}
-                                        onClick={() => {
-                                            setActiveJourneyResearch(research.key);
-                                            setActiveJourneyPoint(null);
-                                        }}
-                                        onKeyDown={(event) =>
-                                            handleResearchTabKeyDown(
-                                                event,
-                                                journeyResearch,
-                                                activeJourneyResearch,
-                                                (key) => {
-                                                    setActiveJourneyResearch(key);
-                                                    setActiveJourneyPoint(null);
-                                                }
-                                            )
-                                        }
-                                    >
-                                        <span>{research.number}</span>
-                                        <strong>{research.name}</strong>
-                                        <small>{research.type}</small>
-                                    </button>
-                                ))}
-                            </div>
-
-                            <article
-                                className="journey-strategy__panel"
-                                id="journey-strategy-panel"
-                                role="tabpanel"
-                                key={selectedJourneyResearch.key}
-                            >
-                                <div className="journey-strategy__chart-head">
-                                    <div>
-                                        <span>EMOTION JOURNEY / 6 STEPS</span>
-                                        <strong>
-                                            {selectedJourneyResearch.name} ·{' '}
-                                            {selectedJourneyResearch.profile}
-                                        </strong>
-                                    </div>
-                                    <p>SCORE 01—05 / ORIGINAL RESEARCH DATA</p>
-                                </div>
-
-                                <div className="journey-strategy__chart">
-                                    <div className="journey-strategy__scale" aria-hidden="true">
-                                        {[5, 4, 3, 2, 1].map((score) => (
-                                            <span key={score}>
-                                                {String(score).padStart(2, '0')}
-                                            </span>
-                                        ))}
-                                    </div>
-                                    <div className="journey-strategy__plot">
-                                        <div className="journey-strategy__canvas">
-                                            <svg
-                                                viewBox="0 0 1000 230"
-                                                role="img"
-                                                aria-label={`${selectedJourneyResearch.name}의 6단계 감정 점수: ${selectedJourneyResearch.scores.join(', ')}`}
-                                                preserveAspectRatio="none"
-                                            >
-                                                {[35, 75, 115, 155, 195].map((y) => (
-                                                    <line key={y} x1="0" y1={y} x2="1000" y2={y} />
-                                                ))}
-                                                <polygon
-                                                    className="journey-strategy__area"
-                                                    points={`83.333,230 ${selectedJourneyResearch.scores
-                                                        .map(
-                                                            (score, index) =>
-                                                                `${83.333 + index * 166.667},${235 - score * 40}`
-                                                        )
-                                                        .join(' ')} 916.668,230`}
-                                                />
-                                                <polyline
-                                                    className="journey-strategy__line"
-                                                    points={selectedJourneyResearch.scores
-                                                        .map(
-                                                            (score, index) =>
-                                                                `${83.333 + index * 166.667},${235 - score * 40}`
-                                                        )
-                                                        .join(' ')}
-                                                />
-                                            </svg>
-                                            <div className="journey-strategy__points">
-                                                {selectedJourneyResearch.scores.map(
-                                                    (score, index) => (
-                                                        <button
-                                                            className={`journey-strategy__point${activeJourneyPoint === index ? ' is-active' : ''}`}
-                                                            style={{
-                                                                '--point-x': `${((index + 0.5) / 6) * 100}%`,
-                                                                '--point-y': `${((235 - score * 40) / 230) * 100}%`,
-                                                            }}
-                                                            key={`${selectedJourneyResearch.key}-${journeyStages[index]}`}
-                                                            type="button"
-                                                            aria-label={`${journeyStages[index]} 단계, 감정 점수 ${score}점, ${emotionScale[score]}`}
-                                                            onMouseEnter={() =>
-                                                                setActiveJourneyPoint(index)
-                                                            }
-                                                            onMouseLeave={() =>
-                                                                setActiveJourneyPoint(null)
-                                                            }
-                                                            onFocus={() =>
-                                                                setActiveJourneyPoint(index)
-                                                            }
-                                                            onBlur={() =>
-                                                                setActiveJourneyPoint(null)
-                                                            }
-                                                            onClick={() =>
-                                                                setActiveJourneyPoint(index)
-                                                            }
-                                                        >
-                                                            <span
-                                                                className="journey-strategy__emotion"
-                                                                aria-hidden="true"
-                                                            >
-                                                                {score}점 · {emotionScale[score]}
-                                                            </span>
-                                                        </button>
-                                                    )
-                                                )}
-                                            </div>
-                                        </div>
-                                        <ol>
-                                            {journeyStages.map((stage, index) => (
-                                                <li key={stage}>
-                                                    <span>0{index + 1}</span>
-                                                    <strong>{stage}</strong>
-                                                </li>
-                                            ))}
-                                        </ol>
-                                    </div>
-                                </div>
-
-                                <div className="journey-strategy__response">
-                                    <div>
-                                        <span>PAIN POINT</span>
-                                        <p>{selectedJourneyResearch.pain}</p>
-                                    </div>
-                                    <i aria-hidden="true">→</i>
-                                    <div>
-                                        <span>DESIGN RESPONSE</span>
-                                        <p>{selectedJourneyResearch.response}</p>
-                                    </div>
-                                </div>
-
-                                <div className="journey-strategy__sources">
-                                    <button
-                                        type="button"
-                                        onClick={(event) =>
-                                            openDocumentPreview(
-                                                {
-                                                    src: selectedJourneyResearch.journey,
-                                                    alt: `${selectedJourneyResearch.name} 사용자 여정 지도 원본`,
-                                                    isResearch: true,
-                                                },
-                                                event
-                                            )
-                                        }
-                                    >
-                                        VIEW JOURNEY MAP <span aria-hidden="true">↗</span>
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={(event) =>
-                                            openDocumentPreview(
-                                                {
-                                                    src: selectedJourneyResearch.canvas,
-                                                    alt: `${selectedJourneyResearch.name} 린 캔버스 원본`,
-                                                    isResearch: true,
-                                                },
-                                                event
-                                            )
-                                        }
-                                    >
-                                        VIEW LEAN CANVAS <span aria-hidden="true">↗</span>
-                                    </button>
-                                </div>
-                            </article>
-                        </div>
-                    </section>
-
-                    <section
-                        ref={uxArchitectureRef}
-                        className={`ux-architecture section${isArchitectureVisible ? ' is-visible' : ''}`}
-                        id="ux-architecture"
-                        aria-labelledby="ux-architecture-title"
-                    >
-                        <div className="ux-architecture__inner">
-                            <header className="ux-architecture__header">
-                                <div
-                                    className="ux-architecture__meta ux-architecture__reveal"
-                                    style={{ '--delay': '0s' }}
-                                >
-                                    <span>15 / UX ARCHITECTURE</span>
-                                    <span>INFORMATION DESIGN / NINTENDO</span>
-                                </div>
-                                <div className="ux-architecture__heading">
-                                    <h3
-                                        id="ux-architecture-title"
-                                        className="ux-architecture__reveal"
-                                        style={{ '--delay': '.08s' }}
-                                    >
-                                        <span>STRUCTURING THE</span>
-                                        <em>Experience.</em>
-                                    </h3>
-                                    <p
-                                        className="ux-architecture__reveal"
-                                        style={{ '--delay': '.16s' }}
-                                    >
-                                        브랜드의 콘텐츠를 체계적으로 정리하고, 사용자의 탐색부터
-                                        구매까지 자연스럽게 이어지는 경험을 설계했습니다.
-                                    </p>
-                                </div>
-                            </header>
-
-                            <div
-                                className="ux-architecture__showcase ux-architecture__reveal"
-                                style={{ '--delay': '.24s' }}
-                            >
-                                <button
-                                    className="ux-architecture__preview"
-                                    type="button"
-                                    onClick={(event) =>
-                                        openArchitecturePreview(selectedArchitecture, event)
-                                    }
-                                    aria-label={`${selectedArchitecture.title} 원본 이미지 확대 보기`}
-                                >
-                                    <img
-                                        key={selectedArchitecture.key}
-                                        src={selectedArchitecture.previewSrc}
-                                        alt={selectedArchitecture.alt}
-                                    />
-                                    <span>
-                                        VIEW FULL IMAGE <i aria-hidden="true">↗</i>
-                                    </span>
-                                </button>
-
-                                <div className="ux-architecture__content">
-                                    <div
-                                        className="ux-architecture__artifact-copy"
-                                        id="ux-architecture-panel"
-                                        role="tabpanel"
-                                        key={`copy-${selectedArchitecture.key}`}
-                                    >
-                                        <span>{selectedArchitecture.number} / DESIGN ARTIFACT</span>
-                                        <h4>{selectedArchitecture.title}</h4>
-                                        <p>{selectedArchitecture.description}</p>
-                                        <small>{selectedArchitecture.keywords}</small>
-                                    </div>
-
-                                    <div
-                                        className="ux-architecture__tabs"
-                                        role="tablist"
-                                        aria-label="UX 설계 산출물 선택"
-                                    >
-                                        {uxArchitectureArtifacts.map((item) => (
-                                            <button
-                                                type="button"
-                                                role="tab"
-                                                aria-selected={activeArchitecture === item.key}
-                                                aria-controls="ux-architecture-panel"
-                                                tabIndex={activeArchitecture === item.key ? 0 : -1}
-                                                className={
-                                                    activeArchitecture === item.key
-                                                        ? 'is-active'
-                                                        : ''
-                                                }
-                                                key={item.key}
-                                                onClick={() => setActiveArchitecture(item.key)}
-                                                onKeyDown={(event) =>
-                                                    handleResearchTabKeyDown(
-                                                        event,
-                                                        uxArchitectureArtifacts,
-                                                        activeArchitecture,
-                                                        setActiveArchitecture
-                                                    )
-                                                }
-                                            >
-                                                <span>{item.number}</span>
-                                                <strong>{item.title}</strong>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section
-                        ref={designDevelopmentRef}
-                        className={`design-development ux-architecture section${isDevelopmentVisible ? ' is-visible' : ''}`}
-                        id="design-development"
-                        aria-labelledby="design-development-title"
-                    >
-                        <div className="design-development__inner ux-architecture__inner">
-                            <header className="design-development__header">
-                                <div
-                                    className="design-development__meta ux-architecture__meta ux-architecture__reveal"
-                                    style={{ '--delay': '0s' }}
-                                >
-                                    <span>16 / DESIGN DEVELOPMENT</span>
-                                    <span>VISUAL SYSTEM / NINTENDO</span>
-                                </div>
-                                <div className="design-development__heading ux-architecture__heading">
-                                    <h3
-                                        id="design-development-title"
-                                        className="ux-architecture__reveal"
-                                        style={{ '--delay': '.08s' }}
-                                    >
-                                        <span>
-                                            FROM <em>Structure.</em>
-                                        </span>
-                                        <span>TO DESIGN.</span>
-                                    </h3>
-                                    <p
-                                        className="ux-architecture__reveal"
-                                        style={{ '--delay': '.16s' }}
-                                    >
-                                        와이어프레임부터 무드보드, 디자인 시스템까지 일관된 브랜드
-                                        경험을 설계했습니다.
-                                    </p>
-                                </div>
-                            </header>
-
-                            <div
-                                className="design-development__showcase ux-architecture__showcase ux-architecture__reveal"
-                                style={{ '--delay': '.24s' }}
-                            >
-                                <button
-                                    className="design-development__preview ux-architecture__preview"
-                                    type="button"
-                                    onClick={(event) =>
-                                        openDevelopmentPreview(selectedDevelopment, event)
-                                    }
-                                    aria-label={`${selectedDevelopment.title} 원본 이미지 크게 보기`}
-                                >
-                                    <img
-                                        key={selectedDevelopment.key}
-                                        src={selectedDevelopment.previewSrc}
-                                        alt={selectedDevelopment.alt}
-                                    />
-                                    <span>
-                                        VIEW FULL IMAGE <i aria-hidden="true">↗</i>
-                                    </span>
-                                </button>
-
-                                <div className="design-development__content ux-architecture__content">
-                                    <div
-                                        className="design-development__copy ux-architecture__artifact-copy"
-                                        id="design-development-panel"
-                                        role="tabpanel"
-                                        key={`development-copy-${selectedDevelopment.key}`}
-                                    >
-                                        <span>
-                                            {selectedDevelopment.number} / DESIGN DEVELOPMENT
-                                        </span>
-                                        <h4>{selectedDevelopment.title}</h4>
-                                        <p>{selectedDevelopment.description}</p>
-                                        <small>{selectedDevelopment.keywords}</small>
-                                    </div>
-
-                                    <div
-                                        className="design-development__tabs ux-architecture__tabs"
-                                        role="tablist"
-                                        aria-label="디자인 개발 산출물 선택"
-                                    >
-                                        {designDevelopmentArtifacts.map((item) => (
-                                            <button
-                                                type="button"
-                                                role="tab"
-                                                aria-selected={activeDevelopment === item.key}
-                                                aria-controls="design-development-panel"
-                                                tabIndex={activeDevelopment === item.key ? 0 : -1}
-                                                className={
-                                                    activeDevelopment === item.key
-                                                        ? 'is-active'
-                                                        : ''
-                                                }
-                                                key={item.key}
-                                                onClick={() => setActiveDevelopment(item.key)}
-                                                onKeyDown={(event) =>
-                                                    handleResearchTabKeyDown(
-                                                        event,
-                                                        designDevelopmentArtifacts,
-                                                        activeDevelopment,
-                                                        setActiveDevelopment
-                                                    )
-                                                }
-                                            >
-                                                <span>{item.number}</span>
-                                                <strong>{item.title}</strong>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section
-                        className="final-outcome section"
-                        id="final-outcome"
-                        aria-labelledby="final-outcome-title"
-                    >
-                        <div className="final-outcome__inner">
-                            <header className="final-outcome__header">
-                                <div className="final-outcome__meta">
-                                    <span>17 / FINAL OUTCOME</span>
-                                    <span>DESKTOP &amp; MOBILE</span>
-                                </div>
-                                <div className="final-outcome__heading">
-                                    <h3 id="final-outcome-title">
+                                <div className="nintendo-final-outcome-13__heading">
+                                    <h3 id="nintendo-final-outcome-13-title">
                                         <span>THE FINAL</span>
                                         <em>Experience.</em>
                                     </h3>
@@ -3940,30 +4165,20 @@ function App() {
                                 </div>
                             </header>
 
-                            <div className="final-outcome__gallery">
-                                {finalOutcomeViews.map((item) => (
-                                    <article
-                                        className={`final-outcome__card final-outcome__card--${item.key}`}
-                                        key={item.key}
-                                    >
-                                        <div className="final-outcome__card-label">
-                                            <span>{item.number}</span>
-                                            <strong>{item.label}</strong>
-                                        </div>
-                                        <div className="final-outcome__media">
-                                            <img src={item.src} alt={item.alt} />
-                                        </div>
-                                    </article>
-                                ))}
-                            </div>
+                            <figure className="nintendo-final-outcome-13__visual">
+                                <img
+                                    src="/images/nintendo/nintendo-final-mockup.png"
+                                    alt="맥북, 게임 화면, 모바일 화면으로 구성된 닌텐도 웹사이트 리뉴얼 최종 목업"
+                                />
+                            </figure>
 
-                            <div className="final-outcome__action">
+                            <div className="nintendo-final-outcome-13__action">
                                 <a
                                     href="https://mbc-teamproject-red.vercel.app/"
                                     target="_blank"
                                     rel="noreferrer"
                                 >
-                                    WEBSITE <span aria-hidden="true">↗</span>
+                                    VIEW WEBSITE <span aria-hidden="true">↗</span>
                                 </a>
                             </div>
                         </div>
