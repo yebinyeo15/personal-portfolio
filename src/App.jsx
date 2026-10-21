@@ -1475,9 +1475,140 @@ function App() {
         let activePanelIndex = -1;
         let snapTimer = null;
         let snapAnimationFrame = null;
+        let initializationFrame = null;
         let isSnapping = false;
+        let isDisposed = false;
         let lastScrollY = window.scrollY;
         let lastScrollDirection = 0;
+        let lastDiagnosticScrollTime = 0;
+        let layoutResizeObserver = null;
+        let diagnosticResizeObserver = null;
+        let diagnosticMutationObserver = null;
+        const isDevelopment = import.meta.env.DEV;
+        const diagnosticStore = isDevelopment
+            ? (window.__NINTENDO_HORIZONTAL_DEBUG__ ??= {
+                  history: [],
+                  instanceCount: 0,
+              })
+            : null;
+        const diagnosticInstance = diagnosticStore
+            ? (diagnosticStore.instanceCount += 1)
+            : null;
+
+        const describeElement = (element) => {
+            if (!element) return null;
+            const style = window.getComputedStyle(element);
+            return {
+                nodeName: element.nodeName,
+                id: element.id,
+                className:
+                    typeof element.className === 'string'
+                        ? element.className
+                        : element.className?.baseVal,
+                scrollTop: element.scrollTop,
+                clientHeight: element.clientHeight,
+                scrollHeight: element.scrollHeight,
+                overflowY: style.overflowY,
+                position: style.position,
+                transform: style.transform,
+            };
+        };
+
+        const getScrollableAncestors = () => {
+            const ancestors = [];
+            let element = story.parentElement;
+
+            while (element) {
+                const style = window.getComputedStyle(element);
+                if (
+                    element.scrollHeight > element.clientHeight + 1 ||
+                    ['auto', 'scroll', 'hidden', 'clip'].includes(style.overflowY) ||
+                    style.transform !== 'none'
+                ) {
+                    ancestors.push(describeElement(element));
+                }
+                element = element.parentElement;
+            }
+
+            return ancestors;
+        };
+
+        const getDiagnosticSnapshot = () => ({
+            instance: diagnosticInstance,
+            timestamp: new Date().toISOString(),
+            readyState: document.readyState,
+            fonts: document.fonts?.status ?? 'unsupported',
+            viewport: {
+                width: window.innerWidth,
+                height: window.innerHeight,
+                devicePixelRatio: window.devicePixelRatio,
+            },
+            media: {
+                desktop: desktopQuery.matches,
+                reducedMotion: reducedMotionQuery.matches,
+            },
+            isHorizontal,
+            storyClass: story.className,
+            storyStart,
+            storyHeight: story.getBoundingClientRect().height,
+            storyScrollHeight: story.scrollHeight,
+            stage: {
+                clientWidth: stage.clientWidth,
+                clientHeight: stage.clientHeight,
+                scrollWidth: stage.scrollWidth,
+                scrollHeight: stage.scrollHeight,
+                position: window.getComputedStyle(stage).position,
+                overflow: window.getComputedStyle(stage).overflow,
+            },
+            track: {
+                clientWidth: track.clientWidth,
+                scrollWidth: track.scrollWidth,
+                transform: window.getComputedStyle(track).transform,
+                display: window.getComputedStyle(track).display,
+            },
+            horizontalTravelDistance,
+            verticalScrollDistance,
+            scrollY: window.scrollY,
+            scrollRoots: {
+                scrollingElement: describeElement(document.scrollingElement),
+                documentElement: describeElement(document.documentElement),
+                body: describeElement(document.body),
+                scrollableStoryAncestors: getScrollableAncestors(),
+                visualViewport: window.visualViewport
+                    ? {
+                          pageTop: window.visualViewport.pageTop,
+                          offsetTop: window.visualViewport.offsetTop,
+                          height: window.visualViewport.height,
+                      }
+                    : null,
+            },
+            documentScrollHeight: document.documentElement.scrollHeight,
+            panels: panels.map((panel, index) => ({
+                index,
+                className: panel.className,
+                clientHeight: panel.clientHeight,
+                scrollHeight: panel.scrollHeight,
+                offsetLeft: panel.offsetLeft,
+            })),
+        });
+
+        const recordDiagnostic = (event, details = {}) => {
+            if (!diagnosticStore) return;
+            const entry = { event, details, ...getDiagnosticSnapshot() };
+            diagnosticStore.latest = entry;
+            diagnosticStore.history.push(entry);
+            if (diagnosticStore.history.length > 100) diagnosticStore.history.shift();
+            console.info(`[Nintendo horizontal #${diagnosticInstance}] ${event}`, entry);
+        };
+
+        if (diagnosticStore) {
+            diagnosticStore.snapshot = getDiagnosticSnapshot;
+            diagnosticStore.help =
+                'Run __NINTENDO_HORIZONTAL_DEBUG__.snapshot() for current values or inspect .latest and .history.';
+            recordDiagnostic('effect:init', {
+                styleSheets: Array.from(document.styleSheets, (sheet) => sheet.href ?? 'inline'),
+            });
+        }
 
         const cancelSnap = () => {
             if (snapTimer !== null) {
@@ -1808,6 +1939,38 @@ function App() {
             }
             lastScrollY = currentY;
             scheduleUpdate();
+            if (isDevelopment && performance.now() - lastDiagnosticScrollTime > 500) {
+                lastDiagnosticScrollTime = performance.now();
+                recordDiagnostic('scroll');
+            }
+        };
+
+        const handleWheel = (event) => {
+            cancelSnap();
+            scheduleUpdate();
+            recordDiagnostic('wheel', {
+                deltaX: event.deltaX,
+                deltaY: event.deltaY,
+                deltaMode: event.deltaMode,
+                defaultPrevented: event.defaultPrevented,
+                target: event.target?.className ?? event.target?.nodeName,
+                path: event
+                    .composedPath()
+                    .filter((element) => element instanceof Element)
+                    .slice(0, 8)
+                    .map(describeElement),
+            });
+        };
+
+        const handleAnyScroll = (event) => {
+            if (!isDevelopment || performance.now() - lastDiagnosticScrollTime <= 250) return;
+            lastDiagnosticScrollTime = performance.now();
+            recordDiagnostic('scroll:capture', {
+                target:
+                    event.target === document
+                        ? 'document'
+                        : describeElement(event.target),
+            });
         };
 
         const handleScrollKeyInput = (event) => {
@@ -1820,10 +1983,30 @@ function App() {
             }
         };
 
+        const isPanelOverflowing = (panel, index, stageHeight) => {
+            if (index !== 1) return panel.scrollHeight > stageHeight + 2;
+
+            const panelRect = panel.getBoundingClientRect();
+            const contentElements = [
+                panel.querySelector('.section-index'),
+                panel.querySelector('.nintendo-intro__visual img'),
+                panel.querySelector('.nintendo-intro__content'),
+            ].filter(Boolean);
+
+            return contentElements.some((element) => {
+                const rect = element.getBoundingClientRect();
+                return rect.top < panelRect.top - 2 || rect.bottom > panelRect.bottom + 2;
+            });
+        };
+
         const measureStory = () => {
             resetStory();
+            recordDiagnostic('measure:start');
 
             if (!desktopQuery.matches || reducedMotionQuery.matches || window.innerHeight < 760) {
+                recordDiagnostic('measure:rejected-media-or-height', {
+                    minimumHeight: 760,
+                });
                 return;
             }
 
@@ -1831,17 +2014,24 @@ function App() {
             chromePathLengths.clear();
             const stageHeight = stage.clientHeight;
             story.style.setProperty('--horizontal-panel-width', `${stage.clientWidth}px`);
-            const hasOverflowingPanel = panels.some(
-                (panel) => panel.scrollHeight > stageHeight + 2
+            const hasOverflowingPanel = panels.some((panel, index) =>
+                isPanelOverflowing(panel, index, stageHeight)
             );
 
             if (hasOverflowingPanel) {
+                recordDiagnostic('measure:rejected-overflow', {
+                    stageHeight,
+                    overflowingPanels: panels
+                        .map((panel, index) => ({ index, scrollHeight: panel.scrollHeight }))
+                        .filter((panel) => panel.scrollHeight > stageHeight + 2),
+                });
                 resetStory();
                 return;
             }
 
             horizontalTravelDistance = Math.max(0, track.scrollWidth - stage.clientWidth);
             if (horizontalTravelDistance <= 0) {
+                recordDiagnostic('measure:rejected-no-horizontal-travel');
                 resetStory();
                 return;
             }
@@ -1907,7 +2097,17 @@ function App() {
             verticalScrollDistance = timelineCursor;
             story.style.height = `${stageHeight + verticalScrollDistance}px`;
             story.style.setProperty('--horizontal-panel-width', `${stage.clientWidth}px`);
-            if (panels.some((panel) => panel.scrollHeight > stageHeight + 2)) {
+            if (
+                panels.some((panel, index) =>
+                    isPanelOverflowing(panel, index, stageHeight)
+                )
+            ) {
+                recordDiagnostic('measure:rejected-overflow-after-timeline', {
+                    stageHeight,
+                    overflowingPanels: panels
+                        .map((panel, index) => ({ index, scrollHeight: panel.scrollHeight }))
+                        .filter((panel) => panel.scrollHeight > stageHeight + 2),
+                });
                 resetStory();
                 return;
             }
@@ -1917,6 +2117,7 @@ function App() {
             isHorizontal = true;
             lastScrollY = window.scrollY;
             updateStory();
+            recordDiagnostic('measure:activated');
         };
 
         const scrollToNintendoPanel = (behavior = 'auto') => {
@@ -1952,6 +2153,7 @@ function App() {
         };
 
         const handleResize = () => {
+            recordDiagnostic('resize:scheduled');
             const currentY = window.scrollY;
             const shouldPreserveTimelinePosition =
                 isHorizontal &&
@@ -1978,13 +2180,68 @@ function App() {
             });
         };
 
-        measureStory();
-        if (window.location.hash === '#nintendo') {
-            window.requestAnimationFrame(handleHistoryNavigation);
+        handleResize();
+        const handleAssetsReady = () => {
+            if (!isDisposed) handleResize();
+        };
+        initializationFrame = window.requestAnimationFrame(() => {
+            initializationFrame = window.requestAnimationFrame(() => {
+                initializationFrame = null;
+                handleAssetsReady();
+            });
+        });
+        if (document.readyState === 'complete') {
+            handleAssetsReady();
+        } else {
+            window.addEventListener('load', handleAssetsReady, { once: true });
+        }
+        document.fonts?.ready.then(handleAssetsReady);
+
+        if ('ResizeObserver' in window) {
+            layoutResizeObserver = new ResizeObserver(() => {
+                handleResize();
+                recordDiagnostic('layout:upstream-resize');
+            });
+            [heroRef.current, aboutRef.current]
+                .filter(Boolean)
+                .forEach((element) => layoutResizeObserver.observe(element));
+        }
+
+        if (isDevelopment && 'ResizeObserver' in window) {
+            diagnosticResizeObserver = new ResizeObserver((entries) => {
+                recordDiagnostic('layout:resize-observer', {
+                    elements: entries.map((entry) => ({
+                        className: entry.target.className,
+                        width: entry.contentRect.width,
+                        height: entry.contentRect.height,
+                    })),
+                });
+            });
+            [story, stage, track, ...panels].forEach((element) =>
+                diagnosticResizeObserver.observe(element)
+            );
+        }
+
+        if (isDevelopment && 'MutationObserver' in window) {
+            diagnosticMutationObserver = new MutationObserver((mutations) => {
+                recordDiagnostic('layout:mutation', {
+                    mutations: mutations.map((mutation) => ({
+                        target: describeElement(mutation.target),
+                        attributeName: mutation.attributeName,
+                        oldValue: mutation.oldValue,
+                    })),
+                });
+            });
+            diagnosticMutationObserver.observe(track, {
+                attributes: true,
+                attributeOldValue: true,
+                attributeFilter: ['class', 'style'],
+            });
         }
 
         window.addEventListener('scroll', handleStoryScroll, { passive: true });
-        window.addEventListener('wheel', cancelSnap, { passive: true });
+        document.addEventListener('scroll', handleAnyScroll, { capture: true, passive: true });
+        window.addEventListener('wheel', handleWheel, { passive: true });
         window.addEventListener('touchstart', cancelSnap, { passive: true });
         window.addEventListener('pointerdown', cancelSnap, { passive: true });
         window.addEventListener('keydown', handleScrollKeyInput);
@@ -1995,8 +2252,11 @@ function App() {
         document.addEventListener('click', handleDocumentClick);
 
         return () => {
+            recordDiagnostic('effect:cleanup');
+            isDisposed = true;
             window.removeEventListener('scroll', handleStoryScroll);
-            window.removeEventListener('wheel', cancelSnap);
+            document.removeEventListener('scroll', handleAnyScroll, true);
+            window.removeEventListener('wheel', handleWheel);
             window.removeEventListener('touchstart', cancelSnap);
             window.removeEventListener('pointerdown', cancelSnap);
             window.removeEventListener('keydown', handleScrollKeyInput);
@@ -2005,6 +2265,16 @@ function App() {
             desktopQuery.removeEventListener('change', handleResize);
             reducedMotionQuery.removeEventListener('change', handleResize);
             document.removeEventListener('click', handleDocumentClick);
+            window.removeEventListener('load', handleAssetsReady);
+            layoutResizeObserver?.disconnect();
+            diagnosticResizeObserver?.disconnect();
+            diagnosticMutationObserver?.disconnect();
+            if (diagnosticStore?.snapshot === getDiagnosticSnapshot) {
+                diagnosticStore.snapshot = null;
+            }
+            if (initializationFrame !== null) {
+                window.cancelAnimationFrame(initializationFrame);
+            }
             if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
             cancelSnap();
             resetStory();
