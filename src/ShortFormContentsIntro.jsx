@@ -1,18 +1,423 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import './shortFormContentsIntro.css';
 
-const shortFormFrames = [
-    { id: '01', title: 'EAU ROSE', src: null, className: 'is-featured' },
-    { id: '02', title: 'FLORAL DETAIL', src: null, className: 'is-detail' },
-    { id: '03', title: 'CAMPAIGN SCENE', src: null, className: 'is-campaign' },
-    { id: '04', title: 'FINAL CUT', src: null, className: 'is-final' },
+const shortFormMockups = [
+    {
+        id: 'diptyque',
+        src: '/images/shortform-diptyque-mockup.png',
+        alt: '딥디크 향수 숏폼 광고 아이폰 목업',
+    },
+    {
+        id: 'running',
+        src: '/images/shortform/shortform-running-mockup.png',
+        alt: '러닝화 숏폼 광고 아이폰 목업',
+    },
 ];
 
-const ShortFormContentsIntro = () => {
-    const sectionRef = useRef(null);
+const adidasFilmDetails = [
+    [
+        '기획 의도',
+        '아디다스 러닝화의 퍼포먼스와 러닝 문화의 역동성을 전달하는 숏폼 광고',
+    ],
+    ['타깃', '러닝과 스포츠 라이프스타일에 관심 있는 소비자'],
+    [
+        '제작 과정',
+        '콘셉트 기획 → 스토리보드 설계 → AI 이미지 생성 → AI 영상 제작 → 영상·사운드 편집',
+    ],
+    [
+        '편집 포인트',
+        '착용 전후의 대비, 러닝 동작의 속도감, 리듬감 있는 장면 전환',
+    ],
+    ['사용 도구', 'AI 이미지·영상 생성 도구, CapCut'],
+    ['영상 포맷', '세로형 9:16 · 약 34초'],
+];
+
+const diptyqueFilmDetails = [
+    [
+        '기획 의도',
+        '딥디크 EAU ROSE의 섬세하고 로맨틱한 향을 감각적인 영상으로 표현',
+    ],
+    ['타깃', '니치 향수와 감성적인 브랜드 콘텐츠에 관심 있는 소비자'],
+    [
+        '제작 과정',
+        '콘셉트 기획 → 스토리보드 설계 → AI 이미지 생성 → AI 영상 제작 → 장면 편집 → 자막 및 사운드 편집',
+    ],
+    [
+        '편집 포인트',
+        '장미와 향수병의 클로즈업, 부드러운 장면 전환, 일관된 컬러 톤',
+    ],
+    ['사용 도구', 'AI 이미지·영상 생성 도구, CapCut'],
+    ['영상 포맷', '세로형 9:16 숏폼 광고 · 약 36초'],
+];
+
+const shortFormFilms = [
+    {
+        id: '01',
+        title: 'ADIDAS RUNNING FILM',
+        subtitle: 'FEEL THE LOCK IN.',
+        videoSrc: '/videos/shortform/shortform-running.mp4',
+        videoLabel: 'ADIDAS 러닝화 AI 숏폼 광고',
+        description: [
+            '스포츠 브랜드 아디다스의 러닝화 ADIZERO ADIOS PRO 4를 중심으로, 최근 주목받는 러닝 문화를 결합한 숏폼 광고를 기획했습니다.',
+            '러닝화 착용 전후의 감각과 움직임의 변화를 하나의 이야기로 구성하고, 스토리보드 기획부터 AI 이미지·영상 제작, 장면 편집과 사운드 연출까지 연결해 제품의 퍼포먼스와 브랜드 특유의 역동적인 에너지를 표현했습니다.',
+        ],
+        details: adidasFilmDetails,
+    },
+    {
+        id: '02',
+        title: 'DIPTYQUE EAU ROSE',
+        subtitle: 'Where Roses Become a Memory.',
+        videoSrc: '/videos/shortform/shortform-diptyque.mp4',
+        videoLabel: 'DIPTYQUE EAU ROSE AI 숏폼 광고',
+        description: [
+            '프랑스 니치 향수 브랜드 딥디크(DIPTYQUE)의 EAU ROSE를 주제로, 장미가 가진 섬세하고 우아한 분위기를 감각적인 숏폼 광고로 기획했습니다.',
+            '장미의 꽃잎과 향수병의 디테일을 중심으로 스토리보드를 구성하고, AI 이미지·영상 생성과 장면 편집을 통해 향기가 시각적으로 전해지는 듯한 경험을 표현했습니다.',
+        ],
+        details: diptyqueFilmDetails,
+    },
+];
+
+const formatMediaTime = (value) => {
+    if (!Number.isFinite(value) || value < 0) return '0:00';
+    const minutes = Math.floor(value / 60);
+    const seconds = Math.floor(value % 60);
+    return `${minutes}:${String(seconds).padStart(2, '0')}`;
+};
+
+const ShortFormFilmPlayer = ({ film }) => {
+    const playerRef = useRef(null);
+    const videoRef = useRef(null);
+    const userPausedRef = useRef(false);
+    const controlsTimerRef = useRef(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [controlsVisible, setControlsVisible] = useState(true);
+    const [isMuted, setIsMuted] = useState(true);
+    const [volume, setVolume] = useState(1);
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const [hasError, setHasError] = useState(false);
+    const [needsStart, setNeedsStart] = useState(false);
+
+    const clearControlsTimer = useCallback(() => {
+        if (controlsTimerRef.current !== null) {
+            window.clearTimeout(controlsTimerRef.current);
+            controlsTimerRef.current = null;
+        }
+    }, []);
+
+    const showControls = useCallback(
+        (keepVisible = false) => {
+            clearControlsTimer();
+            setControlsVisible(true);
+            if (!keepVisible && isPlaying) {
+                controlsTimerRef.current = window.setTimeout(() => {
+                    setControlsVisible(false);
+                    controlsTimerRef.current = null;
+                }, 1400);
+            }
+        },
+        [clearControlsTimer, isPlaying]
+    );
+
+    const handleVideoPlay = () => {
+        clearControlsTimer();
+        setIsPlaying(true);
+        setControlsVisible(true);
+        controlsTimerRef.current = window.setTimeout(() => {
+            setControlsVisible(false);
+            controlsTimerRef.current = null;
+        }, 1400);
+    };
+
+    const handleVideoPause = () => {
+        clearControlsTimer();
+        setIsPlaying(false);
+        setControlsVisible(true);
+    };
+
+    const playVideo = useCallback(async () => {
+        const video = videoRef.current;
+        if (!video || hasError) return;
+        try {
+            await video.play();
+            setNeedsStart(false);
+        } catch {
+            setNeedsStart(true);
+            setIsPlaying(false);
+        }
+    }, [hasError]);
+
+    const togglePlayback = () => {
+        const video = videoRef.current;
+        if (!video || hasError) return;
+        showControls();
+        if (video.paused) {
+            userPausedRef.current = false;
+            playVideo();
+        } else {
+            userPausedRef.current = true;
+            video.pause();
+        }
+    };
+
+    const toggleMute = () => {
+        const video = videoRef.current;
+        if (!video) return;
+        showControls();
+        const nextMuted = !video.muted;
+        video.muted = nextMuted;
+        setIsMuted(nextMuted);
+    };
+
+    const handleVolume = (event) => {
+        const video = videoRef.current;
+        if (!video) return;
+        showControls();
+        const nextVolume = Number(event.target.value);
+        video.volume = nextVolume;
+        setVolume(nextVolume);
+        if (nextVolume === 0) {
+            video.muted = true;
+            setIsMuted(true);
+        }
+    };
+
+    const handleSeek = (event) => {
+        const video = videoRef.current;
+        if (!video || !duration) return;
+        showControls();
+        const nextTime = Number(event.target.value);
+        video.currentTime = nextTime;
+        setCurrentTime(nextTime);
+    };
+
+    const enterFullscreen = async () => {
+        const player = playerRef.current;
+        if (!player?.requestFullscreen) return;
+        showControls();
+        try {
+            await player.requestFullscreen();
+        } catch {
+            // Fullscreen availability is controlled by the browser.
+        }
+    };
+
+    const handleKeyDown = (event) => {
+        const video = videoRef.current;
+        if (!video) return;
+        if (event.key === ' ' || event.key.toLowerCase() === 'k') {
+            event.preventDefault();
+            togglePlayback();
+        } else if (event.key.toLowerCase() === 'm') {
+            toggleMute();
+        } else if (event.key.toLowerCase() === 'f') {
+            enterFullscreen();
+        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+            event.preventDefault();
+            const direction = event.key === 'ArrowRight' ? 5 : -5;
+            video.currentTime = Math.min(Math.max(video.currentTime + direction, 0), duration);
+        }
+    };
+
+    useEffect(() => clearControlsTimer, [clearControlsTimer]);
 
     useEffect(() => {
-        const section = sectionRef.current;
+        const player = playerRef.current;
+        const video = videoRef.current;
+        const panel = player?.closest(`[data-short-form-panel="film-${film.id}"]`);
+        if (!video || !panel) return undefined;
+
+        let frame = 0;
+        let wasVisible = false;
+
+        const updatePlaybackForVisibility = () => {
+            frame = 0;
+            const rect = panel.getBoundingClientRect();
+            const visibleWidth = Math.max(
+                0,
+                Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0)
+            );
+            const visibleHeight = Math.max(
+                0,
+                Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0)
+            );
+            const widthRatio = rect.width > 0 ? visibleWidth / rect.width : 0;
+            const heightRatio = rect.height > 0 ? visibleHeight / rect.height : 0;
+            const isVisible = widthRatio >= 0.55 && heightRatio >= 0.55;
+
+            if (isVisible && !wasVisible) {
+                video.muted = true;
+                setIsMuted(true);
+                if (!userPausedRef.current) playVideo();
+            } else if (!isVisible && wasVisible) {
+                video.pause();
+                video.muted = true;
+                setIsMuted(true);
+            }
+            wasVisible = isVisible;
+        };
+
+        const requestVisibilityUpdate = () => {
+            if (!frame) frame = window.requestAnimationFrame(updatePlaybackForVisibility);
+        };
+
+        updatePlaybackForVisibility();
+        window.addEventListener('scroll', requestVisibilityUpdate, { passive: true });
+        window.addEventListener('resize', requestVisibilityUpdate);
+        return () => {
+            if (frame) window.cancelAnimationFrame(frame);
+            window.removeEventListener('scroll', requestVisibilityUpdate);
+            window.removeEventListener('resize', requestVisibilityUpdate);
+            video.pause();
+        };
+    }, [film.id, playVideo]);
+
+    return (
+        <figure className="short-form-film-media short-form-film-media--player">
+            <div
+                className={`short-form-video-player${controlsVisible ? ' is-controls-visible' : ''}${isPlaying ? '' : ' is-paused'}`}
+                ref={playerRef}
+                role="group"
+                aria-label={`${film.title} 영상 플레이어`}
+                tabIndex="0"
+                onKeyDown={handleKeyDown}
+                onMouseEnter={() => showControls()}
+                onMouseMove={() => showControls()}
+                onMouseLeave={() => showControls()}
+                onPointerDown={() => showControls()}
+                onFocusCapture={() => showControls(true)}
+                onBlurCapture={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget)) showControls();
+                }}
+            >
+                <video
+                    ref={videoRef}
+                    src={film.videoSrc}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="metadata"
+                    aria-label={film.videoLabel}
+                    onClick={togglePlayback}
+                    onPlay={handleVideoPlay}
+                    onPause={handleVideoPause}
+                    onLoadedMetadata={(event) => setDuration(event.currentTarget.duration)}
+                    onDurationChange={(event) => setDuration(event.currentTarget.duration)}
+                    onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)}
+                    onError={() => {
+                        setHasError(true);
+                        setIsPlaying(false);
+                    }}
+                />
+
+                {hasError && (
+                    <div className="short-form-video-player__notice" role="status">
+                        <strong>영상을 불러올 수 없습니다.</strong>
+                        <span>파일 경로와 형식을 확인해 주세요.</span>
+                    </div>
+                )}
+
+                {!hasError && needsStart && (
+                    <button
+                        className="short-form-video-player__start"
+                        type="button"
+                        onClick={togglePlayback}
+                    >
+                        ▶ 영상 재생
+                    </button>
+                )}
+
+                <div className="short-form-video-controls">
+                    <div className="short-form-video-controls__progress">
+                        <input
+                            type="range"
+                            min="0"
+                            max={duration || 0}
+                            step="0.01"
+                            value={Math.min(currentTime, duration || 0)}
+                            onChange={handleSeek}
+                            onPointerDown={() => showControls(true)}
+                            onPointerUp={() => showControls()}
+                            aria-label="영상 재생 위치"
+                        />
+                    </div>
+                    <div className="short-form-video-controls__row">
+                        <button type="button" onClick={togglePlayback} aria-label={isPlaying ? '일시정지' : '재생'}>
+                            {isPlaying ? 'Ⅱ' : '▶'}
+                        </button>
+                        <button type="button" onClick={toggleMute} aria-label={isMuted ? '음소거 해제' : '음소거'}>
+                            {isMuted ? 'MUTE' : 'SOUND'}
+                        </button>
+                        <input
+                            className="short-form-video-controls__volume"
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.05"
+                            value={volume}
+                            onChange={handleVolume}
+                            onPointerDown={() => showControls(true)}
+                            onPointerUp={() => showControls()}
+                            aria-label="볼륨"
+                        />
+                        <span className="short-form-video-controls__time" aria-live="off">
+                            {formatMediaTime(currentTime)} / {formatMediaTime(duration)}
+                        </span>
+                        <button type="button" onClick={enterFullscreen} aria-label="전체화면">
+                            FULL
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </figure>
+    );
+};
+
+const FilmDetailPanel = ({ film }) => (
+    <section
+        className={`short-form-film-detail ${film.id === '01' ? 'is-adidas' : 'is-diptyque'}`}
+        data-short-form-panel={`film-${film.id}`}
+        aria-labelledby={`short-form-film-${film.id}-title`}
+    >
+        <div className="short-form-film-detail__inner">
+            <ShortFormFilmPlayer film={film} />
+            <article className="short-form-film-detail__content">
+                <header>
+                    <span>FILM {film.id} / SHORT-FORM AD</span>
+                    <span>PROJECT DETAILS</span>
+                </header>
+                <div className="short-form-film-detail__heading">
+                    <p>SHORT-FORM CONTENTS</p>
+                    <h2 id={`short-form-film-${film.id}-title`}>{film.title}</h2>
+                    <strong>{film.subtitle}</strong>
+                    <div className="short-form-film-detail__description">
+                        {film.description.map((paragraph) => (
+                            <p key={paragraph}>{paragraph}</p>
+                        ))}
+                    </div>
+                </div>
+                <dl className="short-form-film-detail__list">
+                    {film.details.map(([label, value]) => (
+                        <div key={label}>
+                            <dt>{label}</dt>
+                            <dd>{value}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </article>
+        </div>
+    </section>
+);
+
+const ShortFormContentsIntro = () => {
+    const storyRef = useRef(null);
+    const stageRef = useRef(null);
+    const trackRef = useRef(null);
+    const introRef = useRef(null);
+
+    useEffect(() => {
+        const section = introRef.current;
         if (!section) return undefined;
 
         const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -34,91 +439,415 @@ const ShortFormContentsIntro = () => {
         return () => observer.disconnect();
     }, []);
 
+    useLayoutEffect(() => {
+        const story = storyRef.current;
+        const stage = stageRef.current;
+        const track = trackRef.current;
+        if (!story || !stage || !track) return undefined;
+
+        const desktopQuery = window.matchMedia('(min-width: 901px)');
+        const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const panels = Array.from(track.children);
+        const panelColors = [
+            [241, 242, 248],
+            [241, 238, 245],
+            [234, 213, 221],
+        ];
+        let frame = 0;
+        let snapTimer = null;
+        let snapAnimationFrame = null;
+        let horizontalTravel = 0;
+        let scrollTravel = 0;
+        let holdDistance = 0;
+        let completionHoldDistance = 0;
+        let panelOffsets = [];
+        let isSnapping = false;
+        let lastScrollY = window.scrollY;
+
+        const clamp = (value, min = 0, max = 1) => Math.min(Math.max(value, min), max);
+        const smoothstep = (value) => {
+            const bounded = clamp(value);
+            return bounded * bounded * (3 - 2 * bounded);
+        };
+
+        const cancelSnap = () => {
+            if (snapTimer !== null) {
+                window.clearTimeout(snapTimer);
+                snapTimer = null;
+            }
+            if (snapAnimationFrame !== null) {
+                window.cancelAnimationFrame(snapAnimationFrame);
+                snapAnimationFrame = null;
+            }
+            isSnapping = false;
+        };
+
+        const clearMotionStyles = () => {
+            panels.forEach((panel) => {
+                for (let step = 1; step <= 5; step += 1) {
+                    panel.style.removeProperty(`--sf-motion-opacity-${step}`);
+                    panel.style.removeProperty(`--sf-motion-x-${step}`);
+                    panel.style.removeProperty(`--sf-motion-x-neg-${step}`);
+                    panel.style.removeProperty(`--sf-motion-y-${step}`);
+                }
+                panel.style.removeProperty('--sf-title-reveal');
+            });
+        };
+
+        const getRouteState = (scrollDistance) => {
+            const introOffset = panelOffsets[0] ?? 0;
+            const adidasOffset = panelOffsets[1] ?? introOffset;
+            const diptyqueOffset = panelOffsets[2] ?? adidasOffset;
+            const adidasHoldStart = adidasOffset;
+            const adidasRevealEnd = adidasHoldStart + holdDistance;
+            const adidasHoldEnd = adidasRevealEnd + completionHoldDistance;
+            const diptyqueMoveEnd = adidasHoldEnd + (diptyqueOffset - adidasOffset);
+            const diptyqueRevealEnd = diptyqueMoveEnd + holdDistance;
+            const diptyqueHoldEnd = diptyqueRevealEnd + completionHoldDistance;
+            const distance = clamp(scrollDistance, 0, diptyqueHoldEnd);
+
+            if (distance <= adidasHoldStart) {
+                return {
+                    horizontalOffset: distance,
+                    adidasReveal: 0,
+                    diptyqueReveal: 0,
+                    snapCandidates: [introOffset, adidasHoldStart],
+                };
+            }
+
+            if (distance < adidasRevealEnd) {
+                return {
+                    horizontalOffset: adidasOffset,
+                    adidasReveal: (distance - adidasHoldStart) / holdDistance,
+                    diptyqueReveal: 0,
+                    snapCandidates: null,
+                };
+            }
+
+            if (distance < adidasHoldEnd) {
+                return {
+                    horizontalOffset: adidasOffset,
+                    adidasReveal: 1,
+                    diptyqueReveal: 0,
+                    snapCandidates: null,
+                };
+            }
+
+            if (distance <= diptyqueMoveEnd) {
+                return {
+                    horizontalOffset: adidasOffset + (distance - adidasHoldEnd),
+                    adidasReveal: 1,
+                    diptyqueReveal: 0,
+                    snapCandidates: [adidasHoldEnd, diptyqueMoveEnd],
+                };
+            }
+
+            if (distance < diptyqueRevealEnd) {
+                return {
+                    horizontalOffset: diptyqueOffset,
+                    adidasReveal: 1,
+                    diptyqueReveal: (distance - diptyqueMoveEnd) / holdDistance,
+                    snapCandidates: null,
+                };
+            }
+
+            return {
+                horizontalOffset: diptyqueOffset,
+                adidasReveal: 1,
+                diptyqueReveal: 1,
+                snapCandidates: null,
+            };
+        };
+
+        const updateBackground = (trackPosition) => {
+            const lowerIndex = Math.min(Math.floor(trackPosition), panelColors.length - 1);
+            const upperIndex = Math.min(lowerIndex + 1, panelColors.length - 1);
+            const blend = smoothstep(trackPosition - lowerIndex);
+            const color = panelColors[lowerIndex].map((channel, index) =>
+                Math.round(channel + (panelColors[upperIndex][index] - channel) * blend)
+            );
+            stage.style.backgroundColor = `rgb(${color.join(', ')})`;
+        };
+
+        const updatePanelMotion = (trackPosition) => {
+            panels.forEach((panel, panelIndex) => {
+                const panelProgress = smoothstep(
+                    (trackPosition - (panelIndex - 0.85)) / 0.85
+                );
+
+                for (let step = 1; step <= 5; step += 1) {
+                    const delay = (step - 1) * 0.1;
+                    const stepProgress = smoothstep((panelProgress - delay) / (1 - delay));
+                    const remaining = 1 - stepProgress;
+                    const x = remaining * (18 + step * 2);
+                    const y = remaining * (14 + step * 2);
+                    panel.style.setProperty(`--sf-motion-opacity-${step}`, stepProgress);
+                    panel.style.setProperty(`--sf-motion-x-${step}`, `${x}px`);
+                    panel.style.setProperty(`--sf-motion-x-neg-${step}`, `${-x}px`);
+                    panel.style.setProperty(`--sf-motion-y-${step}`, `${y}px`);
+                }
+            });
+        };
+
+        const measure = () => {
+            cancelSnap();
+            const horizontal = desktopQuery.matches && !reducedMotionQuery.matches;
+            story.classList.toggle('is-horizontal', horizontal);
+            track.style.transform = '';
+            story.style.height = '';
+            stage.style.backgroundColor = '';
+            if (!horizontal) {
+                clearMotionStyles();
+                return;
+            }
+
+            const stageWidth = Math.max(1, stage.getBoundingClientRect().width);
+            horizontalTravel = Math.max(0, track.scrollWidth - stageWidth);
+            panelOffsets = panels.map((panel) =>
+                clamp(
+                    panel.offsetLeft + panel.offsetWidth / 2 - stageWidth / 2,
+                    0,
+                    horizontalTravel
+                )
+            );
+            holdDistance = clamp(stageWidth * 0.42, 500, 900);
+            completionHoldDistance = clamp(stageWidth * 0.075, 120, 180);
+            scrollTravel =
+                horizontalTravel + (holdDistance + completionHoldDistance) * 2;
+            story.style.height = `${window.innerHeight + scrollTravel}px`;
+        };
+
+        const render = () => {
+            frame = 0;
+            if (!story.classList.contains('is-horizontal')) return;
+            const storyStart = story.getBoundingClientRect().top + window.scrollY;
+            const scrollDistance = clamp(window.scrollY - storyStart, 0, scrollTravel);
+            const route = getRouteState(scrollDistance);
+            track.style.transform = `translate3d(${-route.horizontalOffset}px, 0, 0)`;
+            const normalizedProgress =
+                horizontalTravel > 0 ? route.horizontalOffset / horizontalTravel : 0;
+            const trackPosition = normalizedProgress * (panels.length - 1);
+            panels[1]?.style.setProperty(
+                '--sf-title-reveal',
+                `${(route.adidasReveal * 100).toFixed(3)}%`
+            );
+            panels[2]?.style.setProperty(
+                '--sf-title-reveal',
+                `${(route.diptyqueReveal * 100).toFixed(3)}%`
+            );
+            updateBackground(trackPosition);
+            updatePanelMotion(trackPosition);
+        };
+
+        const requestRender = () => {
+            if (!frame) frame = window.requestAnimationFrame(render);
+        };
+
+        const snapToNearestPanel = () => {
+            snapTimer = null;
+            if (
+                !story.classList.contains('is-horizontal') ||
+                isSnapping ||
+                scrollTravel <= 0
+            ) {
+                return;
+            }
+
+            const storyStart = story.getBoundingClientRect().top + window.scrollY;
+            const storyEnd = storyStart + scrollTravel;
+            const currentY = window.scrollY;
+            if (currentY < storyStart || currentY > storyEnd) return;
+
+            const currentOffset = clamp(currentY - storyStart, 0, scrollTravel);
+            const route = getRouteState(currentOffset);
+            if (!route.snapCandidates) return;
+            const targetOffset = route.snapCandidates.reduce((nearest, offset) =>
+                Math.abs(offset - currentOffset) < Math.abs(nearest - currentOffset)
+                    ? offset
+                    : nearest
+            );
+            const targetY = storyStart + targetOffset;
+            const distance = targetY - currentY;
+            const absoluteDistance = Math.abs(distance);
+            if (absoluteDistance < 2) return;
+
+            const panelInterval = Math.max(1, horizontalTravel / (panels.length - 1));
+            const distanceRatio = Math.min(1, absoluteDistance / (panelInterval * 0.5));
+            const duration = 300 + 150 * distanceRatio;
+            const startY = currentY;
+            let startTime = null;
+            isSnapping = true;
+
+            const animateSnap = (time) => {
+                if (!isSnapping) return;
+                if (startTime === null) startTime = time;
+
+                const progress = Math.min(1, (time - startTime) / duration);
+                const easedProgress = 1 - (1 - progress) ** 5;
+                window.scrollTo({
+                    top: startY + distance * easedProgress,
+                    behavior: 'instant',
+                });
+                requestRender();
+
+                if (progress < 1) {
+                    snapAnimationFrame = window.requestAnimationFrame(animateSnap);
+                    return;
+                }
+
+                snapAnimationFrame = null;
+                isSnapping = false;
+                lastScrollY = targetY;
+                requestRender();
+            };
+
+            snapAnimationFrame = window.requestAnimationFrame(animateSnap);
+        };
+
+        const scheduleSnap = () => {
+            if (!story.classList.contains('is-horizontal') || isSnapping) return;
+            if (snapTimer !== null) window.clearTimeout(snapTimer);
+            snapTimer = window.setTimeout(snapToNearestPanel, 320);
+        };
+
+        const handleScroll = () => {
+            const currentY = window.scrollY;
+            requestRender();
+            if (!isSnapping && Math.abs(currentY - lastScrollY) > 0.5) scheduleSnap();
+            lastScrollY = currentY;
+        };
+
+        const handleUserInput = () => {
+            cancelSnap();
+            lastScrollY = window.scrollY;
+        };
+
+        const handleResize = () => {
+            measure();
+            requestRender();
+        };
+
+        measure();
+        render();
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        window.addEventListener('wheel', handleUserInput, { passive: true });
+        window.addEventListener('touchstart', handleUserInput, { passive: true });
+        window.addEventListener('pointerdown', handleUserInput, { passive: true });
+        window.addEventListener('keydown', handleUserInput);
+        window.addEventListener('resize', handleResize);
+        desktopQuery.addEventListener('change', handleResize);
+        reducedMotionQuery.addEventListener('change', handleResize);
+
+        return () => {
+            cancelSnap();
+            if (frame) window.cancelAnimationFrame(frame);
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('wheel', handleUserInput);
+            window.removeEventListener('touchstart', handleUserInput);
+            window.removeEventListener('pointerdown', handleUserInput);
+            window.removeEventListener('keydown', handleUserInput);
+            window.removeEventListener('resize', handleResize);
+            desktopQuery.removeEventListener('change', handleResize);
+            reducedMotionQuery.removeEventListener('change', handleResize);
+            story.classList.remove('is-horizontal');
+            story.style.height = '';
+            stage.style.backgroundColor = '';
+            track.style.transform = '';
+            clearMotionStyles();
+        };
+    }, []);
+
     return (
-        <section
-            className="short-form-contents-intro section"
-            id="short-form-contents"
-            data-short-form-panel="intro"
-            aria-labelledby="short-form-contents-title"
-            ref={sectionRef}
-        >
-            <div className="short-form-contents-intro__inner">
-                <div
-                    className="short-form-contents-intro__collage"
-                    role="group"
-                    aria-label="AI 숏폼 광고 프레임 미리보기"
-                >
-                    <div className="short-form-contents-intro__primary-frame">
-                        {shortFormFrames.slice(0, 1).map((frame) => (
-                            <figure
-                                className={`short-form-contents-intro__frame ${frame.className}`}
-                                key={frame.id}
+        <div className="short-form-story" ref={storyRef}>
+            <div className="short-form-story__stage" ref={stageRef}>
+                <div className="short-form-story__track" ref={trackRef}>
+                    <section
+                        className="short-form-contents-intro section"
+                        id="short-form-contents"
+                        data-short-form-panel="intro"
+                        aria-labelledby="short-form-contents-title"
+                        ref={introRef}
+                    >
+                        <div className="short-form-contents-intro__inner">
+                            <div
+                                className="short-form-contents-intro__films"
+                                role="group"
+                                aria-label="숏폼 광고 두 편 미리보기"
                             >
-                                {frame.src ? (
-                                    <img src={frame.src} alt={`${frame.title} 광고 프레임`} />
-                                ) : (
-                                    <div className="short-form-contents-intro__placeholder">
-                                        <span>MEDIA PLACEHOLDER</span>
+                                {shortFormMockups.map((mockup) => (
+                                    <figure
+                                        className={`short-form-contents-intro__mockup-item is-${mockup.id}`}
+                                        key={mockup.id}
+                                    >
+                                        <img
+                                            className="short-form-contents-intro__mockup"
+                                            src={mockup.src}
+                                            alt={mockup.alt}
+                                            draggable="false"
+                                        />
+                                        <figcaption>
+                                            <strong>
+                                                {mockup.id === 'diptyque'
+                                                    ? '01 / DIPTYQUE'
+                                                    : '02 / ADIDAS'}
+                                            </strong>
+                                            <span>
+                                                {mockup.id === 'diptyque'
+                                                    ? 'FRAGRANCE FILM'
+                                                    : 'RUNNING CAMPAIGN'}
+                                            </span>
+                                        </figcaption>
+                                    </figure>
+                                ))}
+                            </div>
+
+                            <div className="short-form-contents-intro__content">
+                                <header>
+                                    <span>01 / AI MOTION WORK</span>
+                                    <span>SHORT-FORM CONTENTS · INTRO</span>
+                                </header>
+
+                                <div className="short-form-contents-intro__copy">
+                                    <h2 id="short-form-contents-title">
+                                        <img
+                                            className="short-form-contents-intro__chrome-title"
+                                            src="/images/short-form-chrome.png"
+                                            alt="SHORT-FORM"
+                                        />
+                                        <em>Contents.</em>
+                                    </h2>
+                                    <p className="short-form-contents-intro__subtitle">
+                                        FROM IDEA TO MOTION.
+                                    </p>
+                                    <div className="short-form-contents-intro__description">
+                                        <p>
+                                            하나의 아이디어가 짧은 영상 속에서 새로운 장면이
+                                            됩니다.
+                                        </p>
+                                        <p>
+                                            향수의 감각적인 분위기부터 러닝의 역동적인 순간까지,
+                                            <br />
+                                            서로 다른 브랜드의 매력을 AI 비주얼과 영상 편집으로
+                                            표현했습니다.
+                                        </p>
                                     </div>
-                                )}
-                                <figcaption>FRAME {frame.id} / {frame.title}</figcaption>
-                            </figure>
-                        ))}
-                    </div>
-
-                    <div className="short-form-contents-intro__secondary-frames">
-                        {shortFormFrames.slice(1).map((frame) => (
-                            <figure
-                                className={`short-form-contents-intro__frame ${frame.className}`}
-                                key={frame.id}
-                            >
-                                {frame.src ? (
-                                    <img src={frame.src} alt={`${frame.title} 광고 프레임`} />
-                                ) : (
-                                    <div className="short-form-contents-intro__placeholder">
-                                        <span>MEDIA PLACEHOLDER</span>
+                                    <div
+                                        className="short-form-contents-intro__info"
+                                        aria-label="Content production details"
+                                    >
+                                        <p>CREATIVE DIRECTION · AI VISUAL · VIDEO EDITING</p>
+                                        <span>SELECTED FILMS / 2026</span>
                                     </div>
-                                )}
-                                <figcaption>FRAME {frame.id} / {frame.title}</figcaption>
-                            </figure>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="short-form-contents-intro__content">
-                    <header>
-                        <span>01 / AI MOTION WORK</span>
-                        <span>SHORT-FORM CONTENTS · INTRO</span>
-                    </header>
-
-                    <div className="short-form-contents-intro__copy">
-                        <h2 id="short-form-contents-title">
-                            <img
-                                className="short-form-contents-intro__chrome-title"
-                                src="/images/short-form-chrome.png"
-                                alt="SHORT-FORM"
-                            />
-                            <em>CONTENTS.</em>
-                        </h2>
-                        <p className="short-form-contents-intro__subtitle">
-                            AI VISUAL &amp; MOTION DESIGN
-                        </p>
-                        <p className="short-form-contents-intro__description">
-                            AI 이미지 생성부터 영상 연출과 편집까지,
-                            <br />
-                            아이디어를 짧은 영상 콘텐츠로 구현했습니다.
-                            <br />
-                            브랜드의 분위기와 메시지를 감각적인 숏폼 광고로 전달합니다.
-                        </p>
-                    </div>
-
-                    <footer>
-                        <p>AI VISUAL · VIDEO GENERATION · MOTION EDITING</p>
-                        <span>SELECTED FRAMES FROM AI-GENERATED FILMS</span>
-                    </footer>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    {shortFormFilms.map((film) => (
+                        <FilmDetailPanel film={film} key={film.id} />
+                    ))}
                 </div>
             </div>
-        </section>
+        </div>
     );
 };
 

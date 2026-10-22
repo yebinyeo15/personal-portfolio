@@ -1715,6 +1715,9 @@ function App() {
             panelAlignmentDistances = [];
             panels.forEach((panel) => {
                 panel.inert = false;
+                panel.style.removeProperty('--nintendo-title-reveal');
+                panel.style.removeProperty('--nintendo-title-line-1-reveal');
+                panel.style.removeProperty('--nintendo-title-line-2-reveal');
             });
         };
 
@@ -1739,10 +1742,18 @@ function App() {
             );
 
             if (phase.type === 'hold') {
+                const holdProgress = Math.min(
+                    1,
+                    Math.max(
+                        0,
+                        (clampedDistance - phase.start) /
+                            (phase.revealDistance ?? phase.distance)
+                    )
+                );
                 return {
                     activePanel: phase.panel,
-                    holdProgress: phaseProgress,
-                    phaseProgress,
+                    holdProgress,
+                    phaseProgress: holdProgress,
                     offset: phase.offset,
                     phase,
                 };
@@ -1776,6 +1787,37 @@ function App() {
             const offset = Math.min(horizontalTravelDistance, position.offset);
             track.style.transform = `translate3d(${-offset}px, 0, 0)`;
             story.style.setProperty('--horizontal-hold-progress', position.holdProgress.toFixed(4));
+            panels.forEach((panel, panelIndex) => {
+                if (panelIndex < 2 || panelIndex > 7) return;
+                const holdPhase = timeline.find(
+                    (phase) => phase.type === 'hold' && phase.panel === panelIndex
+                );
+                if (!holdPhase) return;
+                const titleReveal = Math.min(
+                    1,
+                    Math.max(
+                        0,
+                        (scrollDistance - holdPhase.start) / holdPhase.revealDistance
+                    )
+                );
+                panel.style.setProperty(
+                    '--nintendo-title-reveal',
+                    `${(titleReveal * 100).toFixed(3)}%`
+                );
+                const firstLineReveal = Math.min(1, titleReveal * 2);
+                const secondLineReveal = Math.min(
+                    1,
+                    Math.max(0, (titleReveal - 0.5) * 2)
+                );
+                panel.style.setProperty(
+                    '--nintendo-title-line-1-reveal',
+                    `${(firstLineReveal * 100).toFixed(3)}%`
+                );
+                panel.style.setProperty(
+                    '--nintendo-title-line-2-reveal',
+                    `${(secondLineReveal * 100).toFixed(3)}%`
+                );
+            });
             story.dataset.horizontalPhase = position.phase?.type ?? 'transition';
             setActivePanel(position.activePanel);
             updateChromePathPreview(position);
@@ -1967,8 +2009,11 @@ function App() {
 
             const stageWidth = stage.clientWidth;
             const transitionDistance = stageWidth * 1.25;
-            const holdDistance = stageWidth * 0.75;
-            const completionDistance = stageWidth * 0.32;
+            const holdDistance = Math.min(900, Math.max(500, stageWidth * 0.42));
+            const completionHoldDistance = Math.min(
+                180,
+                Math.max(120, stageWidth * 0.075)
+            );
             let timelineCursor = 0;
 
             timeline = [];
@@ -1993,14 +2038,16 @@ function App() {
 
             const addHold = (panel) => {
                 const start = timelineCursor;
-                const end = start + holdDistance;
+                const end = start + holdDistance + completionHoldDistance;
                 timeline.push({
                     type: 'hold',
                     panel,
                     offset: panels[panel].offsetLeft,
                     start,
                     end,
-                    distance: holdDistance,
+                    distance: holdDistance + completionHoldDistance,
+                    revealDistance: holdDistance,
+                    completionHoldDistance,
                 });
                 timelineCursor = end;
             };
@@ -2011,17 +2058,6 @@ function App() {
                 addHold(panel);
                 if (panel < panels.length - 1) addTransition(panel, panel + 1);
             }
-
-            const completionStart = timelineCursor;
-            timelineCursor += completionDistance;
-            timeline.push({
-                type: 'complete',
-                panel: panels.length - 1,
-                offset: panels[panels.length - 1].offsetLeft,
-                start: completionStart,
-                end: timelineCursor,
-                distance: completionDistance,
-            });
 
             verticalScrollDistance = timelineCursor;
             story.style.height = `${stageHeight + verticalScrollDistance}px`;
@@ -2235,6 +2271,8 @@ function App() {
         let verticalTravel = 0;
         let measuredStageWidth = 0;
         let measuredStageHeight = 0;
+        let timeline = [];
+        let panelAlignmentDistances = [];
         const scrollPacing = 1.18;
 
         const clamp = (value, minimum, maximum) =>
@@ -2262,18 +2300,92 @@ function App() {
             track.style.removeProperty('transform');
             track.style.removeProperty('will-change');
             stage.style.removeProperty('background-color');
+            timeline = [];
+            panelAlignmentDistances = [];
+            panels.forEach((panel) => {
+                panel.style.removeProperty('--nintendo-late-title-reveal');
+                panel.style.removeProperty('--nintendo-late-title-line-1-reveal');
+                panel.style.removeProperty('--nintendo-late-title-line-2-reveal');
+            });
+        };
+
+        const getTimelinePosition = (scrollDistance) => {
+            const clampedDistance = clamp(scrollDistance, 0, verticalTravel);
+            const phase =
+                timeline.find(({ end }) => clampedDistance < end) ??
+                timeline[timeline.length - 1];
+
+            if (!phase) return { offset: 0, phase: null, revealProgress: 0 };
+
+            if (phase.type === 'hold') {
+                return {
+                    offset: phase.offset,
+                    phase,
+                    revealProgress: clamp(
+                        (clampedDistance - phase.start) / phase.revealDistance,
+                        0,
+                        1
+                    ),
+                };
+            }
+
+            const phaseProgress = clamp(
+                (clampedDistance - phase.start) / phase.distance,
+                0,
+                1
+            );
+            return {
+                offset:
+                    phase.fromOffset +
+                    (phase.toOffset - phase.fromOffset) * phaseProgress,
+                phase,
+                revealProgress: 0,
+            };
         };
 
         const updateTrack = () => {
             animationFrame = null;
             if (!isHorizontal || verticalTravel <= 0) return;
 
-            const progress = clamp((window.scrollY - storyStart) / verticalTravel, 0, 1);
-            track.style.transform = `translate3d(${-progress * horizontalTravel}px, 0, 0)`;
+            const scrollDistance = window.scrollY - storyStart;
+            const position = getTimelinePosition(scrollDistance);
+            const offset = clamp(position.offset, 0, horizontalTravel);
+            track.style.transform = `translate3d(${-offset}px, 0, 0)`;
             stage.style.backgroundColor = interpolatePanelBackground(
                 panelBackgrounds,
-                progress * (panels.length - 1)
+                horizontalTravel > 0
+                    ? (offset / horizontalTravel) * (panels.length - 1)
+                    : 0
             );
+            panels.forEach((panel, panelIndex) => {
+                if (panelIndex < 1 || panelIndex > 5) return;
+                const holdPhase = timeline.find(
+                    (phase) => phase.type === 'hold' && phase.panel === panelIndex
+                );
+                if (!holdPhase) return;
+                const titleReveal = clamp(
+                    (scrollDistance - holdPhase.start) / holdPhase.revealDistance,
+                    0,
+                    1
+                );
+                const firstLineReveal = Math.min(1, titleReveal * 2);
+                const secondLineReveal = Math.min(
+                    1,
+                    Math.max(0, (titleReveal - 0.5) * 2)
+                );
+                panel.style.setProperty(
+                    '--nintendo-late-title-reveal',
+                    `${(titleReveal * 100).toFixed(3)}%`
+                );
+                panel.style.setProperty(
+                    '--nintendo-late-title-line-1-reveal',
+                    `${(firstLineReveal * 100).toFixed(3)}%`
+                );
+                panel.style.setProperty(
+                    '--nintendo-late-title-line-2-reveal',
+                    `${(secondLineReveal * 100).toFixed(3)}%`
+                );
+            });
         };
 
         const requestTrackUpdate = () => {
@@ -2290,19 +2402,12 @@ function App() {
             if (currentY < storyStart || currentY > storyEnd) return;
 
             const currentDistance = currentY - storyStart;
-            const currentHorizontalOffset =
-                currentDistance * (horizontalTravel / verticalTravel);
-            const panelOffsets = panels.map((panel) =>
-                clamp(panel.offsetLeft, 0, horizontalTravel)
-            );
-            const targetDistance = panelOffsets.reduce((nearestOffset, panelOffset) =>
-                Math.abs(panelOffset - currentHorizontalOffset) <
-                Math.abs(nearestOffset - currentHorizontalOffset)
-                    ? panelOffset
-                    : nearestOffset
-            );
+            const { phase } = getTimelinePosition(currentDistance);
+            if (!phase || phase.type !== 'transition') return;
             const targetScrollDistance =
-                targetDistance * (verticalTravel / horizontalTravel);
+                currentDistance - phase.start <= phase.end - currentDistance
+                    ? phase.start
+                    : phase.end;
             const targetY = storyStart + targetScrollDistance;
             const distance = targetY - currentY;
             const absoluteDistance = Math.abs(distance);
@@ -2312,8 +2417,7 @@ function App() {
             const startY = currentY;
             const distanceRatio = Math.min(
                 1,
-                absoluteDistance /
-                    Math.max(1, (verticalTravel / (panels.length - 1)) * 0.5)
+                absoluteDistance / Math.max(1, phase.distance * 0.5)
             );
             const duration = 300 + 150 * distanceRatio;
             let startTime = null;
@@ -2388,14 +2492,68 @@ function App() {
             measuredStageWidth = Math.max(1, Math.round(stageRect.width));
             measuredStageHeight = Math.max(1, Math.round(stageRect.height));
             horizontalTravel = measuredStageWidth * (panels.length - 1);
-            verticalTravel = horizontalTravel * scrollPacing;
-
             story.style.setProperty(
                 '--nintendo-late-panel-width',
                 `${measuredStageWidth}px`
             );
-            story.style.height = `${measuredStageHeight + verticalTravel}px`;
             track.style.width = `${measuredStageWidth * panels.length}px`;
+            const revealDistance = Math.min(
+                900,
+                Math.max(500, measuredStageWidth * 0.42)
+            );
+            const completionHoldDistance = Math.min(
+                180,
+                Math.max(120, measuredStageWidth * 0.075)
+            );
+            let timelineCursor = 0;
+            timeline = [];
+            panelAlignmentDistances = Array(panels.length).fill(0);
+
+            for (let panelIndex = 1; panelIndex < panels.length; panelIndex += 1) {
+                const fromOffset = clamp(
+                    panels[panelIndex - 1].offsetLeft,
+                    0,
+                    horizontalTravel
+                );
+                const toOffset = clamp(
+                    panels[panelIndex].offsetLeft,
+                    0,
+                    horizontalTravel
+                );
+                const transitionDistance =
+                    Math.max(1, Math.abs(toOffset - fromOffset)) * scrollPacing;
+                const transitionStart = timelineCursor;
+                const transitionEnd = transitionStart + transitionDistance;
+                timeline.push({
+                    type: 'transition',
+                    from: panelIndex - 1,
+                    to: panelIndex,
+                    fromOffset,
+                    toOffset,
+                    start: transitionStart,
+                    end: transitionEnd,
+                    distance: transitionDistance,
+                });
+                timelineCursor = transitionEnd;
+                panelAlignmentDistances[panelIndex] = transitionEnd;
+
+                const holdStart = timelineCursor;
+                const holdEnd = holdStart + revealDistance + completionHoldDistance;
+                timeline.push({
+                    type: 'hold',
+                    panel: panelIndex,
+                    offset: toOffset,
+                    start: holdStart,
+                    end: holdEnd,
+                    distance: revealDistance + completionHoldDistance,
+                    revealDistance,
+                    completionHoldDistance,
+                });
+                timelineCursor = holdEnd;
+            }
+            verticalTravel = timelineCursor;
+
+            story.style.height = `${measuredStageHeight + verticalTravel}px`;
             track.style.willChange = 'transform';
 
             storyStart = window.scrollY + story.getBoundingClientRect().top;
@@ -2427,9 +2585,10 @@ function App() {
             const panelIndex = panels.indexOf(panel);
             if (panelIndex < 0) return false;
 
-            const panelProgress = panelIndex / (panels.length - 1);
+            const targetDistance = panelAlignmentDistances[panelIndex];
+            if (!Number.isFinite(targetDistance)) return false;
             window.scrollTo({
-                top: storyStart + panelProgress * verticalTravel,
+                top: storyStart + targetDistance,
                 behavior: reducedMotionQuery.matches ? 'auto' : behavior,
             });
             return true;
@@ -2565,6 +2724,8 @@ function App() {
         let verticalTravel = 0;
         let measuredStageWidth = 0;
         let measuredStageHeight = 0;
+        let timeline = [];
+        let panelAlignmentDistances = [];
         const scrollPacing = 1.18;
 
         const clamp = (value, minimum, maximum) =>
@@ -2646,6 +2807,8 @@ function App() {
             track.style.removeProperty('transform');
             track.style.removeProperty('will-change');
             stage.style.removeProperty('background-color');
+            timeline = [];
+            panelAlignmentDistances = [];
             panels.forEach((panel) => {
                 for (let step = 1; step <= 5; step += 1) {
                     panel.style.removeProperty(`--motion-opacity-${step}`);
@@ -2657,21 +2820,77 @@ function App() {
                 panel.style.removeProperty('--motion-parallax-small-reverse');
                 panel.style.removeProperty('--motion-parallax-medium');
                 panel.style.removeProperty('--motion-parallax-medium-reverse');
+                panel.style.removeProperty('--personal-title-reveal');
+                panel.style.removeProperty('--personal-title-line-1-reveal');
+                panel.style.removeProperty('--personal-title-line-2-reveal');
             });
+        };
+
+        const getTimelinePosition = (scrollDistance) => {
+            const clampedDistance = clamp(scrollDistance, 0, verticalTravel);
+            const phase =
+                timeline.find(({ end }) => clampedDistance < end) ??
+                timeline[timeline.length - 1];
+
+            if (!phase) return { offset: 0, phase: null };
+            if (phase.type === 'hold') return { offset: phase.offset, phase };
+
+            const phaseProgress = clamp(
+                (clampedDistance - phase.start) / phase.distance,
+                0,
+                1
+            );
+            return {
+                offset:
+                    phase.fromOffset +
+                    (phase.toOffset - phase.fromOffset) * phaseProgress,
+                phase,
+            };
         };
 
         const updateTrack = () => {
             animationFrame = null;
             if (!isHorizontal || verticalTravel <= 0) return;
 
-            const progress = clamp((window.scrollY - storyStart) / verticalTravel, 0, 1);
-            const trackPosition = progress * (panels.length - 1);
-            track.style.transform = `translate3d(${-progress * horizontalTravel}px, 0, 0)`;
+            const scrollDistance = window.scrollY - storyStart;
+            const { offset: timelineOffset } = getTimelinePosition(scrollDistance);
+            const offset = clamp(timelineOffset, 0, horizontalTravel);
+            const trackPosition =
+                horizontalTravel > 0
+                    ? (offset / horizontalTravel) * (panels.length - 1)
+                    : 0;
+            track.style.transform = `translate3d(${-offset}px, 0, 0)`;
             stage.style.backgroundColor = interpolatePanelBackground(
                 panelBackgrounds,
                 trackPosition
             );
             updatePanelMotion(trackPosition);
+            panels.forEach((panel, panelIndex) => {
+                if (panelIndex < 1 || panelIndex > 4) return;
+                const holdPhase = timeline.find(
+                    (phase) => phase.type === 'hold' && phase.panel === panelIndex
+                );
+                if (!holdPhase) return;
+                const titleReveal = clamp(
+                    (scrollDistance - holdPhase.start) / holdPhase.revealDistance,
+                    0,
+                    1
+                );
+                const firstLineReveal = Math.min(1, titleReveal * 2);
+                const secondLineReveal = clamp((titleReveal - 0.5) * 2, 0, 1);
+                panel.style.setProperty(
+                    '--personal-title-reveal',
+                    `${(titleReveal * 100).toFixed(3)}%`
+                );
+                panel.style.setProperty(
+                    '--personal-title-line-1-reveal',
+                    `${(firstLineReveal * 100).toFixed(3)}%`
+                );
+                panel.style.setProperty(
+                    '--personal-title-line-2-reveal',
+                    `${(secondLineReveal * 100).toFixed(3)}%`
+                );
+            });
         };
 
         const requestTrackUpdate = () => {
@@ -2681,26 +2900,19 @@ function App() {
 
         const snapToNearestPanel = () => {
             snapTimer = null;
-            if (!isHorizontal || isSnapping || measuredStageWidth <= 0) return;
+            if (!isHorizontal || isSnapping || horizontalTravel <= 0) return;
 
             const currentY = window.scrollY;
             const storyEnd = storyStart + verticalTravel;
             if (currentY < storyStart || currentY > storyEnd) return;
 
             const currentDistance = currentY - storyStart;
-            const currentHorizontalOffset =
-                currentDistance * (horizontalTravel / verticalTravel);
-            const panelOffsets = panels.map((panel) =>
-                clamp(panel.offsetLeft, 0, horizontalTravel)
-            );
-            const targetDistance = panelOffsets.reduce((nearestOffset, panelOffset) =>
-                Math.abs(panelOffset - currentHorizontalOffset) <
-                Math.abs(nearestOffset - currentHorizontalOffset)
-                    ? panelOffset
-                    : nearestOffset
-            );
+            const { phase } = getTimelinePosition(currentDistance);
+            if (!phase || phase.type !== 'transition') return;
             const targetScrollDistance =
-                targetDistance * (verticalTravel / horizontalTravel);
+                currentDistance - phase.start <= phase.end - currentDistance
+                    ? phase.start
+                    : phase.end;
             const targetY = storyStart + targetScrollDistance;
             const distance = targetY - currentY;
             const absoluteDistance = Math.abs(distance);
@@ -2710,8 +2922,7 @@ function App() {
             const startY = currentY;
             const distanceRatio = Math.min(
                 1,
-                absoluteDistance /
-                    Math.max(1, (verticalTravel / (panels.length - 1)) * 0.5)
+                absoluteDistance / Math.max(1, phase.distance * 0.5)
             );
             const duration = 300 + 150 * distanceRatio;
             let startTime = null;
@@ -2786,11 +2997,63 @@ function App() {
             measuredStageWidth = Math.max(1, Math.round(stageRect.width));
             measuredStageHeight = Math.max(1, Math.round(stageRect.height));
             horizontalTravel = measuredStageWidth * (panels.length - 1);
-            verticalTravel = horizontalTravel * scrollPacing;
-
             story.style.setProperty('--personal-story-panel-width', `${measuredStageWidth}px`);
-            story.style.height = `${measuredStageHeight + verticalTravel}px`;
             track.style.width = `${measuredStageWidth * panels.length}px`;
+            const revealDistance = Math.min(
+                900,
+                Math.max(500, measuredStageWidth * 0.42)
+            );
+            const completionHoldDistance = Math.min(
+                180,
+                Math.max(120, measuredStageWidth * 0.075)
+            );
+            let timelineCursor = 0;
+            timeline = [];
+            panelAlignmentDistances = Array(panels.length).fill(0);
+
+            for (let panelIndex = 1; panelIndex < panels.length; panelIndex += 1) {
+                const fromOffset = clamp(
+                    panels[panelIndex - 1].offsetLeft,
+                    0,
+                    horizontalTravel
+                );
+                const toOffset = clamp(
+                    panels[panelIndex].offsetLeft,
+                    0,
+                    horizontalTravel
+                );
+                const transitionDistance =
+                    Math.max(1, Math.abs(toOffset - fromOffset)) * scrollPacing;
+                const transitionStart = timelineCursor;
+                const transitionEnd = transitionStart + transitionDistance;
+                timeline.push({
+                    type: 'transition',
+                    fromOffset,
+                    toOffset,
+                    start: transitionStart,
+                    end: transitionEnd,
+                    distance: transitionDistance,
+                });
+                timelineCursor = transitionEnd;
+                panelAlignmentDistances[panelIndex] = transitionEnd;
+
+                const holdStart = timelineCursor;
+                const holdEnd = holdStart + revealDistance + completionHoldDistance;
+                timeline.push({
+                    type: 'hold',
+                    panel: panelIndex,
+                    offset: toOffset,
+                    start: holdStart,
+                    end: holdEnd,
+                    distance: revealDistance + completionHoldDistance,
+                    revealDistance,
+                    completionHoldDistance,
+                });
+                timelineCursor = holdEnd;
+            }
+            verticalTravel = timelineCursor;
+
+            story.style.height = `${measuredStageHeight + verticalTravel}px`;
             track.style.willChange = 'transform';
 
             storyStart = window.scrollY + story.getBoundingClientRect().top;
@@ -2820,10 +3083,11 @@ function App() {
             const panelIndex = panels.indexOf(panel);
             if (panelIndex < 0) return false;
 
-            const panelOffset = clamp(panels[panelIndex].offsetLeft, 0, horizontalTravel);
+            const targetDistance = panelAlignmentDistances[panelIndex];
+            if (!Number.isFinite(targetDistance)) return false;
 
             window.scrollTo({
-                top: storyStart + panelOffset * (verticalTravel / horizontalTravel),
+                top: storyStart + targetDistance,
                 behavior: reducedMotionQuery.matches ? 'auto' : behavior,
             });
             return true;
@@ -3405,14 +3669,40 @@ function App() {
             <main>
                 <section className="hero" id="home" ref={heroRef}>
                     <div className="hero-topline">
-                        <p>Selected works</p>
+                        <p className="hero-topline__edition">
+                            <span>01 / PORTFOLIO</span>
+                            <small>Y2K EDITION</small>
+                        </p>
                         <p>Seoul, Korea</p>
-                        <p>Available for opportunities</p>
+                        <p>Web design · 2026</p>
                     </div>
-                    <div className="hero-title" aria-label="Design in progress">
-                        <span className="hero-title__primary">DESIGN</span>
-                        <span className="hero-title__outline">IN PROGRESS</span>
-                        <span className="hero-title__year">2026</span>
+
+                    <div className="hero-visual" aria-label="웹 디자이너 여예빈">
+                        <img
+                            className="hero-chrome-decorations"
+                            src="/images/hero/hero-chrome-decorations.png"
+                            alt=""
+                            draggable="false"
+                            aria-hidden="true"
+                        />
+                        <div className="hero-chrome-name" aria-hidden="true">
+                            <span className="hero-chrome-name__item hero-chrome-name__yeo">
+                                <img
+                                    className="hero-chrome-name__image hero-chrome-name__image--yeo"
+                                    src="/images/hero/hero-yeo-chrome.png"
+                                    alt=""
+                                    draggable="false"
+                                />
+                            </span>
+                            <span className="hero-chrome-name__item hero-chrome-name__yebin">
+                                <img
+                                    className="hero-chrome-name__image hero-chrome-name__image--yebin"
+                                    src="/images/hero/hero-yebin-chrome.png"
+                                    alt=""
+                                    draggable="false"
+                                />
+                            </span>
+                        </div>
                         <img
                             className="hero-keyring"
                             src="/keyring/assets/keyring.png"
@@ -3421,19 +3711,34 @@ function App() {
                             draggable="false"
                             aria-hidden="true"
                         />
+                        <div className="hero-visual-meta hero-visual-meta--left" aria-hidden="true">
+                            <span className="hero-visual-meta__label">DESIGN PROFILE</span>
+                            <strong>WEB DESIGN</strong>
+                            <span>+ PUBLISHING</span>
+                            <small>EST. 2026</small>
+                        </div>
+                        <div className="hero-visual-meta hero-visual-meta--right" aria-hidden="true">
+                            <span className="hero-visual-meta__label">
+                                <i /> STATUS
+                            </span>
+                            <strong>DESIGNING</strong>
+                            <span>TOMORROW.</span>
+                            <small>SEOUL · 2026</small>
+                        </div>
                     </div>
+
                     <div className="hero-footer">
-                        <p className="hero-role">
-                            WEB DESIGN
-                            <br />
-                            &amp; PUBLISHING
-                        </p>
-                        <p className="hero-intro">
-                            밝은 에너지로 소통하고, 아이디어를 직접
-                            <br />
-                            디자인하고 구현하는 웹 디자이너{' '}
-                            <span className="hero-intro__name">여예빈</span>입니다.
-                        </p>
+                        <p className="hero-role">WEB DESIGN &amp; PUBLISHING</p>
+                        <div className="hero-intro">
+                            <span className="hero-intro__label">A LITTLE ABOUT ME</span>
+                            <p>
+                                밝은 에너지로 소통하고, 아이디어를 직접
+                                <br />
+                                디자인하고 구현하는 웹 디자이너{' '}
+                                <span className="hero-intro__name">여예빈</span>입니다.
+                            </p>
+                            <small>YEO YEBIN · 2026</small>
+                        </div>
                     </div>
                 </section>
 
