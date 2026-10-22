@@ -86,7 +86,7 @@
 
 .nintendo-final-outcome-13__heading p {
     max-width: 540px;
-    margin: clamp(16px, 2.2vh, 22px) 0 0;
+    margin: clamp(18px, 2.4vh, 24px) 0 0;
     color: #4f5d78;
     font: 500 16px/1.7 var(--font-body);
     word-break: keep-all;
@@ -114,17 +114,21 @@
 
 .nintendo-final-outcome-13__action {
     display: flex;
+    gap: 14px;
     align-self: start;
     justify-content: flex-start;
-    padding-top: clamp(52px, calc(3vh + 30px), 64px);
+    padding-top: clamp(80px, calc(3vh + 58px), 92px);
     grid-column: 1;
     grid-row: 3;
 }
 
 .nintendo-final-outcome-13__action a {
     display: inline-flex;
-    width: clamp(210px, 16vw, 232px);
+    width: auto;
+    min-width: 0;
+    max-width: 232px;
     height: 56px;
+    flex: 1 1 0;
     align-items: center;
     justify-content: center;
     gap: 16px;
@@ -134,6 +138,7 @@
     background: rgba(255, 255, 255, 0.12);
     font: 600 11px/1 var(--font-body);
     letter-spacing: 0.12em;
+    white-space: nowrap;
     text-decoration: none;
     transition:
         color 0.25s ease,
@@ -167,7 +172,7 @@
         font-size: clamp(52px, 5.2vw, 76px);
     }
     .nintendo-final-outcome-13__heading p {
-        margin-top: 14px;
+        margin-top: 16px;
         font-size: 15px;
         line-height: 1.6;
     }
@@ -175,7 +180,7 @@
         max-height: 68svh;
     }
     .nintendo-final-outcome-13__action {
-        padding-top: 32px;
+        padding-top: 58px;
     }
     .nintendo-final-outcome-13__action a {
         height: 50px;
@@ -212,6 +217,7 @@
         grid-row: 4;
     }
     .nintendo-final-outcome-13__action {
+        padding-top: clamp(48px, 8vw, 58px);
         grid-column: 1;
         grid-row: 3;
     }
@@ -244,7 +250,17 @@
         padding: 20px 0 8px;
     }
     .nintendo-final-outcome-13__action a {
+        width: auto;
+    }
+}
+
+@media (max-width: 420px) {
+    .nintendo-final-outcome-13__action {
+        flex-direction: column;
+    }
+    .nintendo-final-outcome-13__action a {
         width: min(100%, 232px);
+        flex-basis: 56px;
     }
 }
 

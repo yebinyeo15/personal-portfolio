@@ -6,12 +6,12 @@ import './userInterview.css';
 import './uxArchitecture.css';
 import './designDevelopment.css';
 import './finalOutcome.css';
-
-const ArrowIcon = () => (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M5 12h14M13 6l6 6-6 6" />
-    </svg>
-);
+import PersonalProjectsIntro from './PersonalProjectsIntro.jsx';
+import DiptyqueProjectIntro from './DiptyqueProjectIntro.jsx';
+import DiptyqueProjectShowcase from './DiptyqueProjectShowcase.jsx';
+import SwarovskiProjectIntro from './SwarovskiProjectIntro.jsx';
+import SwarovskiVisualShowcase from './SwarovskiVisualShowcase.jsx';
+import ShortFormContentsIntro from './ShortFormContentsIntro.jsx';
 
 const personalityReactions = {
     curious: 'ALWAYS EXPLORING',
@@ -311,119 +311,6 @@ const Placeholder = ({ label, className = '' }) => (
     <div className={`placeholder ${className}`} role="img" aria-label={`${label} placeholder`}>
         <span>{label}</span>
     </div>
-);
-
-const EditorialProject = ({ number, projectNumber, name, tone, reverse = false }) => (
-    <section className={`editorial-project editorial-project--${tone}`} id={name.toLowerCase()}>
-        <div className="section editorial-project__intro">
-            <div className={`section-index ${tone === 'dark' ? 'section-index--light' : ''}`}>
-                <span>{number}</span>
-                <span>Project {projectNumber}</span>
-            </div>
-            <div
-                className={`editorial-project__title ${reverse ? 'editorial-project__title--reverse' : ''}`}
-            >
-                <div>
-                    <p className="eyebrow">Personal project · Brand website renewal</p>
-                    <h2>{name}</h2>
-                </div>
-                <p>개인 브랜드 웹사이트 리뉴얼 프로젝트</p>
-            </div>
-            <Placeholder
-                label={`${name} · PROJECT KEY VISUAL`}
-                className="editorial-project__visual"
-            />
-        </div>
-
-        <div className="section editorial-project__overview">
-            <div className="section-label">Overview</div>
-            <div className="editorial-project__statement">
-                <h3>
-                    PROJECT
-                    <br />
-                    OVERVIEW
-                </h3>
-                <p>프로젝트의 배경과 리뉴얼 방향에 대한 실제 내용을 입력할 영역입니다.</p>
-            </div>
-            <div className="editorial-project__brief">
-                <article>
-                    <span>01</span>
-                    <h4>Problem</h4>
-                    <p>발견한 문제와 개선이 필요한 내용을 입력해 주세요.</p>
-                </article>
-                <article>
-                    <span>02</span>
-                    <h4>Goal</h4>
-                    <p>프로젝트의 실제 목표와 방향을 입력해 주세요.</p>
-                </article>
-                <article>
-                    <span>03</span>
-                    <h4>Design Concept</h4>
-                    <p>디자인 콘셉트와 시각적 기준을 입력해 주세요.</p>
-                </article>
-            </div>
-        </div>
-
-        <div className="section editorial-project__process">
-            <div className="editorial-project__process-heading">
-                <div>
-                    <p className="eyebrow">Design process</p>
-                    <h3>
-                        THE MAKING
-                        <br />
-                        OF {name}
-                    </h3>
-                </div>
-                <p>리서치부터 최종 디자인까지 실제 작업 과정을 순서대로 정리할 영역입니다.</p>
-            </div>
-            <div className="editorial-project__process-grid">
-                <Placeholder
-                    label="RESEARCH / MOODBOARD"
-                    className="editorial-process-placeholder"
-                />
-                <Placeholder
-                    label="WIREFRAME / STRUCTURE"
-                    className="editorial-process-placeholder editorial-process-placeholder--tall"
-                />
-                <Placeholder label="DESIGN SYSTEM / UI" className="editorial-process-placeholder" />
-            </div>
-        </div>
-
-        <div className="section editorial-project__result">
-            <div className="editorial-project__result-heading">
-                <div className="section-label">Final result</div>
-                <h3>
-                    FINAL
-                    <br />
-                    SCREENS
-                </h3>
-                <p>완성된 웹사이트 화면 이미지로 교체할 수 있는 갤러리입니다.</p>
-            </div>
-            <div
-                className={`editorial-project__gallery ${reverse ? 'editorial-project__gallery--reverse' : ''}`}
-            >
-                <Placeholder
-                    label={`${name} · MAIN PAGE`}
-                    className="editorial-result-placeholder editorial-result-placeholder--main"
-                />
-                <Placeholder
-                    label={`${name} · DETAIL 01`}
-                    className="editorial-result-placeholder"
-                />
-                <Placeholder
-                    label={`${name} · DETAIL 02`}
-                    className="editorial-result-placeholder"
-                />
-            </div>
-            <div className="editorial-project__cta">
-                <p>Explore the live project</p>
-                <button type="button" disabled>
-                    VIEW WEBSITE <ArrowIcon />
-                </button>
-                <small>실제 사이트 URL을 입력한 후 활성화해 주세요.</small>
-            </div>
-        </div>
-    </section>
 );
 
 const nintendoContributionItems = [
@@ -733,15 +620,48 @@ const InterviewEditorialCard = ({ interview, className = '' }) => (
         </header>
         <section>
             <span>INTERVIEW SUMMARY</span>
-            {interview.summary.map((summary) => <p key={summary}>{summary}</p>)}
+            {interview.summary.map((summary) => (
+                <p key={summary}>{summary}</p>
+            ))}
         </section>
         <dl>
-            <div><dt>NEEDS</dt><dd>{interview.needs}</dd></div>
-            <div><dt>PAIN POINT</dt><dd>{interview.pain}</dd></div>
-            <div><dt>INSIGHT</dt><dd>{interview.insight}</dd></div>
+            <div>
+                <dt>NEEDS</dt>
+                <dd>{interview.needs}</dd>
+            </div>
+            <div>
+                <dt>PAIN POINT</dt>
+                <dd>{interview.pain}</dd>
+            </div>
+            <div>
+                <dt>INSIGHT</dt>
+                <dd>{interview.insight}</dd>
+            </div>
         </dl>
     </article>
 );
+
+const parseRgbColor = (color) => {
+    const channels = color.match(/[\d.]+/g)?.slice(0, 3).map(Number);
+    return channels?.length === 3 ? channels : null;
+};
+
+const interpolatePanelBackground = (panelColors, trackPosition) => {
+    const firstPanelIndex = Math.floor(trackPosition);
+    const secondPanelIndex = Math.min(firstPanelIndex + 1, panelColors.length - 1);
+    const firstColor = panelColors[firstPanelIndex];
+    const secondColor = panelColors[secondPanelIndex];
+
+    if (!firstColor || !secondColor) return '';
+
+    const linearProgress = trackPosition - firstPanelIndex;
+    const easedProgress = linearProgress * linearProgress * (3 - 2 * linearProgress);
+    const channels = firstColor.map((channel, index) =>
+        Math.round(channel + (secondColor[index] - channel) * easedProgress)
+    );
+
+    return `rgb(${channels.join(', ')})`;
+};
 
 function App() {
     const aboutRef = useRef(null);
@@ -753,6 +673,13 @@ function App() {
     const horizontalStoryRef = useRef(null);
     const horizontalStoryStageRef = useRef(null);
     const horizontalStoryTrackRef = useRef(null);
+    const nintendoLateStoryRef = useRef(null);
+    const nintendoLateStoryStageRef = useRef(null);
+    const nintendoLateStoryTrackRef = useRef(null);
+    const personalStoryRef = useRef(null);
+    const personalStoryStageRef = useRef(null);
+    const personalStoryTrackRef = useRef(null);
+    const planningIntroRef = useRef(null);
     const chromeStoryOverlayRef = useRef(null);
     const chromeStoryPathRefs = useRef(new Map());
     const chromeStoryGroupRefs = useRef(new Map());
@@ -794,6 +721,7 @@ function App() {
     const [isNavHidden, setIsNavHidden] = useState(false);
     const [isTopButtonVisible, setIsTopButtonVisible] = useState(false);
     const [isSelectedWorksTitleVisible, setIsSelectedWorksTitleVisible] = useState(false);
+    const [isPlanningIntroVisible, setIsPlanningIntroVisible] = useState(false);
     const [nintendoComparePosition, setNintendoComparePosition] = useState(50);
     const [activeResearchArchive, setActiveResearchArchive] = useState('nintendo');
     const [activeResearchArchiveImage, setActiveResearchArchiveImage] =
@@ -808,8 +736,7 @@ function App() {
         useState('wireframe');
     const [activeDesignDevelopmentArchiveImage, setActiveDesignDevelopmentArchiveImage] =
         useState('main');
-    const [previousDesignDevelopmentArchive, setPreviousDesignDevelopmentArchive] =
-        useState(null);
+    const [previousDesignDevelopmentArchive, setPreviousDesignDevelopmentArchive] = useState(null);
     const [documentPreview, setDocumentPreview] = useState(null);
     const [architecturePreview, setArchitecturePreview] = useState(null);
     const [architectureZoom, setArchitectureZoom] = useState(1);
@@ -1439,6 +1366,28 @@ function App() {
         return () => observer.disconnect();
     }, []);
 
+    useEffect(() => {
+        const section = planningIntroRef.current;
+        if (!section) return undefined;
+
+        if (!('IntersectionObserver' in window)) {
+            const frameId = window.requestAnimationFrame(() => setIsPlanningIntroVisible(true));
+            return () => window.cancelAnimationFrame(frameId);
+        }
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (!entry.isIntersecting) return;
+                setIsPlanningIntroVisible(true);
+                observer.disconnect();
+            },
+            { threshold: 0.3 }
+        );
+
+        observer.observe(section);
+        return () => observer.disconnect();
+    }, []);
+
     useLayoutEffect(() => {
         const story = horizontalStoryRef.current;
         const stage = horizontalStoryStageRef.current;
@@ -1447,14 +1396,7 @@ function App() {
         const chromeStar = chromeStoryStarRef.current;
         const chromePathPreview = track?.querySelector('.nintendo-chrome-path-preview');
 
-        if (
-            !story ||
-            !stage ||
-            !track ||
-            !chromeOverlay ||
-            !chromeStar ||
-            !chromePathPreview
-        ) {
+        if (!story || !stage || !track || !chromeOverlay || !chromeStar || !chromePathPreview) {
             return undefined;
         }
 
@@ -1491,9 +1433,7 @@ function App() {
                   instanceCount: 0,
               })
             : null;
-        const diagnosticInstance = diagnosticStore
-            ? (diagnosticStore.instanceCount += 1)
-            : null;
+        const diagnosticInstance = diagnosticStore ? (diagnosticStore.instanceCount += 1) : null;
 
         const describeElement = (element) => {
             if (!element) return null;
@@ -1659,20 +1599,13 @@ function App() {
                 const segmentStart = segment === 0 ? 0 : segment + arrivalReveal;
                 const segmentEnd = segment + (phase.panel === 7 ? 1 : holdReveal);
                 progress =
-                    (segmentStart +
-                        (segmentEnd - segmentStart) * position.phaseProgress) /
-                    6;
-            } else if (
-                phase?.type === 'transition' &&
-                phase.from >= 2 &&
-                phase.from < 7
-            ) {
+                    (segmentStart + (segmentEnd - segmentStart) * position.phaseProgress) / 6;
+            } else if (phase?.type === 'transition' && phase.from >= 2 && phase.from < 7) {
                 const segment = phase.from - 2;
                 const transitionStart = segment + holdReveal;
                 const transitionEnd = segment + 1 + arrivalReveal;
                 progress =
-                    (transitionStart +
-                        (transitionEnd - transitionStart) * position.phaseProgress) /
+                    (transitionStart + (transitionEnd - transitionStart) * position.phaseProgress) /
                     6;
             } else if (phase?.type === 'complete') {
                 progress = 1;
@@ -1755,8 +1688,7 @@ function App() {
                 Math.min(pathLength, pathLength * progress + tangentDistance)
             );
             const angle =
-                (Math.atan2(nextPoint.y - previousPoint.y, nextPoint.x - previousPoint.x) *
-                    180) /
+                (Math.atan2(nextPoint.y - previousPoint.y, nextPoint.x - previousPoint.x) * 180) /
                 Math.PI;
 
             chromeStar.setAttribute(
@@ -1966,10 +1898,7 @@ function App() {
             if (!isDevelopment || performance.now() - lastDiagnosticScrollTime <= 250) return;
             lastDiagnosticScrollTime = performance.now();
             recordDiagnostic('scroll:capture', {
-                target:
-                    event.target === document
-                        ? 'document'
-                        : describeElement(event.target),
+                target: event.target === document ? 'document' : describeElement(event.target),
             });
         };
 
@@ -2097,11 +2026,7 @@ function App() {
             verticalScrollDistance = timelineCursor;
             story.style.height = `${stageHeight + verticalScrollDistance}px`;
             story.style.setProperty('--horizontal-panel-width', `${stage.clientWidth}px`);
-            if (
-                panels.some((panel, index) =>
-                    isPanelOverflowing(panel, index, stageHeight)
-                )
-            ) {
+            if (panels.some((panel, index) => isPanelOverflowing(panel, index, stageHeight))) {
                 recordDiagnostic('measure:rejected-overflow-after-timeline', {
                     stageHeight,
                     overflowingPanels: panels
@@ -2275,6 +2200,720 @@ function App() {
             if (initializationFrame !== null) {
                 window.cancelAnimationFrame(initializationFrame);
             }
+            if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+            cancelSnap();
+            resetStory();
+        };
+    }, []);
+
+    useLayoutEffect(() => {
+        const story = nintendoLateStoryRef.current;
+        const stage = nintendoLateStoryStageRef.current;
+        const track = nintendoLateStoryTrackRef.current;
+
+        if (!story || !stage || !track) return undefined;
+
+        const desktopQuery = window.matchMedia('(min-width: 901px)');
+        const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const panels = Array.from(track.children).filter(
+            (panel) => panel.classList.contains('section') && !panel.hidden
+        );
+        const panelBackgrounds = panels.map((panel) =>
+            parseRgbColor(window.getComputedStyle(panel).backgroundColor)
+        );
+        let animationFrame = null;
+        let initializationFrame = null;
+        let snapTimer = null;
+        let snapAnimationFrame = null;
+        let resizeObserver = null;
+        let isHorizontal = false;
+        let isSnapping = false;
+        let isDisposed = false;
+        let lastScrollY = window.scrollY;
+        let storyStart = 0;
+        let horizontalTravel = 0;
+        let verticalTravel = 0;
+        let measuredStageWidth = 0;
+        let measuredStageHeight = 0;
+        const scrollPacing = 1.18;
+
+        const clamp = (value, minimum, maximum) =>
+            Math.min(Math.max(value, minimum), maximum);
+
+        const cancelSnap = () => {
+            if (snapTimer !== null) {
+                window.clearTimeout(snapTimer);
+                snapTimer = null;
+            }
+            if (snapAnimationFrame !== null) {
+                window.cancelAnimationFrame(snapAnimationFrame);
+                snapAnimationFrame = null;
+            }
+            isSnapping = false;
+        };
+
+        const resetStory = () => {
+            cancelSnap();
+            isHorizontal = false;
+            story.classList.remove('is-horizontal');
+            story.style.removeProperty('height');
+            story.style.removeProperty('--nintendo-late-panel-width');
+            track.style.removeProperty('width');
+            track.style.removeProperty('transform');
+            track.style.removeProperty('will-change');
+            stage.style.removeProperty('background-color');
+        };
+
+        const updateTrack = () => {
+            animationFrame = null;
+            if (!isHorizontal || verticalTravel <= 0) return;
+
+            const progress = clamp((window.scrollY - storyStart) / verticalTravel, 0, 1);
+            track.style.transform = `translate3d(${-progress * horizontalTravel}px, 0, 0)`;
+            stage.style.backgroundColor = interpolatePanelBackground(
+                panelBackgrounds,
+                progress * (panels.length - 1)
+            );
+        };
+
+        const requestTrackUpdate = () => {
+            if (animationFrame !== null) return;
+            animationFrame = window.requestAnimationFrame(updateTrack);
+        };
+
+        const snapToNearestPanel = () => {
+            snapTimer = null;
+            if (!isHorizontal || isSnapping || horizontalTravel <= 0) return;
+
+            const currentY = window.scrollY;
+            const storyEnd = storyStart + verticalTravel;
+            if (currentY < storyStart || currentY > storyEnd) return;
+
+            const currentDistance = currentY - storyStart;
+            const currentHorizontalOffset =
+                currentDistance * (horizontalTravel / verticalTravel);
+            const panelOffsets = panels.map((panel) =>
+                clamp(panel.offsetLeft, 0, horizontalTravel)
+            );
+            const targetDistance = panelOffsets.reduce((nearestOffset, panelOffset) =>
+                Math.abs(panelOffset - currentHorizontalOffset) <
+                Math.abs(nearestOffset - currentHorizontalOffset)
+                    ? panelOffset
+                    : nearestOffset
+            );
+            const targetScrollDistance =
+                targetDistance * (verticalTravel / horizontalTravel);
+            const targetY = storyStart + targetScrollDistance;
+            const distance = targetY - currentY;
+            const absoluteDistance = Math.abs(distance);
+
+            if (absoluteDistance < 1) return;
+
+            const startY = currentY;
+            const distanceRatio = Math.min(
+                1,
+                absoluteDistance /
+                    Math.max(1, (verticalTravel / (panels.length - 1)) * 0.5)
+            );
+            const duration = 300 + 150 * distanceRatio;
+            let startTime = null;
+            isSnapping = true;
+
+            const animateSnap = (time) => {
+                if (!isSnapping) return;
+                if (startTime === null) startTime = time;
+
+                const progress = Math.min(1, (time - startTime) / duration);
+                const easedProgress = 1 - (1 - progress) ** 5;
+                window.scrollTo({
+                    top: startY + distance * easedProgress,
+                    behavior: 'instant',
+                });
+
+                if (progress < 1) {
+                    snapAnimationFrame = window.requestAnimationFrame(animateSnap);
+                    return;
+                }
+
+                snapAnimationFrame = null;
+                isSnapping = false;
+                lastScrollY = targetY;
+                requestTrackUpdate();
+            };
+
+            snapAnimationFrame = window.requestAnimationFrame(animateSnap);
+        };
+
+        const scheduleSnap = () => {
+            if (!isHorizontal || isSnapping) return;
+            if (snapTimer !== null) window.clearTimeout(snapTimer);
+            snapTimer = window.setTimeout(snapToNearestPanel, 320);
+        };
+
+        const handleStoryScroll = () => {
+            const currentY = window.scrollY;
+            requestTrackUpdate();
+            if (!isSnapping && Math.abs(currentY - lastScrollY) > 0.5) scheduleSnap();
+            lastScrollY = currentY;
+        };
+
+        const handleUserInput = () => {
+            cancelSnap();
+            lastScrollY = window.scrollY;
+        };
+
+        const measureStory = ({ preserveProgress = false } = {}) => {
+            if (isDisposed) return;
+
+            const shouldUseHorizontal =
+                desktopQuery.matches && !reducedMotionQuery.matches && panels.length > 1;
+            const previousProgress =
+                preserveProgress && isHorizontal && verticalTravel > 0
+                    ? clamp((window.scrollY - storyStart) / verticalTravel, 0, 1)
+                    : null;
+            const wasInsideStory =
+                previousProgress !== null &&
+                window.scrollY >= storyStart &&
+                window.scrollY <= storyStart + verticalTravel;
+
+            if (!shouldUseHorizontal) {
+                resetStory();
+                return;
+            }
+
+            story.classList.add('is-horizontal');
+            isHorizontal = true;
+
+            const stageRect = stage.getBoundingClientRect();
+            measuredStageWidth = Math.max(1, Math.round(stageRect.width));
+            measuredStageHeight = Math.max(1, Math.round(stageRect.height));
+            horizontalTravel = measuredStageWidth * (panels.length - 1);
+            verticalTravel = horizontalTravel * scrollPacing;
+
+            story.style.setProperty(
+                '--nintendo-late-panel-width',
+                `${measuredStageWidth}px`
+            );
+            story.style.height = `${measuredStageHeight + verticalTravel}px`;
+            track.style.width = `${measuredStageWidth * panels.length}px`;
+            track.style.willChange = 'transform';
+
+            storyStart = window.scrollY + story.getBoundingClientRect().top;
+
+            if (wasInsideStory) {
+                window.scrollTo({
+                    top: storyStart + previousProgress * verticalTravel,
+                    behavior: 'auto',
+                });
+            }
+
+            updateTrack();
+        };
+
+        const requestMeasure = ({ preserveProgress = true } = {}) => {
+            if (initializationFrame !== null) {
+                window.cancelAnimationFrame(initializationFrame);
+            }
+            initializationFrame = window.requestAnimationFrame(() => {
+                initializationFrame = null;
+                measureStory({ preserveProgress });
+            });
+        };
+
+        const scrollToPanel = (target, behavior = 'smooth') => {
+            if (!isHorizontal) return false;
+
+            const panel = target.closest('.nintendo-late-story__track > .section');
+            const panelIndex = panels.indexOf(panel);
+            if (panelIndex < 0) return false;
+
+            const panelProgress = panelIndex / (panels.length - 1);
+            window.scrollTo({
+                top: storyStart + panelProgress * verticalTravel,
+                behavior: reducedMotionQuery.matches ? 'auto' : behavior,
+            });
+            return true;
+        };
+
+        const handleDocumentClick = (event) => {
+            const anchor = event.target.closest('a[href^="#"]');
+            if (!anchor || anchor.getAttribute('href') === '#') return;
+
+            const targetId = decodeURIComponent(anchor.hash.slice(1));
+            const target = document.getElementById(targetId);
+            if (!target || !track.contains(target)) return;
+
+            event.preventDefault();
+            if (scrollToPanel(target)) {
+                window.history.pushState(null, '', anchor.hash);
+            }
+        };
+
+        const handleHashNavigation = () => {
+            if (!window.location.hash) {
+                requestTrackUpdate();
+                return;
+            }
+
+            const target = document.getElementById(
+                decodeURIComponent(window.location.hash.slice(1))
+            );
+            if (!target || !track.contains(target)) {
+                requestTrackUpdate();
+                return;
+            }
+
+            window.requestAnimationFrame(() => scrollToPanel(target, 'auto'));
+        };
+
+        const handleResize = () => {
+            cancelSnap();
+            requestMeasure({ preserveProgress: true });
+        };
+        const handleAssetsReady = () => {
+            cancelSnap();
+            requestMeasure({ preserveProgress: true });
+        };
+
+        measureStory();
+        initializationFrame = window.requestAnimationFrame(() => {
+            initializationFrame = null;
+            measureStory();
+            handleHashNavigation();
+        });
+
+        if ('ResizeObserver' in window) {
+            resizeObserver = new ResizeObserver(([entry]) => {
+                const { width, height } = entry.contentRect;
+                if (
+                    Math.abs(width - measuredStageWidth) > 1 ||
+                    Math.abs(height - measuredStageHeight) > 1
+                ) {
+                    requestMeasure({ preserveProgress: true });
+                }
+            });
+            resizeObserver.observe(stage);
+        }
+
+        window.addEventListener('scroll', handleStoryScroll, { passive: true });
+        window.addEventListener('wheel', handleUserInput, { passive: true });
+        window.addEventListener('touchstart', handleUserInput, { passive: true });
+        window.addEventListener('pointerdown', handleUserInput, { passive: true });
+        window.addEventListener('keydown', handleUserInput);
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('load', handleAssetsReady);
+        window.addEventListener('pageshow', handleAssetsReady);
+        window.addEventListener('popstate', handleHashNavigation);
+        window.addEventListener('hashchange', handleHashNavigation);
+        desktopQuery.addEventListener('change', handleResize);
+        reducedMotionQuery.addEventListener('change', handleResize);
+        document.addEventListener('click', handleDocumentClick);
+
+        document.fonts?.ready.then(() => {
+            if (!isDisposed) requestMeasure({ preserveProgress: true });
+        });
+
+        return () => {
+            isDisposed = true;
+            window.removeEventListener('scroll', handleStoryScroll);
+            window.removeEventListener('wheel', handleUserInput);
+            window.removeEventListener('touchstart', handleUserInput);
+            window.removeEventListener('pointerdown', handleUserInput);
+            window.removeEventListener('keydown', handleUserInput);
+            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('load', handleAssetsReady);
+            window.removeEventListener('pageshow', handleAssetsReady);
+            window.removeEventListener('popstate', handleHashNavigation);
+            window.removeEventListener('hashchange', handleHashNavigation);
+            desktopQuery.removeEventListener('change', handleResize);
+            reducedMotionQuery.removeEventListener('change', handleResize);
+            document.removeEventListener('click', handleDocumentClick);
+            resizeObserver?.disconnect();
+            if (initializationFrame !== null) {
+                window.cancelAnimationFrame(initializationFrame);
+            }
+            if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+            cancelSnap();
+            resetStory();
+        };
+    }, []);
+
+    useLayoutEffect(() => {
+        const story = personalStoryRef.current;
+        const stage = personalStoryStageRef.current;
+        const track = personalStoryTrackRef.current;
+
+        if (!story || !stage || !track) return undefined;
+
+        const desktopQuery = window.matchMedia('(min-width: 901px)');
+        const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const panels = Array.from(track.children).filter((panel) => !panel.hidden);
+        const panelBackgrounds = panels.map((panel) =>
+            parseRgbColor(window.getComputedStyle(panel).backgroundColor)
+        );
+        let animationFrame = null;
+        let measureFrame = null;
+        let snapTimer = null;
+        let snapAnimationFrame = null;
+        let resizeObserver = null;
+        let isHorizontal = false;
+        let isSnapping = false;
+        let isDisposed = false;
+        let lastScrollY = window.scrollY;
+        let storyStart = 0;
+        let horizontalTravel = 0;
+        let verticalTravel = 0;
+        let measuredStageWidth = 0;
+        let measuredStageHeight = 0;
+        const scrollPacing = 1.18;
+
+        const clamp = (value, minimum, maximum) =>
+            Math.min(Math.max(value, minimum), maximum);
+
+        const smoothstep = (value) => value * value * (3 - 2 * value);
+
+        const cancelSnap = () => {
+            if (snapTimer !== null) {
+                window.clearTimeout(snapTimer);
+                snapTimer = null;
+            }
+            if (snapAnimationFrame !== null) {
+                window.cancelAnimationFrame(snapAnimationFrame);
+                snapAnimationFrame = null;
+            }
+            isSnapping = false;
+        };
+
+        const updatePanelMotion = (trackPosition) => {
+            panels.forEach((panel, panelIndex) => {
+                const entryProgress = clamp(
+                    (trackPosition - (panelIndex - 0.85)) / 0.75,
+                    0,
+                    1
+                );
+                const relativePosition = clamp(trackPosition - panelIndex, -1, 1);
+
+                for (let step = 1; step <= 5; step += 1) {
+                    const stepStart = (step - 1) * 0.1;
+                    const stepProgress = smoothstep(
+                        clamp((entryProgress - stepStart) / (1 - stepStart), 0, 1)
+                    );
+                    const remaining = 1 - stepProgress;
+
+                    const motionOpacity = 0.2 + stepProgress * 0.8;
+
+                    panel.style.setProperty(
+                        `--motion-opacity-${step}`,
+                        motionOpacity.toFixed(4)
+                    );
+                    panel.style.setProperty(`--motion-shift-${step}`, `${remaining * 20}px`);
+                    panel.style.setProperty(
+                        `--motion-shift-neg-${step}`,
+                        `${remaining * -20}px`
+                    );
+                    panel.style.setProperty(
+                        `--motion-scale-${step}`,
+                        (0.99 + stepProgress * 0.01).toFixed(4)
+                    );
+                }
+
+                panel.style.setProperty(
+                    '--motion-parallax-small',
+                    `${relativePosition * -6}px`
+                );
+                panel.style.setProperty(
+                    '--motion-parallax-small-reverse',
+                    `${relativePosition * 6}px`
+                );
+                panel.style.setProperty(
+                    '--motion-parallax-medium',
+                    `${relativePosition * -8}px`
+                );
+                panel.style.setProperty(
+                    '--motion-parallax-medium-reverse',
+                    `${relativePosition * 8}px`
+                );
+            });
+        };
+
+        const resetStory = () => {
+            cancelSnap();
+            isHorizontal = false;
+            story.classList.remove('is-horizontal');
+            story.style.removeProperty('height');
+            story.style.removeProperty('--personal-story-panel-width');
+            track.style.removeProperty('width');
+            track.style.removeProperty('transform');
+            track.style.removeProperty('will-change');
+            stage.style.removeProperty('background-color');
+            panels.forEach((panel) => {
+                for (let step = 1; step <= 5; step += 1) {
+                    panel.style.removeProperty(`--motion-opacity-${step}`);
+                    panel.style.removeProperty(`--motion-shift-${step}`);
+                    panel.style.removeProperty(`--motion-shift-neg-${step}`);
+                    panel.style.removeProperty(`--motion-scale-${step}`);
+                }
+                panel.style.removeProperty('--motion-parallax-small');
+                panel.style.removeProperty('--motion-parallax-small-reverse');
+                panel.style.removeProperty('--motion-parallax-medium');
+                panel.style.removeProperty('--motion-parallax-medium-reverse');
+            });
+        };
+
+        const updateTrack = () => {
+            animationFrame = null;
+            if (!isHorizontal || verticalTravel <= 0) return;
+
+            const progress = clamp((window.scrollY - storyStart) / verticalTravel, 0, 1);
+            const trackPosition = progress * (panels.length - 1);
+            track.style.transform = `translate3d(${-progress * horizontalTravel}px, 0, 0)`;
+            stage.style.backgroundColor = interpolatePanelBackground(
+                panelBackgrounds,
+                trackPosition
+            );
+            updatePanelMotion(trackPosition);
+        };
+
+        const requestTrackUpdate = () => {
+            if (animationFrame !== null) return;
+            animationFrame = window.requestAnimationFrame(updateTrack);
+        };
+
+        const snapToNearestPanel = () => {
+            snapTimer = null;
+            if (!isHorizontal || isSnapping || measuredStageWidth <= 0) return;
+
+            const currentY = window.scrollY;
+            const storyEnd = storyStart + verticalTravel;
+            if (currentY < storyStart || currentY > storyEnd) return;
+
+            const currentDistance = currentY - storyStart;
+            const currentHorizontalOffset =
+                currentDistance * (horizontalTravel / verticalTravel);
+            const panelOffsets = panels.map((panel) =>
+                clamp(panel.offsetLeft, 0, horizontalTravel)
+            );
+            const targetDistance = panelOffsets.reduce((nearestOffset, panelOffset) =>
+                Math.abs(panelOffset - currentHorizontalOffset) <
+                Math.abs(nearestOffset - currentHorizontalOffset)
+                    ? panelOffset
+                    : nearestOffset
+            );
+            const targetScrollDistance =
+                targetDistance * (verticalTravel / horizontalTravel);
+            const targetY = storyStart + targetScrollDistance;
+            const distance = targetY - currentY;
+            const absoluteDistance = Math.abs(distance);
+
+            if (absoluteDistance < 1) return;
+
+            const startY = currentY;
+            const distanceRatio = Math.min(
+                1,
+                absoluteDistance /
+                    Math.max(1, (verticalTravel / (panels.length - 1)) * 0.5)
+            );
+            const duration = 300 + 150 * distanceRatio;
+            let startTime = null;
+            isSnapping = true;
+
+            const animateSnap = (time) => {
+                if (!isSnapping) return;
+                if (startTime === null) startTime = time;
+
+                const progress = Math.min(1, (time - startTime) / duration);
+                const easedProgress = 1 - (1 - progress) ** 5;
+                window.scrollTo({
+                    top: startY + distance * easedProgress,
+                    behavior: 'instant',
+                });
+
+                if (progress < 1) {
+                    snapAnimationFrame = window.requestAnimationFrame(animateSnap);
+                    return;
+                }
+
+                snapAnimationFrame = null;
+                isSnapping = false;
+                lastScrollY = targetY;
+                requestTrackUpdate();
+            };
+
+            snapAnimationFrame = window.requestAnimationFrame(animateSnap);
+        };
+
+        const scheduleSnap = () => {
+            if (!isHorizontal || isSnapping) return;
+            if (snapTimer !== null) window.clearTimeout(snapTimer);
+            snapTimer = window.setTimeout(snapToNearestPanel, 320);
+        };
+
+        const handleStoryScroll = () => {
+            const currentY = window.scrollY;
+            requestTrackUpdate();
+            if (!isSnapping && Math.abs(currentY - lastScrollY) > 0.5) scheduleSnap();
+            lastScrollY = currentY;
+        };
+
+        const handleUserInput = () => {
+            cancelSnap();
+            lastScrollY = window.scrollY;
+        };
+
+        const measureStory = ({ preserveProgress = false } = {}) => {
+            if (isDisposed) return;
+
+            const shouldUseHorizontal =
+                desktopQuery.matches && !reducedMotionQuery.matches && panels.length > 1;
+            const previousProgress =
+                preserveProgress && isHorizontal && verticalTravel > 0
+                    ? clamp((window.scrollY - storyStart) / verticalTravel, 0, 1)
+                    : null;
+            const wasInsideStory =
+                previousProgress !== null &&
+                window.scrollY >= storyStart &&
+                window.scrollY <= storyStart + verticalTravel;
+
+            if (!shouldUseHorizontal) {
+                resetStory();
+                return;
+            }
+
+            story.classList.add('is-horizontal');
+            isHorizontal = true;
+
+            const stageRect = stage.getBoundingClientRect();
+            measuredStageWidth = Math.max(1, Math.round(stageRect.width));
+            measuredStageHeight = Math.max(1, Math.round(stageRect.height));
+            horizontalTravel = measuredStageWidth * (panels.length - 1);
+            verticalTravel = horizontalTravel * scrollPacing;
+
+            story.style.setProperty('--personal-story-panel-width', `${measuredStageWidth}px`);
+            story.style.height = `${measuredStageHeight + verticalTravel}px`;
+            track.style.width = `${measuredStageWidth * panels.length}px`;
+            track.style.willChange = 'transform';
+
+            storyStart = window.scrollY + story.getBoundingClientRect().top;
+
+            if (wasInsideStory) {
+                window.scrollTo({
+                    top: storyStart + previousProgress * verticalTravel,
+                    behavior: 'auto',
+                });
+            }
+
+            updateTrack();
+        };
+
+        const requestMeasure = ({ preserveProgress = true } = {}) => {
+            if (measureFrame !== null) window.cancelAnimationFrame(measureFrame);
+            measureFrame = window.requestAnimationFrame(() => {
+                measureFrame = null;
+                measureStory({ preserveProgress });
+            });
+        };
+
+        const scrollToPanel = (target, behavior = 'smooth') => {
+            if (!isHorizontal) return false;
+
+            const panel = target.closest('.personal-horizontal-story__track > section');
+            const panelIndex = panels.indexOf(panel);
+            if (panelIndex < 0) return false;
+
+            const panelOffset = clamp(panels[panelIndex].offsetLeft, 0, horizontalTravel);
+
+            window.scrollTo({
+                top: storyStart + panelOffset * (verticalTravel / horizontalTravel),
+                behavior: reducedMotionQuery.matches ? 'auto' : behavior,
+            });
+            return true;
+        };
+
+        const handleDocumentClick = (event) => {
+            if (!(event.target instanceof Element)) return;
+            const anchor = event.target.closest('a[href^="#"]');
+            if (!anchor || anchor.getAttribute('href') === '#') return;
+
+            const target = document.getElementById(decodeURIComponent(anchor.hash.slice(1)));
+            if (!target || !track.contains(target)) return;
+
+            event.preventDefault();
+            if (scrollToPanel(target)) window.history.pushState(null, '', anchor.hash);
+        };
+
+        const handleHashNavigation = () => {
+            const target = window.location.hash
+                ? document.getElementById(decodeURIComponent(window.location.hash.slice(1)))
+                : null;
+
+            if (!target || !track.contains(target)) {
+                requestTrackUpdate();
+                return;
+            }
+
+            window.requestAnimationFrame(() => scrollToPanel(target, 'auto'));
+        };
+
+        const handleResize = () => {
+            cancelSnap();
+            requestMeasure({ preserveProgress: true });
+        };
+
+        measureStory();
+        measureFrame = window.requestAnimationFrame(() => {
+            measureFrame = null;
+            measureStory();
+            handleHashNavigation();
+        });
+
+        if ('ResizeObserver' in window) {
+            resizeObserver = new ResizeObserver(([entry]) => {
+                const { width, height } = entry.contentRect;
+                if (
+                    Math.abs(width - measuredStageWidth) > 1 ||
+                    Math.abs(height - measuredStageHeight) > 1
+                ) {
+                    requestMeasure({ preserveProgress: true });
+                }
+            });
+            resizeObserver.observe(stage);
+        }
+
+        window.addEventListener('scroll', handleStoryScroll, { passive: true });
+        window.addEventListener('wheel', handleUserInput, { passive: true });
+        window.addEventListener('touchstart', handleUserInput, { passive: true });
+        window.addEventListener('pointerdown', handleUserInput, { passive: true });
+        window.addEventListener('keydown', handleUserInput);
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('load', handleResize);
+        window.addEventListener('pageshow', handleResize);
+        window.addEventListener('popstate', handleHashNavigation);
+        window.addEventListener('hashchange', handleHashNavigation);
+        desktopQuery.addEventListener('change', handleResize);
+        reducedMotionQuery.addEventListener('change', handleResize);
+        document.addEventListener('click', handleDocumentClick);
+
+        document.fonts?.ready.then(() => {
+            if (!isDisposed) requestMeasure({ preserveProgress: true });
+        });
+
+        return () => {
+            isDisposed = true;
+            window.removeEventListener('scroll', handleStoryScroll);
+            window.removeEventListener('wheel', handleUserInput);
+            window.removeEventListener('touchstart', handleUserInput);
+            window.removeEventListener('pointerdown', handleUserInput);
+            window.removeEventListener('keydown', handleUserInput);
+            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('load', handleResize);
+            window.removeEventListener('pageshow', handleResize);
+            window.removeEventListener('popstate', handleHashNavigation);
+            window.removeEventListener('hashchange', handleHashNavigation);
+            desktopQuery.removeEventListener('change', handleResize);
+            reducedMotionQuery.removeEventListener('change', handleResize);
+            document.removeEventListener('click', handleDocumentClick);
+            resizeObserver?.disconnect();
+            if (measureFrame !== null) window.cancelAnimationFrame(measureFrame);
             if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
             cancelSnap();
             resetStory();
@@ -2618,9 +3257,7 @@ function App() {
         (image) => image.key === activeUserInsightImage
     );
     const previousUserInsightCategory = previousUserInsight
-        ? userInsightCategories.find(
-              (category) => category.key === previousUserInsight.categoryKey
-          )
+        ? userInsightCategories.find((category) => category.key === previousUserInsight.categoryKey)
         : null;
     const previousUserInsightImage = previousUserInsightCategory?.images.find(
         (image) => image.key === previousUserInsight.imageKey
@@ -2654,7 +3291,8 @@ function App() {
         if (!section || index < 0) return;
         const scrollRange = Math.max(section.offsetHeight - window.innerHeight, 1);
         window.scrollTo({
-            top: section.offsetTop + scrollRange * ((index + 0.5) / designStructureArtifacts.length),
+            top:
+                section.offsetTop + scrollRange * ((index + 0.5) / designStructureArtifacts.length),
             behavior: 'auto',
         });
         selectDesignStructure(key);
@@ -2663,10 +3301,9 @@ function App() {
     const selectedDesignDevelopmentArchive = designDevelopmentArtifacts.find(
         (item) => item.key === activeDesignDevelopmentArchive
     );
-    const selectedDesignDevelopmentArchiveImage =
-        selectedDesignDevelopmentArchive.modalImages.find(
-            (image) => image.key === activeDesignDevelopmentArchiveImage
-        );
+    const selectedDesignDevelopmentArchiveImage = selectedDesignDevelopmentArchive.modalImages.find(
+        (image) => image.key === activeDesignDevelopmentArchiveImage
+    );
     const previousDesignDevelopmentArchiveCategory = previousDesignDevelopmentArchive
         ? designDevelopmentArtifacts.find(
               (item) => item.key === previousDesignDevelopmentArchive.categoryKey
@@ -2911,14 +3548,14 @@ function App() {
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="#diptyque">
+                                                    <a href="#diptyque-project-01">
                                                         <span>02</span>
                                                         <span>Diptyque</span>
                                                         <span aria-hidden="true">↗</span>
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="#swarovski">
+                                                    <a href="#swarovski-project-01">
                                                         <span>03</span>
                                                         <span>Swarovski</span>
                                                         <span aria-hidden="true">↗</span>
@@ -3549,10 +4186,7 @@ function App() {
                                         ))}
                                     </div>
                                 </div>
-                                <div
-                                    className="nintendo-chrome-path-preview"
-                                    aria-hidden="true"
-                                >
+                                <div className="nintendo-chrome-path-preview" aria-hidden="true">
                                     <svg
                                         viewBox="0 0 9600 900"
                                         preserveAspectRatio="none"
@@ -3671,9 +4305,7 @@ function App() {
                                                         node
                                                     );
                                                 } else {
-                                                    chromeStoryGroupRefs.current.delete(
-                                                        item.panel
-                                                    );
+                                                    chromeStoryGroupRefs.current.delete(item.panel);
                                                 }
                                             }}
                                         >
@@ -3720,8 +4352,18 @@ function App() {
                         </div>
                     </div>
 
+                    <div className="nintendo-late-story" ref={nintendoLateStoryRef}>
+                        <div
+                            className="nintendo-late-story__stage"
+                            ref={nintendoLateStoryStageRef}
+                        >
+                            <div
+                                className="nintendo-late-story__track"
+                                ref={nintendoLateStoryTrackRef}
+                            >
                     <section
-                        className="nintendo-planning-intro section"
+                        ref={planningIntroRef}
+                        className={`nintendo-planning-intro section${isPlanningIntroVisible ? ' is-visible' : ''}`}
                         aria-labelledby="nintendo-planning-title"
                     >
                         <div className="nintendo-planning-intro__grid" aria-hidden="true" />
@@ -3752,7 +4394,11 @@ function App() {
                                     NEXT CHAPTER · RESEARCH MODE
                                 </span>
                                 <h3 id="nintendo-planning-title">
-                                    <span>BEHIND THE</span>
+                                    <img
+                                        className="nintendo-planning-intro__title-image"
+                                        src="/images/behind-the-chrome.png"
+                                        alt="BEHIND THE"
+                                    />
                                     <em>Experience.</em>
                                 </h3>
                             </div>
@@ -3832,12 +4478,14 @@ function App() {
                                                 className="nintendo-research-archive__thumbnail-set is-leaving"
                                                 aria-hidden="true"
                                             >
-                                                {previousResearchArchiveCategory.images.map((image) => (
-                                                    <div key={image.key}>
-                                                        <img src={image.src} alt="" />
-                                                        <span>{image.label}</span>
-                                                    </div>
-                                                ))}
+                                                {previousResearchArchiveCategory.images.map(
+                                                    (image) => (
+                                                        <div key={image.key}>
+                                                            <img src={image.src} alt="" />
+                                                            <span>{image.label}</span>
+                                                        </div>
+                                                    )
+                                                )}
                                             </div>
                                         )}
                                         <div
@@ -3847,10 +4495,18 @@ function App() {
                                             {selectedResearchArchive.images.map((image) => (
                                                 <button
                                                     type="button"
-                                                    aria-pressed={activeResearchArchiveImage === image.key}
-                                                    className={activeResearchArchiveImage === image.key ? 'is-active' : ''}
+                                                    aria-pressed={
+                                                        activeResearchArchiveImage === image.key
+                                                    }
+                                                    className={
+                                                        activeResearchArchiveImage === image.key
+                                                            ? 'is-active'
+                                                            : ''
+                                                    }
                                                     key={image.key}
-                                                    onClick={() => selectResearchArchiveImage(image.key)}
+                                                    onClick={() =>
+                                                        selectResearchArchiveImage(image.key)
+                                                    }
                                                 >
                                                     <img src={image.src} alt="" />
                                                     <span>{image.label}</span>
@@ -3882,9 +4538,17 @@ function App() {
                                             <button
                                                 type="button"
                                                 role="tab"
-                                                aria-selected={activeResearchArchive === category.key}
-                                                tabIndex={activeResearchArchive === category.key ? 0 : -1}
-                                                className={activeResearchArchive === category.key ? 'is-active' : ''}
+                                                aria-selected={
+                                                    activeResearchArchive === category.key
+                                                }
+                                                tabIndex={
+                                                    activeResearchArchive === category.key ? 0 : -1
+                                                }
+                                                className={
+                                                    activeResearchArchive === category.key
+                                                        ? 'is-active'
+                                                        : ''
+                                                }
                                                 key={category.key}
                                                 onClick={() => selectResearchArchive(category.key)}
                                                 onKeyDown={(event) =>
@@ -3902,7 +4566,6 @@ function App() {
                                             </button>
                                         ))}
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -3930,7 +4593,12 @@ function App() {
                                                 className="is-leaving"
                                             />
                                         ) : previousUserInsightImage ? (
-                                            <img className="is-leaving" src={previousUserInsightImage.src} alt="" aria-hidden="true" />
+                                            <img
+                                                className="is-leaving"
+                                                src={previousUserInsightImage.src}
+                                                alt=""
+                                                aria-hidden="true"
+                                            />
                                         ) : null}
                                         {activeUserInsight === 'interview' ? (
                                             <InterviewEditorialCard
@@ -3954,8 +4622,15 @@ function App() {
                                                 }
                                                 aria-label={`${selectedUserInsightImage.label} 자료 확대 보기`}
                                             >
-                                                <img className="is-entering" key={selectedUserInsightImage.key} src={selectedUserInsightImage.src} alt={selectedUserInsightImage.alt} />
-                                                <span>VIEW FULL IMAGE <i aria-hidden="true">↗</i></span>
+                                                <img
+                                                    className="is-entering"
+                                                    key={selectedUserInsightImage.key}
+                                                    src={selectedUserInsightImage.src}
+                                                    alt={selectedUserInsightImage.alt}
+                                                />
+                                                <span>
+                                                    VIEW FULL IMAGE <i aria-hidden="true">↗</i>
+                                                </span>
                                             </button>
                                         )}
                                     </div>
@@ -3971,10 +4646,24 @@ function App() {
                                                 aria-hidden="true"
                                             >
                                                 {previousUserInsightCategory.images.map((image) => (
-                                                    <div className={previousUserInsightCategory.key === 'interview' ? 'is-person' : ''} key={image.key}>
-                                                        {previousUserInsightCategory.key !== 'interview' && <img src={image.src} alt="" />}
+                                                    <div
+                                                        className={
+                                                            previousUserInsightCategory.key ===
+                                                            'interview'
+                                                                ? 'is-person'
+                                                                : ''
+                                                        }
+                                                        key={image.key}
+                                                    >
+                                                        {previousUserInsightCategory.key !==
+                                                            'interview' && (
+                                                            <img src={image.src} alt="" />
+                                                        )}
                                                         <span>{image.label}</span>
-                                                        {previousUserInsightCategory.key === 'interview' && <strong>{image.name}</strong>}
+                                                        {previousUserInsightCategory.key ===
+                                                            'interview' && (
+                                                            <strong>{image.name}</strong>
+                                                        )}
                                                     </div>
                                                 ))}
                                             </div>
@@ -3986,14 +4675,22 @@ function App() {
                                             {selectedUserInsight.images.map((image) => (
                                                 <button
                                                     type="button"
-                                                    aria-pressed={activeUserInsightImage === image.key}
+                                                    aria-pressed={
+                                                        activeUserInsightImage === image.key
+                                                    }
                                                     className={`${activeUserInsight === 'interview' ? 'is-person ' : ''}${activeUserInsightImage === image.key ? 'is-active' : ''}`.trim()}
                                                     key={image.key}
-                                                    onClick={() => selectUserInsightImage(image.key)}
+                                                    onClick={() =>
+                                                        selectUserInsightImage(image.key)
+                                                    }
                                                 >
-                                                    {activeUserInsight !== 'interview' && <img src={image.src} alt="" />}
+                                                    {activeUserInsight !== 'interview' && (
+                                                        <img src={image.src} alt="" />
+                                                    )}
                                                     <span>{image.label}</span>
-                                                    {activeUserInsight === 'interview' && <strong>{image.name}</strong>}
+                                                    {activeUserInsight === 'interview' && (
+                                                        <strong>{image.name}</strong>
+                                                    )}
                                                 </button>
                                             ))}
                                         </div>
@@ -4003,31 +4700,42 @@ function App() {
                                         className={`nintendo-user-insight__source-actions${activeUserInsight === 'interview' ? '' : ' is-placeholder'}`}
                                         aria-hidden={activeUserInsight !== 'interview'}
                                     >
-                                        {activeUserInsight === 'interview' && selectedUserInsightImage.pdf && (
-                                            <>
-                                                <a href={selectedUserInsightImage.pdf} target="_blank" rel="noreferrer">
-                                                    VIEW ORIGINAL PDF <span aria-hidden="true">↗</span>
-                                                </a>
-                                                <button
-                                                    type="button"
-                                                    onClick={(event) => openDocumentPreview(
-                                                        {
-                                                            src: selectedUserInsightImage.src,
-                                                            alt: selectedUserInsightImage.alt,
-                                                            isResearch: true,
-                                                        },
-                                                        event
-                                                    )}
-                                                >
-                                                    VIEW ORIGINAL IMAGE <span aria-hidden="true">↗</span>
-                                                </button>
-                                            </>
-                                        )}
+                                        {activeUserInsight === 'interview' &&
+                                            selectedUserInsightImage.pdf && (
+                                                <>
+                                                    <a
+                                                        href={selectedUserInsightImage.pdf}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                    >
+                                                        VIEW ORIGINAL PDF{' '}
+                                                        <span aria-hidden="true">↗</span>
+                                                    </a>
+                                                    <button
+                                                        type="button"
+                                                        onClick={(event) =>
+                                                            openDocumentPreview(
+                                                                {
+                                                                    src: selectedUserInsightImage.src,
+                                                                    alt: selectedUserInsightImage.alt,
+                                                                    isResearch: true,
+                                                                },
+                                                                event
+                                                            )
+                                                        }
+                                                    >
+                                                        VIEW ORIGINAL IMAGE{' '}
+                                                        <span aria-hidden="true">↗</span>
+                                                    </button>
+                                                </>
+                                            )}
                                     </div>
                                 </div>
 
                                 <div className="nintendo-research-archive__content">
-                                    <p className="nintendo-research-archive__eyebrow">ARCHIVE 01 / 04</p>
+                                    <p className="nintendo-research-archive__eyebrow">
+                                        ARCHIVE 01 / 04
+                                    </p>
                                     <h3 id="nintendo-user-insight-title">
                                         <span>Understanding</span>
                                         <em>the Players.</em>
@@ -4045,10 +4753,18 @@ function App() {
                                                 type="button"
                                                 role="tab"
                                                 aria-selected={activeUserInsight === category.key}
-                                                tabIndex={activeUserInsight === category.key ? 0 : -1}
-                                                className={activeUserInsight === category.key ? 'is-active' : ''}
+                                                tabIndex={
+                                                    activeUserInsight === category.key ? 0 : -1
+                                                }
+                                                className={
+                                                    activeUserInsight === category.key
+                                                        ? 'is-active'
+                                                        : ''
+                                                }
                                                 key={category.key}
-                                                onClick={() => selectUserInsightFromControl(category.key)}
+                                                onClick={() =>
+                                                    selectUserInsightFromControl(category.key)
+                                                }
                                                 onKeyDown={(event) =>
                                                     handleResearchTabKeyDown(
                                                         event,
@@ -4083,56 +4799,119 @@ function App() {
                                 <div className="nintendo-research-archive__media">
                                     <div className="nintendo-research-archive__main">
                                         {previousDesignStructureItem && (
-                                            <img className="is-leaving" src={previousDesignStructureItem.src} alt="" aria-hidden="true" />
+                                            <img
+                                                className="is-leaving"
+                                                src={previousDesignStructureItem.src}
+                                                alt=""
+                                                aria-hidden="true"
+                                            />
                                         )}
                                         <button
                                             className="nintendo-user-insight__image-trigger"
                                             type="button"
-                                            onClick={(event) => openArchitecturePreview(selectedDesignStructure, event)}
+                                            onClick={(event) =>
+                                                openArchitecturePreview(
+                                                    selectedDesignStructure,
+                                                    event
+                                                )
+                                            }
                                             aria-label={`${selectedDesignStructure.title} 원본 이미지 확대 보기`}
                                         >
-                                            <img className="is-entering" key={selectedDesignStructure.key} src={selectedDesignStructure.src} alt={selectedDesignStructure.alt} />
-                                            <span>VIEW FULL IMAGE <i aria-hidden="true">↗</i></span>
+                                            <img
+                                                className="is-entering"
+                                                key={selectedDesignStructure.key}
+                                                src={selectedDesignStructure.src}
+                                                alt={selectedDesignStructure.alt}
+                                            />
+                                            <span>
+                                                VIEW FULL IMAGE <i aria-hidden="true">↗</i>
+                                            </span>
                                         </button>
                                     </div>
-                                    <div className="nintendo-research-archive__thumbnails" role="group" aria-label="디자인 구조 자료 선택">
-                                        <div className="nintendo-research-archive__thumbnail-set is-entering" key={activeDesignStructure}>
+                                    <div
+                                        className="nintendo-research-archive__thumbnails"
+                                        role="group"
+                                        aria-label="디자인 구조 자료 선택"
+                                    >
+                                        <div
+                                            className="nintendo-research-archive__thumbnail-set is-entering"
+                                            key={activeDesignStructure}
+                                        >
                                             {designStructureArtifacts.map((item) => (
                                                 <button
                                                     type="button"
-                                                    aria-pressed={activeDesignStructure === item.key}
-                                                    className={activeDesignStructure === item.key ? 'is-active' : ''}
+                                                    aria-pressed={
+                                                        activeDesignStructure === item.key
+                                                    }
+                                                    className={
+                                                        activeDesignStructure === item.key
+                                                            ? 'is-active'
+                                                            : ''
+                                                    }
                                                     key={item.key}
-                                                    onClick={() => selectDesignStructureFromControl(item.key)}
+                                                    onClick={() =>
+                                                        selectDesignStructureFromControl(item.key)
+                                                    }
                                                 >
                                                     <img src={item.previewSrc} alt="" />
-                                                    <span>{item.key === 'ia' ? 'IA' : item.key === 'flow' ? 'USER FLOW' : 'MIND MAP'}</span>
+                                                    <span>
+                                                        {item.key === 'ia'
+                                                            ? 'IA'
+                                                            : item.key === 'flow'
+                                                              ? 'USER FLOW'
+                                                              : 'MIND MAP'}
+                                                    </span>
                                                 </button>
                                             ))}
                                         </div>
                                     </div>
-                                    <div className="nintendo-user-insight__source-actions is-placeholder" aria-hidden="true" />
+                                    <div
+                                        className="nintendo-user-insight__source-actions is-placeholder"
+                                        aria-hidden="true"
+                                    />
                                 </div>
                                 <div className="nintendo-research-archive__content">
-                                    <p className="nintendo-research-archive__eyebrow">ARCHIVE 01 / 03</p>
+                                    <p className="nintendo-research-archive__eyebrow">
+                                        ARCHIVE 01 / 03
+                                    </p>
                                     <h3 id="nintendo-design-structure-title">
                                         <span>From Insight</span>
                                         <em>to Structure.</em>
                                     </h3>
                                     <p className="nintendo-research-archive__description">
-                                        사용자의 니즈를 바탕으로 정보의 흐름과 사이트 구조를 설계했습니다.
+                                        사용자의 니즈를 바탕으로 정보의 흐름과 사이트 구조를
+                                        설계했습니다.
                                     </p>
-                                    <div className="nintendo-research-archive__categories" role="tablist" aria-label="디자인 구조 자료 카테고리">
+                                    <div
+                                        className="nintendo-research-archive__categories"
+                                        role="tablist"
+                                        aria-label="디자인 구조 자료 카테고리"
+                                    >
                                         {designStructureArtifacts.map((item) => (
                                             <button
                                                 type="button"
                                                 role="tab"
                                                 aria-selected={activeDesignStructure === item.key}
-                                                tabIndex={activeDesignStructure === item.key ? 0 : -1}
-                                                className={activeDesignStructure === item.key ? 'is-active' : ''}
+                                                tabIndex={
+                                                    activeDesignStructure === item.key ? 0 : -1
+                                                }
+                                                className={
+                                                    activeDesignStructure === item.key
+                                                        ? 'is-active'
+                                                        : ''
+                                                }
                                                 key={item.key}
-                                                onClick={() => selectDesignStructureFromControl(item.key)}
-                                                onKeyDown={(event) => handleResearchTabKeyDown(event, designStructureArtifacts, activeDesignStructure, selectDesignStructureFromControl)}
+                                                onClick={() =>
+                                                    selectDesignStructureFromControl(item.key)
+                                                }
+                                                onKeyDown={(event) =>
+                                                    handleResearchTabKeyDown(
+                                                        event,
+                                                        designStructureArtifacts,
+                                                        activeDesignStructure,
+                                                        selectDesignStructureFromControl
+                                                    )
+                                                }
                                             >
                                                 <span>{item.number}</span>
                                                 <strong>{item.title}</strong>
@@ -4184,7 +4963,9 @@ function App() {
                                                 src={selectedDesignDevelopmentArchiveImage.src}
                                                 alt={selectedDesignDevelopmentArchiveImage.alt}
                                             />
-                                            <span>VIEW FULL IMAGE <i aria-hidden="true">↗</i></span>
+                                            <span>
+                                                VIEW FULL IMAGE <i aria-hidden="true">↗</i>
+                                            </span>
                                         </button>
                                     </div>
                                     <div
@@ -4198,7 +4979,11 @@ function App() {
                                                 <div className="nintendo-research-archive__thumbnail-set is-leaving">
                                                     {previousDesignDevelopmentArchiveCategory.modalImages.map(
                                                         (image) => (
-                                                            <button type="button" key={image.key} tabIndex={-1}>
+                                                            <button
+                                                                type="button"
+                                                                key={image.key}
+                                                                tabIndex={-1}
+                                                            >
                                                                 <img src={image.src} alt="" />
                                                                 <span>{image.label}</span>
                                                             </button>
@@ -4210,26 +4995,32 @@ function App() {
                                             className="nintendo-research-archive__thumbnail-set is-entering"
                                             key={activeDesignDevelopmentArchive}
                                         >
-                                            {selectedDesignDevelopmentArchive.modalImages.map((image) => (
-                                                <button
-                                                    type="button"
-                                                    aria-pressed={
-                                                        activeDesignDevelopmentArchiveImage === image.key
-                                                    }
-                                                    className={
-                                                        activeDesignDevelopmentArchiveImage === image.key
-                                                            ? 'is-active'
-                                                            : ''
-                                                    }
-                                                    key={image.key}
-                                                    onClick={() =>
-                                                        selectDesignDevelopmentArchiveImage(image.key)
-                                                    }
-                                                >
-                                                    <img src={image.src} alt="" />
-                                                    <span>{image.label}</span>
-                                                </button>
-                                            ))}
+                                            {selectedDesignDevelopmentArchive.modalImages.map(
+                                                (image) => (
+                                                    <button
+                                                        type="button"
+                                                        aria-pressed={
+                                                            activeDesignDevelopmentArchiveImage ===
+                                                            image.key
+                                                        }
+                                                        className={
+                                                            activeDesignDevelopmentArchiveImage ===
+                                                            image.key
+                                                                ? 'is-active'
+                                                                : ''
+                                                        }
+                                                        key={image.key}
+                                                        onClick={() =>
+                                                            selectDesignDevelopmentArchiveImage(
+                                                                image.key
+                                                            )
+                                                        }
+                                                    >
+                                                        <img src={image.src} alt="" />
+                                                        <span>{image.label}</span>
+                                                    </button>
+                                                )
+                                            )}
                                         </div>
                                     </div>
                                     <div
@@ -4246,7 +5037,8 @@ function App() {
                                         <em>Experience.</em>
                                     </h3>
                                     <p className="nintendo-research-archive__description">
-                                        아이디어를 구체적인 화면과 시각적 디자인 시스템으로 발전시켰습니다.
+                                        아이디어를 구체적인 화면과 시각적 디자인 시스템으로
+                                        발전시켰습니다.
                                     </p>
                                     <div
                                         className="nintendo-research-archive__categories"
@@ -4450,9 +5242,40 @@ function App() {
                                 >
                                     VIEW WEBSITE <span aria-hidden="true">↗</span>
                                 </a>
+                                <a
+                                    href="https://www.figma.com/proto/jlCiMEG4RmMn2e8wsIMnks/Nintendo-%EB%A6%AC%EB%89%B4%EC%96%BC-%ED%8C%80%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%9E%A5%ED%91%9C?node-id=1-574&viewport=73%2C269%2C0.03&t=3QdOCFPfZkn0ybZo-1&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=1%3A574&page-id=0%3A1"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    VIEW PROPOSAL <span aria-hidden="true">↗</span>
+                                </a>
                             </div>
                         </div>
                     </section>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="personal-horizontal-story" ref={personalStoryRef}>
+                        <div
+                            className="personal-horizontal-story__stage"
+                            ref={personalStoryStageRef}
+                        >
+                            <div
+                                className="personal-horizontal-story__track"
+                                ref={personalStoryTrackRef}
+                            >
+                                <PersonalProjectsIntro />
+                                <DiptyqueProjectIntro />
+                                <DiptyqueProjectShowcase />
+                                <SwarovskiProjectIntro />
+                                <SwarovskiVisualShowcase />
+                            </div>
+                        </div>
+                    </div>
+
+                    <ShortFormContentsIntro />
 
                     {/*
           <section
@@ -4632,80 +5455,7 @@ function App() {
           </section>
           */}
 
-                    <div className="process section">
-                        <div className="process-heading">
-                            <div className="section-label">Design process</div>
-                            <h3>
-                                FROM IDEA
-                                <br />
-                                TO SCREEN
-                            </h3>
-                        </div>
-                        <div className="process-board">
-                            <Placeholder
-                                label="RESEARCH / WIREFRAME"
-                                className="process-placeholder process-placeholder--wide"
-                            />
-                            <Placeholder label="DESIGN SYSTEM" className="process-placeholder" />
-                            <Placeholder label="UI COMPONENTS" className="process-placeholder" />
-                        </div>
-                        <div className="contribution">
-                            <div>
-                                <span className="eyebrow">My contribution</span>
-                                <h3>
-                                    ROLE &amp;
-                                    <br />
-                                    RESPONSIBILITY
-                                </h3>
-                            </div>
-                            <p>
-                                프로젝트에서 담당한 역할과 실제 기여 내용을 입력하는 영역입니다.
-                                기획, 디자인, 퍼블리싱 등 수행 범위를 사실에 맞게 정리해 주세요.
-                            </p>
-                            <div className="contribution-list">
-                                <span>Planning</span>
-                                <span>UI Design</span>
-                                <span>Publishing</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="results section">
-                        <div className="results-heading">
-                            <div className="section-label">Final result</div>
-                            <h3>
-                                SCREENS
-                                <br />
-                                IN ACTION
-                            </h3>
-                            <p>최종 웹사이트의 주요 페이지 이미지를 순서대로 전시합니다.</p>
-                        </div>
-                        <div className="screen-gallery">
-                            <Placeholder
-                                label="MAIN PAGE"
-                                className="screen-placeholder screen-placeholder--large"
-                            />
-                            <Placeholder label="SUB PAGE 01" className="screen-placeholder" />
-                            <Placeholder label="SUB PAGE 02" className="screen-placeholder" />
-                        </div>
-                        <div className="project-cta" id="nintendo-cta">
-                            <p>Explore the live project</p>
-                            <a href="#work" aria-label="실제 사이트 링크를 입력해 주세요">
-                                VIEW WEBSITE <ArrowIcon />
-                            </a>
-                            <small>실제 사이트 URL로 교체해 주세요.</small>
-                        </div>
-                    </div>
                 </section>
-
-                <EditorialProject number="03" projectNumber="02" name="DIPTYQUE" tone="light" />
-                <EditorialProject
-                    number="04"
-                    projectNumber="03"
-                    name="SWAROVSKI"
-                    tone="dark"
-                    reverse
-                />
 
                 <section className="archive section" id="archive">
                     <div className="section-index">
