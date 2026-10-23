@@ -1,0 +1,9 @@
+.skills-qa-flow {
+    position: relative;
+    background: #111827;
+}
+
+.skills-qa-flow > .skills-section,
+.skills-qa-flow > .quick-qa {
+    background: transparent;
+}

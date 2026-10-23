@@ -8883,116 +8883,6 @@ footer p:last-child {
     justify-self: end;
 }
 
-/* Extended one-page portfolio */
-.archive {
-    padding-top: 90px;
-    padding-bottom: 180px;
-    background: var(--paper);
-}
-.archive-heading {
-    display: grid;
-    grid-template-columns: 1.5fr 0.65fr;
-    gap: 8vw;
-    align-items: end;
-    padding: 110px 0 120px;
-}
-.archive-heading h2 {
-    margin: 0;
-    font:
-        500 clamp(58px, 9vw, 138px)/0.82 Manrope,
-        sans-serif;
-    letter-spacing: -0.08em;
-}
-.archive-heading > div > p:last-child {
-    margin: 0;
-    color: var(--muted);
-    font-size: 13px;
-    line-height: 1.8;
-}
-.archive-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: clamp(20px, 3vw, 48px);
-}
-.archive-card--offset {
-    margin-top: 160px;
-}
-.archive-placeholder {
-    aspect-ratio: 4 / 3;
-    background-color: var(--surface);
-}
-.archive-card__meta {
-    display: grid;
-    grid-template-columns: 0.5fr 1fr;
-    padding-top: 18px;
-    border-top: 1px solid var(--line);
-    margin-top: 16px;
-}
-.archive-card__meta span {
-    grid-row: span 2;
-    font-size: 9px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-}
-.archive-card__meta h3 {
-    margin: 0 0 8px;
-    font:
-        500 24px Manrope,
-        sans-serif;
-    letter-spacing: -0.04em;
-}
-.archive-card__meta p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 11px;
-}
-
-.skills {
-    padding-top: 70px;
-    padding-bottom: 150px;
-    color: #f1f4f8;
-    background: var(--dark);
-}
-.skills-heading {
-    padding: 120px 0 130px;
-}
-.skills-heading h2 {
-    margin: 0;
-    font:
-        500 clamp(58px, 9.5vw, 148px)/0.82 Manrope,
-        sans-serif;
-    letter-spacing: -0.08em;
-}
-.skills-heading h2 span {
-    color: transparent;
-    -webkit-text-stroke: 1px #f1f4f8;
-}
-.skills-list {
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-}
-.skills-list > div {
-    display: grid;
-    grid-template-columns: 0.3fr 1fr 1fr;
-    align-items: center;
-    min-height: 130px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-.skills-list span {
-    font-size: 10px;
-}
-.skills-list h3 {
-    margin: 0;
-    font:
-        500 clamp(24px, 3vw, 42px) Manrope,
-        sans-serif;
-    letter-spacing: -0.04em;
-}
-.skills-list p {
-    margin: 0;
-    color: #9eabba;
-    font-size: 12px;
-}
-
 .contact {
     position: relative;
     min-height: 92vh;
@@ -9072,8 +8962,6 @@ h4,
 .nintendo-contribution__heading h3,
 .nintendo-collaboration__title-primary,
 .nintendo-documentation__title-primary,
-.archive-heading h2,
-.skills-heading h2,
 .contact-copy h2,
 .more-about-heading h2,
 .more-about-panel h3,
@@ -9105,8 +8993,6 @@ h4,
 .love-editorial__kicker,
 .love-archive__system-bar,
 .nintendo-info-list,
-.archive-card__meta span,
-.skills-list > div > span,
 .contact-links span,
 .contact-top,
 .site-footer {
@@ -9122,8 +9008,6 @@ h4,
 .love-editorial__description,
 .more-about-panel__copy > p,
 .more-about-panel__body,
-.archive-card__meta p,
-.skills-list p,
 .contact-links p {
     font-family: var(--font-body);
     word-break: keep-all;
@@ -9139,8 +9023,6 @@ h4,
     line-height: 1.82;
 }
 .nintendo-contribution__description,
-.archive-card__meta p,
-.skills-list p,
 .contact-links p {
     font-size: clamp(13px, 0.92vw, 14px);
     line-height: 1.7;
@@ -9426,13 +9308,6 @@ h4,
     }
     .overview-intro {
         grid-template-columns: 1fr;
-    }
-    .archive-heading {
-        grid-template-columns: 1fr;
-        gap: 50px;
-    }
-    .archive-grid {
-        grid-template-columns: 1fr 1fr;
     }
 }
 
@@ -10618,39 +10493,6 @@ h4,
     .problem-grid h4 {
         margin-top: 45px;
     }
-    .archive {
-        padding-bottom: 100px;
-    }
-    .archive-heading {
-        padding: 75px 0;
-    }
-    .archive-grid {
-        grid-template-columns: 1fr;
-    }
-    .archive-card--offset {
-        margin-top: 30px;
-    }
-    .archive-card__meta {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-    .archive-card__meta span {
-        grid-row: auto;
-    }
-    .skills {
-        padding-bottom: 100px;
-    }
-    .skills-heading {
-        padding: 80px 0 90px;
-    }
-    .skills-list > div {
-        grid-template-columns: 0.2fr 1fr;
-        gap: 16px;
-        padding: 25px 0;
-    }
-    .skills-list p {
-        grid-column: 2;
-    }
     .contact {
         min-height: 760px;
     }
@@ -10683,8 +10525,6 @@ h4,
     .nintendo-contribution__description,
     .nintendo-collaboration__copy,
     .nintendo-documentation__copy,
-    .archive-card__meta p,
-    .skills-list p,
     .contact-links p {
         font-size: 12.5px;
         line-height: 1.68;

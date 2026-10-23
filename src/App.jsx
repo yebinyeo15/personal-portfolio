@@ -13,6 +13,8 @@ import SwarovskiProjectIntro from './SwarovskiProjectIntro.jsx';
 import SwarovskiVisualShowcase from './SwarovskiVisualShowcase.jsx';
 import ShortFormContentsIntro from './ShortFormContentsIntro.jsx';
 import OtherWorks from './OtherWorks.jsx';
+import SkillsTypographyIntro from './SkillsTypographyIntro.jsx';
+import SkillsQAFlow from './SkillsQAFlow.jsx';
 
 const personalityReactions = {
     curious: 'ALWAYS EXPLORING',
@@ -5764,86 +5766,9 @@ function App() {
 
                 </section>
 
-                <section className="archive section" id="archive">
-                    <div className="section-index">
-                        <span>05</span>
-                        <span>Creative archive</span>
-                    </div>
-                    <div className="archive-heading">
-                        <h2>
-                            CREATIVE
-                            <br />
-                            ARCHIVE
-                        </h2>
-                        <div>
-                            <p className="eyebrow">Content · Practice · Study</p>
-                            <p>실제 작업물을 추후 추가할 수 있도록 구성한 아카이브 영역입니다.</p>
-                        </div>
-                    </div>
-                    <div className="archive-grid">
-                        <article className="archive-card">
-                            <Placeholder label="VIDEO CONTENT" className="archive-placeholder" />
-                            <div className="archive-card__meta">
-                                <span>01 / Content</span>
-                                <h3>영상 콘텐츠 작업</h3>
-                                <p>작업물을 추가해 주세요.</p>
-                            </div>
-                        </article>
-                        <article className="archive-card archive-card--offset">
-                            <Placeholder
-                                label="WEB LAYOUT / PUBLISHING"
-                                className="archive-placeholder"
-                            />
-                            <div className="archive-card__meta">
-                                <span>02 / Practice</span>
-                                <h3>웹 레이아웃 및 퍼블리싱</h3>
-                                <p>연습 작업을 추가해 주세요.</p>
-                            </div>
-                        </article>
-                        <article className="archive-card">
-                            <Placeholder label="MOBILE UI STUDY" className="archive-placeholder" />
-                            <div className="archive-card__meta">
-                                <span>03 / Study</span>
-                                <h3>모바일 UI 디자인 스터디</h3>
-                                <p>스터디 작업을 추가해 주세요.</p>
-                            </div>
-                        </article>
-                    </div>
-                </section>
+                <SkillsTypographyIntro />
 
-                <section className="skills section" id="skills">
-                    <div className="section-index section-index--light">
-                        <span>06</span>
-                        <span>Skills &amp; Tools</span>
-                    </div>
-                    <div className="skills-heading">
-                        <p className="eyebrow">What I work with</p>
-                        <h2>
-                            TOOLS FOR
-                            <br />
-                            MAKING IDEAS
-                            <br />
-                            <span>VISIBLE.</span>
-                        </h2>
-                    </div>
-                    <div className="skills-list">
-                        <div>
-                            <span>01</span>
-                            <h3>Design</h3>
-                            <p>사용하는 디자인 도구를 입력해 주세요.</p>
-                        </div>
-                        <div>
-                            <span>02</span>
-                            <h3>Publishing</h3>
-                            <p>사용하는 퍼블리싱 기술을 입력해 주세요.</p>
-                        </div>
-                        <div>
-                            <span>03</span>
-                            <h3>Workflow</h3>
-                            <p>협업 및 작업 도구를 입력해 주세요.</p>
-                        </div>
-                    </div>
-                </section>
+                <SkillsQAFlow />
 
                 <section
                     className="more-about"

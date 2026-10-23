@@ -1,0 +1,114 @@
+.skills-typography-intro {
+    position: relative;
+    height: 290vh;
+    height: 290svh;
+    overflow: clip;
+    color: #f1f4f8;
+    background: var(--dark);
+}
+
+.skills-typography-intro__stage {
+    position: sticky;
+    top: 0;
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    height: 100svh;
+    align-items: center;
+    overflow: hidden;
+}
+
+.skills-typography-intro__stage p {
+    position: relative;
+    flex: 0 0 auto;
+    margin: 0;
+    color: inherit;
+    font-family: var(--font-display), Manrope, sans-serif;
+    font-size: clamp(150px, 15vw, 300px);
+    font-weight: 400;
+    line-height: 0.9;
+    letter-spacing: -0.055em;
+    white-space: nowrap;
+    transform: translate3d(var(--skills-type-x, 20vw), 0, 0);
+    will-change: transform;
+}
+
+.skills-typography-intro__stage p > .skills-type-word--sans {
+    color: #f1f4f8;
+    font-family: var(--font-display), Manrope, sans-serif;
+    font-style: normal;
+    font-weight: 400;
+}
+
+.skills-typography-intro__stage p > .skills-type-word--serif {
+    position: relative;
+    top: -0.015em;
+    color: #c5a7f2;
+    font-family: 'Cormorant Garamond', var(--font-serif);
+    font-size: 1.03em;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.065em;
+}
+
+.skills-type-glyph {
+    display: inline-block;
+    color: inherit;
+    font: inherit;
+    opacity: var(--skills-absorb-opacity, 1);
+    filter: blur(var(--skills-absorb-blur, 0));
+    transform: translate3d(
+            var(--skills-absorb-x, 0),
+            var(--skills-absorb-y, 0),
+            0
+        )
+        scale(
+            var(--skills-absorb-scale-x, 1),
+            var(--skills-absorb-scale-y, 1)
+        );
+    transform-origin: center bottom;
+    will-change: transform, opacity, filter;
+}
+
+@media (max-width: 700px) {
+    .skills-typography-intro {
+        height: 165vh;
+        height: 165svh;
+    }
+
+    .skills-typography-intro__stage p {
+        font-size: clamp(82px, 25vw, 118px);
+        letter-spacing: -0.06em;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skills-typography-intro {
+        height: auto;
+        min-height: 100vh;
+        min-height: 100svh;
+    }
+
+    .skills-typography-intro__stage {
+        position: relative;
+        min-height: 100vh;
+        min-height: 100svh;
+    }
+
+    .skills-typography-intro__stage p {
+        width: 100%;
+        padding-inline: clamp(20px, 5vw, 80px);
+        font-size: clamp(17px, 5.2vw, 84px);
+        letter-spacing: -0.045em;
+        text-align: center;
+        transform: none;
+        will-change: auto;
+    }
+
+    .skills-type-glyph {
+        opacity: 1;
+        filter: none;
+        transform: none;
+        will-change: auto;
+    }
+}

@@ -1,0 +1,300 @@
+.quick-qa {
+    box-sizing: border-box;
+    position: relative;
+    height: 160vh;
+    height: 160svh;
+    color: #f1f4f8;
+    background: #1c2538;
+}
+
+.quick-qa__stage {
+    position: sticky;
+    top: 0;
+    display: grid;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100vh;
+    height: 100svh;
+    padding: clamp(94px, 11vh, 150px) clamp(28px, 6vw, 112px);
+    place-items: center;
+}
+
+.quick-qa.is-static {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100svh;
+}
+
+.quick-qa.is-static .quick-qa__stage {
+    position: relative;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100svh;
+}
+
+.quick-qa__inner {
+    width: min(100%, 1380px);
+}
+
+.quick-qa__header {
+    text-align: center;
+    opacity: 0;
+    transform: translateY(26px);
+    transition:
+        opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.quick-qa.is-visible .quick-qa__header {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.quick-qa__header h2 {
+    display: flex;
+    margin: 0;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(8px, 1.2vw, 20px);
+    font-family: var(--font-display), Manrope, sans-serif;
+    font-size: clamp(62px, 6.7vw, 116px);
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: -0.065em;
+}
+
+.quick-qa__header h2 img {
+    display: block;
+    width: clamp(198px, 18.7vw, 352px);
+    height: auto;
+    max-height: 1.188em;
+    margin: -0.08em -0.02em -0.08em -0.04em;
+    object-fit: contain;
+    object-position: center;
+}
+
+.quick-qa__header h2 span {
+    color: #f1f4f8;
+}
+
+.quick-qa__header > p {
+    margin: clamp(18px, 2.4vh, 28px) 0 0;
+    transform: translateY(5px);
+    color: #aeb9cb;
+    font-family: var(--font-body);
+    font-size: clamp(14px, 0.88vw, 16px);
+    line-height: 1.75;
+    word-break: keep-all;
+}
+
+.quick-qa__list {
+    margin-top: clamp(64px, 7.5vh, 94px);
+    border-top: 1px solid rgba(225, 231, 241, 0.2);
+}
+
+.quick-qa__item {
+    border-bottom: 1px solid rgba(225, 231, 241, 0.2);
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+        opacity 600ms var(--qa-delay) cubic-bezier(0.22, 1, 0.36, 1),
+        transform 600ms var(--qa-delay) cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 400ms ease;
+}
+
+.quick-qa.is-visible .quick-qa__item {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.quick-qa__item.is-open {
+    border-color: rgba(197, 167, 242, 0.48);
+}
+
+.quick-qa__item > button {
+    display: grid;
+    width: 100%;
+    min-height: clamp(88px, 9.5vh, 112px);
+    padding: 12px 0;
+    border: 0;
+    align-items: center;
+    grid-template-columns: minmax(64px, 0.16fr) 1fr 52px;
+    gap: clamp(20px, 3vw, 48px);
+    color: inherit;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+}
+
+.quick-qa__number {
+    color: #c5a7f2;
+    font: 700 10px/1.2 var(--font-mono);
+    letter-spacing: 0.13em;
+}
+
+.quick-qa__question {
+    color: #f1f4f8;
+    font-family: var(--font-body);
+    font-size: clamp(19px, 1.45vw, 27px);
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: -0.025em;
+    word-break: keep-all;
+    transition: color 350ms ease;
+}
+
+.quick-qa__item.is-open .quick-qa__question {
+    color: #d6c1f6;
+}
+
+.quick-qa__toggle {
+    position: relative;
+    display: block;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #f1f4f8;
+    justify-self: end;
+}
+
+.quick-qa__toggle::before,
+.quick-qa__toggle::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 14px;
+    height: 1px;
+    background: #1c2538;
+    content: '';
+    transform: translate(-50%, -50%);
+    transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1), opacity 250ms ease;
+}
+
+.quick-qa__toggle::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.quick-qa__item.is-open .quick-qa__toggle::before {
+    transform: translate(-50%, -50%) rotate(180deg);
+}
+
+.quick-qa__item.is-open .quick-qa__toggle::after {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(180deg);
+}
+
+.quick-qa__answer {
+    display: grid;
+    overflow: hidden;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+        grid-template-rows 400ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 350ms ease;
+}
+
+.quick-qa__answer > div {
+    min-height: 0;
+}
+
+.quick-qa__answer p {
+    max-width: 900px;
+    margin: 0 64px clamp(26px, 3.5vh, 42px) max(84px, 16%);
+    color: #aeb9cb;
+    font-family: var(--font-body);
+    font-size: clamp(14px, 0.95vw, 17px);
+    line-height: 1.85;
+    word-break: keep-all;
+}
+
+.quick-qa__item.is-open .quick-qa__answer {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+.quick-qa__item > button:focus-visible {
+    outline: 1px solid #c5a7f2;
+    outline-offset: 5px;
+}
+
+@media (max-width: 700px) {
+    .quick-qa {
+        height: auto;
+        min-height: 0;
+    }
+
+    .quick-qa__stage {
+        position: relative;
+        height: auto;
+        min-height: 0;
+        padding: 82px 22px 88px;
+    }
+
+    .quick-qa__header h2 {
+        font-size: clamp(54px, 17vw, 78px);
+        gap: 6px;
+    }
+
+    .quick-qa__header h2 img {
+        width: clamp(160px, 47.3vw, 209px);
+    }
+
+    .quick-qa__header > p {
+        max-width: 310px;
+        margin-inline: auto;
+        font-size: 14px;
+    }
+
+    .quick-qa__list {
+        margin-top: 58px;
+    }
+
+    .quick-qa__item > button {
+        min-height: 96px;
+        grid-template-columns: 48px 1fr 46px;
+        gap: 12px;
+    }
+
+    .quick-qa__question {
+        font-size: 18px;
+    }
+
+    .quick-qa__toggle {
+        width: 44px;
+        height: 44px;
+    }
+
+    .quick-qa__answer p {
+        margin: 0 0 28px 60px;
+        font-size: 14px;
+        line-height: 1.8;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .quick-qa {
+        height: auto;
+        min-height: 100vh;
+        min-height: 100svh;
+    }
+
+    .quick-qa__stage {
+        position: relative;
+        height: auto;
+        min-height: 100vh;
+        min-height: 100svh;
+    }
+
+    .quick-qa__header,
+    .quick-qa__item {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    .quick-qa__answer,
+    .quick-qa__toggle::before,
+    .quick-qa__toggle::after {
+        transition: none;
+    }
+}
