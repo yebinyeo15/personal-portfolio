@@ -15,39 +15,39 @@ const shortFormMockups = [
 ];
 
 const adidasFilmDetails = [
-    [
-        '기획 의도',
-        '아디다스 러닝화의 퍼포먼스와 러닝 문화의 역동성을 전달하는 숏폼 광고',
-    ],
+    ['기획 의도', '아디다스 러닝화의 퍼포먼스와 러닝 문화의 역동성을 전달하는 숏폼 광고'],
     ['타깃', '러닝과 스포츠 라이프스타일에 관심 있는 소비자'],
     [
         '제작 과정',
         '콘셉트 기획 → 스토리보드 설계 → AI 이미지 생성 → AI 영상 제작 → 영상·사운드 편집',
     ],
-    [
-        '편집 포인트',
-        '착용 전후의 대비, 러닝 동작의 속도감, 리듬감 있는 장면 전환',
-    ],
+    ['편집 포인트', '착용 전후의 대비, 러닝 동작의 속도감, 리듬감 있는 장면 전환'],
     ['사용 도구', 'AI 이미지·영상 생성 도구, CapCut'],
     ['영상 포맷', '세로형 9:16 · 약 34초'],
 ];
 
 const diptyqueFilmDetails = [
-    [
-        '기획 의도',
-        '딥디크 EAU ROSE의 섬세하고 로맨틱한 향을 감각적인 영상으로 표현',
-    ],
+    ['기획 의도', '딥디크 EAU ROSE의 섬세하고 로맨틱한 향을 감각적인 영상으로 표현'],
     ['타깃', '니치 향수와 감성적인 브랜드 콘텐츠에 관심 있는 소비자'],
     [
         '제작 과정',
         '콘셉트 기획 → 스토리보드 설계 → AI 이미지 생성 → AI 영상 제작 → 장면 편집 → 자막 및 사운드 편집',
     ],
-    [
-        '편집 포인트',
-        '장미와 향수병의 클로즈업, 부드러운 장면 전환, 일관된 컬러 톤',
-    ],
+    ['편집 포인트', '장미와 향수병의 클로즈업, 부드러운 장면 전환, 일관된 컬러 톤'],
     ['사용 도구', 'AI 이미지·영상 생성 도구, CapCut'],
     ['영상 포맷', '세로형 9:16 숏폼 광고 · 약 36초'],
+];
+
+const blueBottleFilmDetails = [
+    ['기획 의도', '커피가 완성되는 과정에 담긴 시간과 정성, 일상의 여유를 시네마틱하게 전달'],
+    ['타깃', '스페셜티 커피와 미니멀한 라이프스타일, 감각적인 브랜드 콘텐츠에 관심 있는 소비자'],
+    [
+        '제작 과정',
+        '콘셉트 기획 → 14씬 스토리보드 설계 → AI 이미지 생성 → AI 영상 제작 → 영상·사운드 편집',
+    ],
+    ['편집 포인트', '매크로 클로즈업, 느린 카메라 움직임, 온도감 있는 컬러 전환, 커피 추출 ASMR'],
+    ['사용 도구', 'Figma, AI 이미지·영상 생성 도구, CapCut'],
+    ['영상 포맷', '가로형 16:9 브랜드 콘셉트 필름 · 1분 10초'],
 ];
 
 const shortFormFilms = [
@@ -65,6 +65,7 @@ const shortFormFilms = [
     },
     {
         id: '02',
+        theme: 'diptyque',
         title: 'DIPTYQUE EAU ROSE',
         subtitle: 'Where Roses Become a Memory.',
         videoSrc: '/videos/shortform/shortform-diptyque.mp4',
@@ -74,6 +75,24 @@ const shortFormFilms = [
             '장미의 꽃잎과 향수병의 디테일을 중심으로 스토리보드를 구성하고, AI 이미지·영상 생성과 장면 편집을 통해 향기가 시각적으로 전해지는 듯한 경험을 표현했습니다.',
         ],
         details: diptyqueFilmDetails,
+    },
+    {
+        id: '03',
+        theme: 'blue-bottle',
+        title: 'BLUE BOTTLE COFFEE',
+        subtitle: 'THE ART OF SLOW.',
+        supportingCopy: '천천히 완성되는 한 잔의 가치',
+        videoSrc: '/videos/blue-bottle/blue-bottle-the-art-of-slow.mp4',
+        videoLabel: 'BLUE BOTTLE COFFEE THE ART OF SLOW 브랜드 콘셉트 필름',
+        headerLabel: 'BRAND CAMPAIGN',
+        categoryLabel: 'BRAND AD CAMPAIGNS',
+        disclaimer: 'UNOFFICIAL BRAND CONCEPT FILM',
+        projectLink: 'https://www.figma.com/design/DaUzuGBSc95Y1SZMdQMfc0/?node-id=836-3352',
+        description: [
+            '블루보틀 커피를 주제로, 한 잔의 커피가 완성되기까지의 시간과 섬세한 과정을 담은 약 90초 분량의 브랜드 콘셉트 필름을 제작했습니다.',
+            '블루보틀의 아침을 비추는 햇살에서 시작해 원두의 질감, 핸드드립 추출, 아이스 라떼가 완성되는 순간까지 총 14개의 장면을 설계했습니다. AI 이미지·영상 제작과 사운드 편집을 통해 일상의 느린 순간이 가진 감각적인 가치를 표현했습니다.',
+        ],
+        details: blueBottleFilmDetails,
     },
 ];
 
@@ -343,10 +362,18 @@ const ShortFormFilmPlayer = ({ film }) => {
                         />
                     </div>
                     <div className="short-form-video-controls__row">
-                        <button type="button" onClick={togglePlayback} aria-label={isPlaying ? '일시정지' : '재생'}>
+                        <button
+                            type="button"
+                            onClick={togglePlayback}
+                            aria-label={isPlaying ? '일시정지' : '재생'}
+                        >
                             {isPlaying ? 'Ⅱ' : '▶'}
                         </button>
-                        <button type="button" onClick={toggleMute} aria-label={isMuted ? '음소거 해제' : '음소거'}>
+                        <button
+                            type="button"
+                            onClick={toggleMute}
+                            aria-label={isMuted ? '음소거 해제' : '음소거'}
+                        >
                             {isMuted ? 'MUTE' : 'SOUND'}
                         </button>
                         <input
@@ -374,23 +401,47 @@ const ShortFormFilmPlayer = ({ film }) => {
     );
 };
 
+const ShortFormFilmPlaceholder = ({ film }) => (
+    <figure
+        className="short-form-film-media short-form-film-media--landscape"
+        aria-label={film.videoLabel}
+    >
+        <div className="short-form-film-media__placeholder">
+            <span>BRAND FILM</span>
+            <strong>COMING SOON</strong>
+            <small>16:9 · APPROX. 90 SEC</small>
+        </div>
+    </figure>
+);
+
 const FilmDetailPanel = ({ film }) => (
     <section
-        className={`short-form-film-detail ${film.id === '01' ? 'is-adidas' : 'is-diptyque'}`}
+        className={`short-form-film-detail is-${film.theme ?? (film.id === '01' ? 'adidas' : 'diptyque')}`}
         data-short-form-panel={`film-${film.id}`}
         aria-labelledby={`short-form-film-${film.id}-title`}
     >
         <div className="short-form-film-detail__inner">
-            <ShortFormFilmPlayer film={film} />
+            {film.videoSrc ? (
+                <ShortFormFilmPlayer film={film} />
+            ) : (
+                <ShortFormFilmPlaceholder film={film} />
+            )}
             <article className="short-form-film-detail__content">
                 <header>
-                    <span>FILM {film.id} / SHORT-FORM AD</span>
+                    <span>
+                        FILM {film.id} / {film.headerLabel ?? 'SHORT-FORM AD'}
+                    </span>
                     <span>PROJECT DETAILS</span>
                 </header>
                 <div className="short-form-film-detail__heading">
-                    <p>SHORT-FORM CONTENTS</p>
+                    <p>{film.categoryLabel ?? 'SHORT-FORM CONTENTS'}</p>
                     <h2 id={`short-form-film-${film.id}-title`}>{film.title}</h2>
                     <strong>{film.subtitle}</strong>
+                    {film.supportingCopy && (
+                        <span className="short-form-film-detail__supporting-copy">
+                            {film.supportingCopy}
+                        </span>
+                    )}
                     <div className="short-form-film-detail__description">
                         {film.description.map((paragraph) => (
                             <p key={paragraph}>{paragraph}</p>
@@ -452,6 +503,7 @@ const ShortFormContentsIntro = () => {
             [241, 242, 248],
             [241, 238, 245],
             [234, 213, 221],
+            [229, 239, 246],
         ];
         let frame = 0;
         let snapTimer = null;
@@ -498,19 +550,24 @@ const ShortFormContentsIntro = () => {
             const introOffset = panelOffsets[0] ?? 0;
             const adidasOffset = panelOffsets[1] ?? introOffset;
             const diptyqueOffset = panelOffsets[2] ?? adidasOffset;
+            const blueBottleOffset = panelOffsets[3] ?? diptyqueOffset;
             const adidasHoldStart = adidasOffset;
             const adidasRevealEnd = adidasHoldStart + holdDistance;
             const adidasHoldEnd = adidasRevealEnd + completionHoldDistance;
             const diptyqueMoveEnd = adidasHoldEnd + (diptyqueOffset - adidasOffset);
             const diptyqueRevealEnd = diptyqueMoveEnd + holdDistance;
             const diptyqueHoldEnd = diptyqueRevealEnd + completionHoldDistance;
-            const distance = clamp(scrollDistance, 0, diptyqueHoldEnd);
+            const blueBottleMoveEnd = diptyqueHoldEnd + (blueBottleOffset - diptyqueOffset);
+            const blueBottleRevealEnd = blueBottleMoveEnd + holdDistance;
+            const blueBottleHoldEnd = blueBottleRevealEnd + completionHoldDistance;
+            const distance = clamp(scrollDistance, 0, blueBottleHoldEnd);
 
             if (distance <= adidasHoldStart) {
                 return {
                     horizontalOffset: distance,
                     adidasReveal: 0,
                     diptyqueReveal: 0,
+                    blueBottleReveal: 0,
                     snapCandidates: [introOffset, adidasHoldStart],
                 };
             }
@@ -520,6 +577,7 @@ const ShortFormContentsIntro = () => {
                     horizontalOffset: adidasOffset,
                     adidasReveal: (distance - adidasHoldStart) / holdDistance,
                     diptyqueReveal: 0,
+                    blueBottleReveal: 0,
                     snapCandidates: null,
                 };
             }
@@ -529,6 +587,7 @@ const ShortFormContentsIntro = () => {
                     horizontalOffset: adidasOffset,
                     adidasReveal: 1,
                     diptyqueReveal: 0,
+                    blueBottleReveal: 0,
                     snapCandidates: null,
                 };
             }
@@ -538,6 +597,7 @@ const ShortFormContentsIntro = () => {
                     horizontalOffset: adidasOffset + (distance - adidasHoldEnd),
                     adidasReveal: 1,
                     diptyqueReveal: 0,
+                    blueBottleReveal: 0,
                     snapCandidates: [adidasHoldEnd, diptyqueMoveEnd],
                 };
             }
@@ -547,14 +607,46 @@ const ShortFormContentsIntro = () => {
                     horizontalOffset: diptyqueOffset,
                     adidasReveal: 1,
                     diptyqueReveal: (distance - diptyqueMoveEnd) / holdDistance,
+                    blueBottleReveal: 0,
+                    snapCandidates: null,
+                };
+            }
+
+            if (distance < diptyqueHoldEnd) {
+                return {
+                    horizontalOffset: diptyqueOffset,
+                    adidasReveal: 1,
+                    diptyqueReveal: 1,
+                    blueBottleReveal: 0,
+                    snapCandidates: null,
+                };
+            }
+
+            if (distance <= blueBottleMoveEnd) {
+                return {
+                    horizontalOffset: diptyqueOffset + (distance - diptyqueHoldEnd),
+                    adidasReveal: 1,
+                    diptyqueReveal: 1,
+                    blueBottleReveal: 0,
+                    snapCandidates: [diptyqueHoldEnd, blueBottleMoveEnd],
+                };
+            }
+
+            if (distance < blueBottleRevealEnd) {
+                return {
+                    horizontalOffset: blueBottleOffset,
+                    adidasReveal: 1,
+                    diptyqueReveal: 1,
+                    blueBottleReveal: (distance - blueBottleMoveEnd) / holdDistance,
                     snapCandidates: null,
                 };
             }
 
             return {
-                horizontalOffset: diptyqueOffset,
+                horizontalOffset: blueBottleOffset,
                 adidasReveal: 1,
                 diptyqueReveal: 1,
+                blueBottleReveal: 1,
                 snapCandidates: null,
             };
         };
@@ -571,9 +663,7 @@ const ShortFormContentsIntro = () => {
 
         const updatePanelMotion = (trackPosition) => {
             panels.forEach((panel, panelIndex) => {
-                const panelProgress = smoothstep(
-                    (trackPosition - (panelIndex - 0.85)) / 0.85
-                );
+                const panelProgress = smoothstep((trackPosition - (panelIndex - 0.85)) / 0.85);
 
                 for (let step = 1; step <= 5; step += 1) {
                     const delay = (step - 1) * 0.1;
@@ -612,8 +702,7 @@ const ShortFormContentsIntro = () => {
             );
             holdDistance = clamp(stageWidth * 0.42, 500, 900);
             completionHoldDistance = clamp(stageWidth * 0.075, 120, 180);
-            scrollTravel =
-                horizontalTravel + (holdDistance + completionHoldDistance) * 2;
+            scrollTravel = horizontalTravel + (holdDistance + completionHoldDistance) * 3;
             story.style.height = `${window.innerHeight + scrollTravel}px`;
         };
 
@@ -635,6 +724,10 @@ const ShortFormContentsIntro = () => {
                 '--sf-title-reveal',
                 `${(route.diptyqueReveal * 100).toFixed(3)}%`
             );
+            panels[3]?.style.setProperty(
+                '--sf-title-reveal',
+                `${(route.blueBottleReveal * 100).toFixed(3)}%`
+            );
             updateBackground(trackPosition);
             updatePanelMotion(trackPosition);
         };
@@ -645,11 +738,7 @@ const ShortFormContentsIntro = () => {
 
         const snapToNearestPanel = () => {
             snapTimer = null;
-            if (
-                !story.classList.contains('is-horizontal') ||
-                isSnapping ||
-                scrollTravel <= 0
-            ) {
+            if (!story.classList.contains('is-horizontal') || isSnapping || scrollTravel <= 0) {
                 return;
             }
 
@@ -803,37 +892,34 @@ const ShortFormContentsIntro = () => {
 
                             <div className="short-form-contents-intro__content">
                                 <header>
-                                    <span>01 / AI MOTION WORK</span>
-                                    <span>SHORT-FORM CONTENTS · INTRO</span>
+                                    <span>01 / BRAND AD CAMPAIGNS</span>
+                                    <span>BRAND AD CAMPAIGNS · INTRO</span>
                                 </header>
 
                                 <div className="short-form-contents-intro__copy">
                                     <h2 id="short-form-contents-title">
                                         <img
                                             className="short-form-contents-intro__chrome-title"
-                                            src="/images/short-form-chrome.png"
-                                            alt="SHORT-FORM"
+                                            src="/images/shortform/ad-brand-chrome-title.png"
+                                            alt="AD. BRAND"
                                         />
-                                        <em>Contents.</em>
+                                        <em>Campaigns.</em>
                                     </h2>
                                     <p className="short-form-contents-intro__subtitle">
-                                        FROM IDEA TO MOTION.
+                                        FROM IDEA TO CAMPAIGN.
                                     </p>
                                     <div className="short-form-contents-intro__description">
+                                        <p>짧은 순간의 임팩트부터 깊이 있는 브랜드의 이야기까지.</p>
                                         <p>
-                                            하나의 아이디어가 짧은 영상 속에서 새로운 장면이
-                                            됩니다.
-                                        </p>
-                                        <p>
-                                            향수의 감각적인 분위기부터 러닝의 역동적인 순간까지,
+                                            세로형 숏폼 광고와 가로형 브랜드 필름을 통해,
                                             <br />
-                                            서로 다른 브랜드의 매력을 AI 비주얼과 영상 편집으로
+                                            서로 다른 브랜드의 매력을 감각적인 영상으로
                                             표현했습니다.
                                         </p>
                                     </div>
                                     <div
                                         className="short-form-contents-intro__info"
-                                        aria-label="Content production details"
+                                        aria-label="Brand ad campaign production details"
                                     >
                                         <p>CREATIVE DIRECTION · AI VISUAL · VIDEO EDITING</p>
                                         <span>SELECTED FILMS / 2026</span>

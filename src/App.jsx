@@ -12,6 +12,7 @@ import DiptyqueProjectShowcase from './DiptyqueProjectShowcase.jsx';
 import SwarovskiProjectIntro from './SwarovskiProjectIntro.jsx';
 import SwarovskiVisualShowcase from './SwarovskiVisualShowcase.jsx';
 import ShortFormContentsIntro from './ShortFormContentsIntro.jsx';
+import OtherWorks from './OtherWorks.jsx';
 
 const personalityReactions = {
     curious: 'ALWAYS EXPLORING',
@@ -5581,6 +5582,7 @@ function App() {
                     </div>
 
                     <ShortFormContentsIntro />
+                    <OtherWorks />
 
                     {/*
           <section

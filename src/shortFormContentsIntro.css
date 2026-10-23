@@ -99,6 +99,11 @@
     --sf-title-neutral: #9b9298;
 }
 
+.short-form-story.is-horizontal .short-form-film-detail.is-blue-bottle {
+    --sf-title-color: #17354d;
+    --sf-title-neutral: #96a9b7;
+}
+
 .short-form-story.is-horizontal .short-form-film-detail__heading h2 {
     color: transparent;
     background-image: linear-gradient(
@@ -519,6 +524,7 @@
 
 .short-form-contents-intro__copy h2 {
     position: relative;
+    width: min(100%, 820px);
     margin: 0;
     font-family: var(--font-display);
     font-size: clamp(58px, 5.4vw, 102px);
@@ -529,7 +535,7 @@
 
 .short-form-contents-intro__chrome-title {
     display: block;
-    width: min(100%, 780px);
+    width: min(100%, 820px);
     height: auto;
     max-width: 100%;
     object-fit: contain;
@@ -542,7 +548,7 @@
     display: block;
     width: fit-content;
     margin-top: clamp(-20px, -1.15vw, -9px);
-    margin-left: clamp(46px, 5.5vw, 108px);
+    margin-left: 35.8%;
     color: var(--short-form-lavender);
     font-family: var(--font-serif);
     font-size: 0.8em;
@@ -550,6 +556,10 @@
     font-weight: 400;
     line-height: 1;
     letter-spacing: -0.045em;
+    padding: 0.04em 0.12em 0.14em 0.04em;
+    margin-right: -0.12em;
+    margin-bottom: -0.14em;
+    overflow: visible;
 }
 
 .short-form-contents-intro__subtitle {
@@ -631,11 +641,48 @@
     gap: clamp(44px, 4.6vw, 90px);
 }
 
+.short-form-film-detail.is-blue-bottle .short-form-film-detail__inner {
+    width: min(96%, 1695px);
+    grid-template-columns: minmax(0, 1.08fr) minmax(520px, 0.92fr);
+    gap: clamp(52px, 5vw, 96px);
+}
+
 .short-form-film-detail .short-form-film-media {
     width: auto;
     height: min(71.5vh, 820px);
     max-width: 100%;
     justify-self: center;
+}
+
+.short-form-film-detail.is-blue-bottle .short-form-film-media {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+}
+
+.short-form-film-media--landscape {
+    border-color: #bcd0de;
+    border-radius: clamp(8px, 0.7vw, 13px);
+    background: #d0e0eb;
+}
+
+.short-form-film-media--landscape .short-form-film-media__placeholder {
+    color: #17354d;
+    background: #d0e0eb;
+}
+
+.short-form-film-media--landscape .short-form-film-media__placeholder::before {
+    border-color: rgba(66, 126, 168, 0.3);
+}
+
+.short-form-film-media--landscape .short-form-film-media__placeholder strong {
+    color: #357aa9;
+    font: 500 clamp(24px, 2.2vw, 42px)/1 var(--font-body);
+    letter-spacing: -0.025em;
+}
+
+.short-form-film-media--landscape .short-form-film-media__placeholder small {
+    color: #4e6577;
 }
 
 .short-form-film-detail__content {
@@ -732,18 +779,18 @@
     font-size: 14px;
 }
 
-.short-form-film-detail:is(.is-adidas, .is-diptyque) .short-form-film-detail__heading {
+.short-form-film-detail:is(.is-adidas, .is-diptyque, .is-blue-bottle) .short-form-film-detail__heading {
     padding-block: clamp(24px, 3.2vh, 40px);
 }
 
-.short-form-film-detail:is(.is-adidas, .is-diptyque) .short-form-film-detail__heading > p {
+.short-form-film-detail:is(.is-adidas, .is-diptyque, .is-blue-bottle) .short-form-film-detail__heading > p {
     color: #8773b6;
     font-size: clamp(11px, 0.62vw, 12px);
     line-height: 1.35;
     letter-spacing: 0.08em;
 }
 
-.short-form-film-detail:is(.is-adidas, .is-diptyque) .short-form-film-detail__heading h2 {
+.short-form-film-detail:is(.is-adidas, .is-diptyque, .is-blue-bottle) .short-form-film-detail__heading h2 {
     max-width: 860px;
     font-family: var(--font-body);
     font-size: clamp(44px, 3.7vw, 72px);
@@ -754,7 +801,7 @@
     text-wrap: balance;
 }
 
-.short-form-film-detail:is(.is-adidas, .is-diptyque) .short-form-film-detail__heading > strong {
+.short-form-film-detail:is(.is-adidas, .is-diptyque, .is-blue-bottle) .short-form-film-detail__heading > strong {
     margin-top: clamp(16px, 1.8vh, 22px);
     color: #7b5eae;
     font-family: var(--font-body);
@@ -765,7 +812,7 @@
     text-transform: none;
 }
 
-.short-form-film-detail:is(.is-adidas, .is-diptyque) .short-form-film-detail__description {
+.short-form-film-detail:is(.is-adidas, .is-diptyque, .is-blue-bottle) .short-form-film-detail__description {
     max-width: 840px;
     gap: clamp(8px, 1vh, 12px);
     margin-top: clamp(16px, 2vh, 22px);
@@ -778,7 +825,7 @@
     text-transform: none;
 }
 
-.short-form-film-detail:is(.is-adidas, .is-diptyque) .short-form-film-detail__description p {
+.short-form-film-detail:is(.is-adidas, .is-diptyque, .is-blue-bottle) .short-form-film-detail__description p {
     margin: 0;
     color: #263047;
     font-family: var(--font-body);
@@ -790,11 +837,11 @@
     text-transform: none;
 }
 
-.short-form-film-detail:is(.is-adidas, .is-diptyque) .short-form-film-detail__list {
+.short-form-film-detail:is(.is-adidas, .is-diptyque, .is-blue-bottle) .short-form-film-detail__list {
     grid-template-columns: 1fr;
 }
 
-.short-form-film-detail:is(.is-adidas, .is-diptyque)
+.short-form-film-detail:is(.is-adidas, .is-diptyque, .is-blue-bottle)
     .short-form-film-detail__list
     div:nth-child(n) {
     min-height: clamp(46px, 4.8vh, 58px);
@@ -805,7 +852,7 @@
     gap: clamp(18px, 1.5vw, 28px);
 }
 
-.short-form-film-detail:is(.is-adidas, .is-diptyque) .short-form-film-detail__list dt {
+.short-form-film-detail:is(.is-adidas, .is-diptyque, .is-blue-bottle) .short-form-film-detail__list dt {
     color: #62547e;
     font-family: var(--font-body);
     font-size: 13px;
@@ -815,7 +862,7 @@
     text-transform: none;
 }
 
-.short-form-film-detail:is(.is-adidas, .is-diptyque) .short-form-film-detail__list dd {
+.short-form-film-detail:is(.is-adidas, .is-diptyque, .is-blue-bottle) .short-form-film-detail__list dd {
     color: #273249;
     font-family: var(--font-body);
     font-size: 14px;
@@ -856,6 +903,90 @@
 
 .short-form-film-detail.is-diptyque .short-form-film-detail__list div:nth-child(n) {
     border-bottom-color: rgba(141, 88, 116, 0.24);
+}
+
+.short-form-film-detail.is-blue-bottle {
+    --short-form-ink: #17354d;
+    --short-form-muted: #4e6577;
+    --short-form-lavender: #357aa9;
+    --short-form-line: #bcd0de;
+    color: #17354d;
+    background: #e5eff6;
+}
+
+.short-form-film-detail.is-blue-bottle .short-form-film-detail__heading > p,
+.short-form-film-detail.is-blue-bottle .short-form-film-detail__heading > strong {
+    color: #427ea8;
+}
+
+.short-form-film-detail__supporting-copy {
+    display: block;
+    margin-top: 7px;
+    color: var(--short-form-muted);
+    font: 500 clamp(12px, 0.68vw, 14px)/1.5 var(--font-body);
+    letter-spacing: -0.01em;
+}
+
+.short-form-film-detail.is-blue-bottle .short-form-film-detail__heading h2 {
+    color: #17354d;
+    font-size: clamp(40px, 3.25vw, 64px);
+}
+
+.short-form-film-detail.is-blue-bottle .short-form-film-detail__description,
+.short-form-film-detail.is-blue-bottle .short-form-film-detail__description p,
+.short-form-film-detail.is-blue-bottle .short-form-film-detail__list dd {
+    color: #4e6577;
+}
+
+.short-form-film-detail.is-blue-bottle .short-form-film-detail__list dt {
+    color: #427ea8;
+}
+
+.short-form-film-detail.is-blue-bottle .short-form-film-detail__list div:nth-child(n) {
+    border-bottom-color: #bcd0de;
+}
+
+.short-form-film-detail__footer {
+    display: flex;
+    min-height: 58px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 10px 0;
+}
+
+.short-form-film-detail__footer small {
+    color: #6d8494;
+    font: 650 9px/1.4 var(--font-mono);
+    letter-spacing: 0.12em;
+}
+
+.short-form-film-detail__footer a {
+    flex: 0 0 auto;
+    padding: 9px 12px;
+    border: 1px solid #9bb8cc;
+    border-radius: 999px;
+    color: #17354d;
+    font: 700 9px/1 var(--font-mono);
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    transition: border-color 180ms ease, color 180ms ease, background-color 180ms ease;
+}
+
+.short-form-film-detail__footer a:hover,
+.short-form-film-detail__footer a:focus-visible {
+    border-color: #357aa9;
+    color: #f7fbfd;
+    background: #357aa9;
+}
+
+.short-form-film-detail.is-blue-bottle .short-form-video-controls input[type='range'] {
+    accent-color: #357aa9;
+}
+
+.short-form-film-detail.is-blue-bottle .short-form-video-controls button:hover,
+.short-form-film-detail.is-blue-bottle .short-form-video-controls button:focus-visible {
+    color: #83b9da;
 }
 
 .short-form-film-detail__note {
@@ -920,11 +1051,11 @@
         padding-block: 24px;
     }
 
-    .short-form-film-detail:is(.is-adidas, .is-diptyque) .short-form-film-detail__heading {
+    .short-form-film-detail:is(.is-adidas, .is-diptyque, .is-blue-bottle) .short-form-film-detail__heading {
         padding-block: 15px;
     }
 
-    .short-form-film-detail:is(.is-adidas, .is-diptyque)
+    .short-form-film-detail:is(.is-adidas, .is-diptyque, .is-blue-bottle)
         .short-form-film-detail__description {
         gap: 6px;
         margin-top: 12px;
@@ -932,7 +1063,7 @@
         line-height: 1.55;
     }
 
-    .short-form-film-detail:is(.is-adidas, .is-diptyque)
+    .short-form-film-detail:is(.is-adidas, .is-diptyque, .is-blue-bottle)
         .short-form-film-detail__list
         div:nth-child(n) {
         min-height: 0;
@@ -954,6 +1085,11 @@
     .short-form-film-detail:is(.is-adidas, .is-diptyque) .short-form-film-detail__inner {
         grid-template-columns: minmax(260px, 0.68fr) minmax(500px, 1.32fr);
         gap: 42px;
+    }
+
+    .short-form-film-detail.is-blue-bottle .short-form-film-detail__inner {
+        grid-template-columns: minmax(0, 1fr) minmax(420px, 0.95fr);
+        gap: 38px;
     }
 }
 
@@ -1024,6 +1160,12 @@
     }
 
     .short-form-film-detail:is(.is-adidas, .is-diptyque) .short-form-film-detail__inner {
+        width: min(100%, 760px);
+        grid-template-columns: 1fr;
+        gap: 42px;
+    }
+
+    .short-form-film-detail.is-blue-bottle .short-form-film-detail__inner {
         width: min(100%, 760px);
         grid-template-columns: 1fr;
         gap: 42px;
@@ -1124,7 +1266,7 @@
 
     .short-form-contents-intro__copy h2 em {
         margin-top: clamp(-14px, -3vw, -8px);
-        margin-left: clamp(24px, 9vw, 48px);
+        margin-left: min(33%, calc(100% - 5.25em));
     }
 
     .short-form-contents-intro__description {
@@ -1169,13 +1311,13 @@
         font-size: clamp(42px, 13vw, 62px);
     }
 
-    .short-form-film-detail:is(.is-adidas, .is-diptyque)
+    .short-form-film-detail:is(.is-adidas, .is-diptyque, .is-blue-bottle)
         .short-form-film-detail__heading
         h2 {
         font-size: clamp(38px, 11.5vw, 52px);
     }
 
-    .short-form-film-detail:is(.is-adidas, .is-diptyque)
+    .short-form-film-detail:is(.is-adidas, .is-diptyque, .is-blue-bottle)
         .short-form-film-detail__description {
         font-size: 14px;
     }
@@ -1187,6 +1329,12 @@
     .short-form-film-detail__list div:nth-child(n) {
         padding: 15px 0;
         border-right: 0;
+    }
+
+    .short-form-film-detail__footer {
+        align-items: flex-start;
+        flex-direction: column;
+        padding-block: 14px;
     }
 }
 
