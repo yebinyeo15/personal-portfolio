@@ -18,20 +18,20 @@ const skillColumns = [
 
 const orbitTools = [
     [
-        { name: 'Figma', slug: 'figma' },
-        { name: 'Git', slug: 'git' },
-        { name: 'GitHub', slug: 'github' },
+        { name: 'Figma', slug: 'figma', fallback: 'FI' },
+        { name: 'Git', slug: 'git', fallback: 'GI' },
+        { name: 'GitHub', slug: 'github', fallback: 'GH' },
     ],
     [
-        { name: 'HTML5', slug: 'html5' },
-        { name: 'CSS', slug: 'css' },
-        { name: 'JavaScript', slug: 'javascript' },
-        { name: 'React', slug: 'react' },
+        { name: 'HTML5', slug: 'html5', fallback: 'H5' },
+        { name: 'CSS', slug: 'css', fallback: 'CSS' },
+        { name: 'JavaScript', slug: 'javascript', fallback: 'JS' },
+        { name: 'React', slug: 'react', fallback: 'RE' },
     ],
     [
-        { name: 'Sass', slug: 'sass' },
-        { name: 'Vite', slug: 'vite' },
-        { name: 'Vercel', slug: 'vercel' },
+        { name: 'Sass', slug: 'sass', fallback: 'SA' },
+        { name: 'Vite', slug: 'vite', fallback: 'VI' },
+        { name: 'Vercel', slug: 'vercel', fallback: 'VE' },
     ],
 ];
 
@@ -48,11 +48,18 @@ const OrbitRing = ({ tools, ring }) => (
             return (
                 <div className="skills-orbit__node" style={position} key={tool.name}>
                     <span className="skills-orbit__logo-frame">
+                        <span className="skills-orbit__logo-fallback">{tool.fallback}</span>
                         <img
                             src={`https://cdn.simpleicons.org/${tool.slug}/C7D2E3`}
                             alt=""
                             loading="lazy"
                             decoding="async"
+                            onLoad={(event) => {
+                                event.currentTarget.dataset.loaded = 'true';
+                            }}
+                            onError={(event) => {
+                                event.currentTarget.hidden = true;
+                            }}
                         />
                     </span>
                 </div>

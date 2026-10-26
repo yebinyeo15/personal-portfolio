@@ -819,24 +819,9 @@
     pointer-events: none;
     transition:
         color 0.25s ease,
-        opacity 0.35s ease,
-        transform 0.35s ease;
-}
-.nav-reveal-zone {
-    position: fixed;
-    z-index: 21;
-    top: 0;
-    left: 50%;
-    width: min(240px, 60vw);
-    height: 10px;
-    transform: translateX(-50%);
-    border: 0;
-    padding: 0;
-    background: transparent;
-}
-.nav-reveal-zone:focus-visible {
-    outline: 2px solid #9780d8;
-    outline-offset: 2px;
+        opacity 300ms ease-in-out,
+        transform 300ms ease-in-out,
+        visibility 0s linear;
 }
 .logo {
     position: relative;
@@ -897,42 +882,24 @@
 .site-nav a:hover::after {
     width: calc(100% - 12px);
 }
-.site-header.is-collapsed .logo {
-    border-color: rgba(113, 128, 150, 0.08);
-    background: rgba(235, 239, 247, 0.18);
-    -webkit-backdrop-filter: blur(6px);
-    backdrop-filter: blur(6px);
-}
-.site-header.is-collapsed .logo img {
-    opacity: 0.9;
-}
 .site-header.is-on-dark {
     color: #f1f4f8;
 }
-.site-header.is-on-dark.is-expanded .logo {
+.site-header.is-on-dark .logo {
     border-color: rgba(255, 255, 255, 0.36);
     background: rgba(241, 244, 248, 0.88);
     backdrop-filter: blur(10px);
 }
-.site-header.is-collapsed .site-nav {
+.site-header.is-auto-hidden {
     visibility: hidden;
     opacity: 0;
+    transform: translateY(-100%);
     pointer-events: none;
     transition:
-        opacity 0.4s ease,
-        transform 0.4s ease,
-        visibility 0s linear 0.4s;
-}
-.site-header.is-collapsed .site-nav--left {
-    transform: translateX(14px);
-}
-.site-header.is-collapsed .site-nav--right {
-    transform: translateX(-14px);
-}
-.site-header.is-auto-hidden {
-    opacity: 0;
-    transform: translateY(-10px);
-    pointer-events: none;
+        color 0.25s ease,
+        opacity 300ms ease-in-out,
+        transform 300ms ease-in-out,
+        visibility 0s linear 300ms;
 }
 .site-header.is-auto-hidden .logo,
 .site-header.is-auto-hidden .site-nav {
@@ -984,42 +951,6 @@
     height: 1px;
     background: rgba(116, 104, 158, 0.16);
     content: '';
-}
-.hero-topline {
-    position: relative;
-    z-index: 5;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    padding-top: 12px;
-    color: #465269;
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    font-size: clamp(9px, 0.62vw, 12px);
-    font-weight: 650;
-    letter-spacing: 0.14em;
-}
-.hero-topline p {
-    margin: 0;
-}
-.hero-topline p:nth-child(2) {
-    text-align: center;
-}
-.hero-topline p:last-child {
-    text-align: right;
-}
-.hero-topline__edition {
-    display: flex;
-    gap: 9px;
-    align-items: center;
-}
-.hero-topline__edition span {
-    color: #39465e;
-}
-.hero-topline__edition small {
-    padding-left: 9px;
-    border-left: 1px solid rgba(150, 130, 196, 0.62);
-    color: #8067b5;
-    font: inherit;
 }
 .hero-visual {
     position: relative;
@@ -1191,63 +1122,6 @@
     will-change: transform;
     animation: hero-keyring-sway 3.6s ease-in-out infinite;
 }
-.hero-visual-meta {
-    position: absolute;
-    z-index: 4;
-    top: 13%;
-    display: grid;
-    gap: 6px;
-    color: #465269;
-    font: 650 clamp(10px, 0.64vw, 13px)/1.3 var(--font-mono);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-}
-.hero-visual-meta::before {
-    width: 34px;
-    height: 1px;
-    margin-bottom: 4px;
-    background: #a999cf;
-    content: '';
-}
-.hero-visual-meta--left {
-    left: 0;
-}
-.hero-visual-meta--right {
-    right: 0;
-    justify-items: end;
-    text-align: right;
-}
-.hero-visual-meta--right::before {
-    justify-self: end;
-}
-.hero-visual-meta__label {
-    color: #8066b7;
-    font-size: 0.84em;
-    letter-spacing: 0.14em;
-}
-.hero-visual-meta strong {
-    color: #202b42;
-    font-size: clamp(15px, 0.94vw, 19px);
-    font-weight: 750;
-    line-height: 1.05;
-    letter-spacing: 0.04em;
-}
-.hero-visual-meta small {
-    margin-top: 3px;
-    color: #5d687e;
-    font: 650 0.8em/1.2 var(--font-mono);
-    letter-spacing: 0.13em;
-}
-.hero-visual-meta__label i {
-    display: inline-block;
-    width: 5px;
-    height: 5px;
-    margin-right: 5px;
-    border-radius: 50%;
-    background: #9d85cf;
-    box-shadow: 0 0 0 3px rgba(157, 133, 207, 0.12);
-    vertical-align: 1px;
-}
 @keyframes hero-keyring-sway {
     0%,
     100% {
@@ -1281,12 +1155,6 @@
     grid-template-columns: 1fr 1fr;
     align-items: end;
     padding-top: clamp(16px, 2dvh, 24px);
-}
-.hero-role {
-    margin: 0;
-    color: #3f4c64;
-    font: 650 clamp(10px, 0.68vw, 13px)/1.3 var(--font-mono);
-    letter-spacing: 0.11em;
 }
 .hero-intro {
     justify-self: end;
@@ -4116,7 +3984,9 @@
     top: 0;
     left: calc(var(--horizontal-panel-width) * 2);
     display: block;
-    width: calc(var(--horizontal-panel-width) * 6);
+    width: calc(
+        var(--horizontal-panel-width) * var(--horizontal-preview-panel-count, 1)
+    );
     height: 100%;
     overflow: visible;
     pointer-events: none;
@@ -4272,6 +4142,8 @@
     :is(
         .nintendo-research-archive__content h3 > span,
         .nintendo-research-archive__content h3 > em,
+        .nintendo-documentation__title-primary,
+        .nintendo-documentation__title-serif,
         .nintendo-final-outcome-13__heading h3 > span,
         .nintendo-final-outcome-13__heading h3 > em
     ),
@@ -4309,6 +4181,7 @@
 .nintendo-late-story.is-horizontal
     :is(
         .nintendo-research-archive__content h3,
+        .nintendo-documentation__heading h3,
         .nintendo-final-outcome-13__heading h3
     ),
 .personal-horizontal-story.is-horizontal
@@ -4388,6 +4261,8 @@
     :is(
         .nintendo-research-archive__content h3 > span,
         .nintendo-research-archive__content h3 > em,
+        .nintendo-documentation__title-primary,
+        .nintendo-documentation__title-serif,
         .nintendo-final-outcome-13__heading h3 > span,
         .nintendo-final-outcome-13__heading h3 > em
     ) {
@@ -4407,6 +4282,7 @@
 .nintendo-late-story.is-horizontal
     :is(
         .nintendo-research-archive__content h3 > span,
+        .nintendo-documentation__title-primary,
         .nintendo-final-outcome-13__heading h3 > span
     ) {
     --nintendo-late-title-color: var(
@@ -4422,6 +4298,7 @@
 .nintendo-late-story.is-horizontal
     :is(
         .nintendo-research-archive__content h3 > em,
+        .nintendo-documentation__title-serif,
         .nintendo-final-outcome-13__heading h3 > em
     ) {
     --nintendo-late-title-color: var(
@@ -4432,6 +4309,14 @@
         --nintendo-late-title-line-2-reveal,
         0%
     );
+}
+
+.nintendo-late-story.is-horizontal .nintendo-documentation__title-primary {
+    --nintendo-late-title-color: var(--documentation-ink);
+}
+
+.nintendo-late-story.is-horizontal .nintendo-documentation__title-serif {
+    --nintendo-late-title-color: var(--documentation-accent);
 }
 
 .nintendo-late-story.is-horizontal .nintendo-research-archive__inner {
@@ -4836,12 +4721,20 @@
     }
 }
 .selected-works-heading {
+    position: relative;
     display: flex;
     min-height: 100vh;
     min-height: 100svh;
     flex-direction: column;
+    overflow: hidden;
     padding-top: 90px;
     padding-bottom: 70px;
+    background:
+        radial-gradient(circle at 31% 52%, rgba(121, 104, 179, 0.18), transparent 30%),
+        linear-gradient(rgba(224, 231, 242, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(224, 231, 242, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, #19243a 0%, #19243a 82%, var(--dark) 100%);
+    background-size: auto, 64px 64px, 64px 64px, auto;
 }
 .selected-works-heading::after {
     width: 100%;
@@ -4851,13 +4744,106 @@
     content: '';
 }
 .selected-works-layout {
-    display: grid;
-    grid-template-columns: 1.4fr 0.6fr;
-    gap: clamp(48px, 8vw, 130px);
-    align-items: end;
-    align-content: center;
+    position: relative;
     flex: 1;
-    padding: 70px 0;
+    padding: clamp(56px, 8vh, 92px) 0;
+}
+.team-projects-title {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    width: clamp(560px, 47.5vw, 1210px);
+    margin: 0;
+    justify-items: start;
+    transform: translate(-50%, -50%);
+}
+.team-projects-title__image {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+}
+.team-projects-title__serif {
+    position: relative;
+    z-index: 1;
+    justify-self: end;
+    margin-top: clamp(-92px, -4.6vw, -52px);
+    margin-right: clamp(8px, 1.3vw, 32px);
+    color: #7968b3;
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: clamp(62px, 5.9vw, 123px);
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.055em;
+}
+.team-projects-editorial-meta {
+    position: absolute;
+    z-index: 2;
+    bottom: 3%;
+    left: 0;
+    display: grid;
+    gap: 7px;
+    color: rgba(222, 228, 239, 0.68);
+}
+.team-projects-editorial-meta span {
+    color: #a891dc;
+    font: 600 9px/1.2 var(--font-mono);
+    letter-spacing: 0.14em;
+}
+.team-projects-editorial-meta strong {
+    color: #f1f4f8;
+    font: 500 clamp(18px, 1.35vw, 24px)/1.3 Manrope, sans-serif;
+    letter-spacing: -0.03em;
+}
+.team-projects-editorial-meta p {
+    margin: 0;
+    color: #aeb9c8;
+    font: 500 11px/1.4 var(--font-mono);
+    letter-spacing: 0.06em;
+}
+.team-projects-edge-caption {
+    position: absolute;
+    right: 0;
+    bottom: 3%;
+    margin: 0;
+    color: #a891dc;
+    font: 600 9px/1.2 var(--font-mono);
+    letter-spacing: 0.16em;
+}
+.selected-works-heading.is-animation-ready .team-projects-title__image,
+.selected-works-heading.is-animation-ready .team-projects-title__serif {
+    transform: translateY(28px);
+    opacity: 0;
+}
+.selected-works-heading.is-visible .team-projects-title__image {
+    animation: team-projects-enter 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.selected-works-heading.is-visible .team-projects-title__serif {
+    animation: team-projects-enter 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both;
+}
+.selected-works-heading.is-animation-ready .team-projects-editorial-meta,
+.selected-works-heading.is-animation-ready .team-projects-edge-caption {
+    transform: translateY(14px);
+    opacity: 0;
+}
+.selected-works-heading.is-visible .team-projects-editorial-meta,
+.selected-works-heading.is-visible .team-projects-edge-caption {
+    animation: team-projects-enter 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.42s both;
+}
+@keyframes team-projects-enter {
+    from {
+        transform: translateY(28px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 .selected-works-heading h2 {
     margin: 0;
@@ -6307,6 +6293,10 @@
 }
 
 .nintendo-documentation {
+    --documentation-ink: #17213c;
+    --documentation-muted: #64708c;
+    --documentation-accent: #8e79c5;
+    --documentation-line: #dce3ec;
     display: flex;
     height: 100vh;
     height: 100svh;
@@ -6318,25 +6308,23 @@
     justify-content: center;
     padding-top: clamp(52px, 6svh, 72px);
     padding-bottom: clamp(38px, 4.5svh, 56px);
+    color: var(--documentation-ink);
     background:
-        radial-gradient(circle at 24% 72%, rgba(179, 157, 232, 0.1), transparent 24%),
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-    background-size:
-        auto,
-        64px 64px,
-        64px 64px;
+        radial-gradient(circle at 84% 17%, rgba(195, 181, 237, 0.25), transparent 28%),
+        linear-gradient(rgba(74, 94, 132, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74, 94, 132, 0.055) 1px, transparent 1px),
+        #eaf3f8;
+    background-size: auto, 44px 44px, 44px 44px, auto;
 }
 .nintendo-documentation__header,
 .nintendo-documentation__archives {
     width: 100%;
-    max-width: 1500px;
+    max-width: 1600px;
     margin-right: auto;
     margin-left: auto;
 }
-.nintendo-documentation__header > .eyebrow {
-    margin: 0 0 20px;
-    color: #b39de8;
+.nintendo-documentation__meta {
+    margin-bottom: clamp(20px, 3dvh, 42px);
 }
 .nintendo-documentation__heading {
     display: grid;
@@ -6353,7 +6341,7 @@
     display: block;
 }
 .nintendo-documentation__title-primary {
-    color: #f1f4f8;
+    color: var(--documentation-ink);
     font:
         500 clamp(40px, 4vw, 68px)/0.94 Manrope,
         sans-serif;
@@ -6363,7 +6351,7 @@
 .nintendo-documentation__title-serif {
     margin-top: 5px;
     margin-left: 12px;
-    color: #d9cbff;
+    color: var(--documentation-accent);
     font:
         italic clamp(36px, 3.8vw, 62px)/1.05 'Libre Baskerville',
         serif;
@@ -6372,7 +6360,7 @@
 .nintendo-documentation__copy {
     position: relative;
     max-width: 620px;
-    padding-bottom: 4px;
+    padding: 0 0 4px;
     text-align: left;
 }
 .nintendo-documentation__copy p {
@@ -6380,36 +6368,41 @@
     word-break: keep-all;
 }
 .nintendo-documentation__role {
-    position: absolute;
-    bottom: calc(100% + 9px);
-    left: 0;
-    color: #aeb9c8;
-    font-size: 9px;
-    font-weight: 500;
+    display: inline-flex;
+    position: static;
+    align-items: center;
+    margin-bottom: 15px !important;
+    padding: 0;
+    color: var(--documentation-accent);
+    font-size: 12px;
+    font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
 }
 .nintendo-documentation__role span {
-    color: #b39de8;
+    margin-right: 4px;
+    color: var(--documentation-accent);
 }
 .nintendo-documentation__copy-lead {
-    color: #eef1f6;
-    font-size: clamp(18px, 1.55vw, 24px);
+    color: var(--documentation-ink);
+    font-size: 28px;
+    font-weight: 600;
     line-height: 1.45;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.03em;
 }
 .nintendo-documentation__copy-body {
-    margin-top: 15px;
-    color: #b7c1cf;
-    font-size: 13.5px;
-    line-height: 1.75;
+    margin-top: 17px;
+    color: #53617a;
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.7;
 }
 .nintendo-documentation__archives {
     display: grid;
     height: clamp(330px, 50svh, 540px);
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: clamp(28px, 3vw, 48px);
-    margin-top: clamp(20px, 2.6svh, 30px);
+    margin-top: clamp(24px, 2.8svh, 32px);
 }
 .nintendo-documentation__archive {
     display: grid;
@@ -6417,7 +6410,7 @@
     min-height: 0;
     grid-template-rows: auto minmax(0, 1fr);
     padding-top: 13px;
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-top: 1px solid var(--documentation-line);
 }
 .nintendo-documentation__archive-heading {
     position: relative;
@@ -6425,7 +6418,7 @@
 }
 .nintendo-documentation__archive-heading > p {
     margin: 0;
-    color: #b39de8;
+    color: var(--documentation-accent);
     font-size: 9px;
     font-weight: 500;
     letter-spacing: 0.14em;
@@ -6433,7 +6426,7 @@
 }
 .nintendo-documentation__archive-heading h4 {
     margin: 7px 0 0;
-    color: #f1f4f8;
+    color: var(--documentation-ink);
     font-size: clamp(17px, 1.35vw, 21px);
     font-weight: 600;
     line-height: 1.3;
@@ -6443,7 +6436,7 @@
     position: absolute;
     right: 12px;
     bottom: 2px;
-    color: #aeb9c8;
+    color: var(--documentation-muted);
     font-size: 11px;
     line-height: 1.5;
     word-break: keep-all;
@@ -6461,10 +6454,10 @@
     min-width: 0;
     min-height: 0;
     overflow: hidden;
-    border: 1px solid rgba(179, 157, 232, 0.18);
-    border-radius: 4px;
+    border: 1px solid var(--documentation-line);
+    border-radius: 6px;
     padding: 0;
-    background: rgba(7, 11, 20, 0.34);
+    background: rgba(255, 255, 255, 0.86);
     cursor: pointer;
 }
 .nintendo-documentation__archive--figma .nintendo-documentation__image--main {
@@ -6485,10 +6478,13 @@
     display: grid;
     grid-template-columns: 52px minmax(0, 1fr);
     align-items: center;
-    gap: 10px;
-    padding: 7px;
+    gap: 12px;
+    padding: 7px 2px;
+    border: 0;
+    border-top: 1px solid var(--documentation-line);
+    border-radius: 0;
     text-align: left;
-    background: rgba(17, 24, 39, 0.72);
+    background: transparent;
 }
 .nintendo-documentation__image img {
     display: block;
@@ -6503,7 +6499,7 @@
 .nintendo-documentation__image--detail img {
     width: 52px;
     height: 50px;
-    border-radius: 2px;
+    border-radius: 6px;
     object-fit: cover;
     object-position: top;
 }
@@ -6516,24 +6512,43 @@
 }
 .nintendo-documentation__preview-label span {
     overflow: hidden;
-    color: #bdaaf0;
+    color: var(--documentation-accent);
     font-size: 9px;
     letter-spacing: 0.12em;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 .nintendo-documentation__preview-label strong {
-    color: #eef1f6;
+    display: inline-block;
+    width: fit-content;
+    color: var(--documentation-ink);
     font-size: 11px;
     font-weight: 500;
     letter-spacing: 0.04em;
+    transition:
+        color 180ms ease,
+        transform 180ms ease;
 }
 .nintendo-documentation__image:hover img,
 .nintendo-documentation__image:focus-visible img {
     opacity: 0.82;
 }
+.nintendo-documentation__image:hover,
 .nintendo-documentation__image:focus-visible {
-    outline: 1px solid #d9cbff;
+    border-color: rgba(142, 121, 197, 0.72);
+}
+.nintendo-documentation__image--detail:hover,
+.nintendo-documentation__image--detail:focus-visible {
+    background: transparent;
+}
+.nintendo-documentation__image--detail:hover .nintendo-documentation__preview-label strong,
+.nintendo-documentation__image--detail:focus-visible
+    .nintendo-documentation__preview-label strong {
+    color: var(--documentation-accent);
+    transform: translateX(4px);
+}
+.nintendo-documentation__image:focus-visible {
+    outline: 2px solid var(--documentation-accent);
     outline-offset: 3px;
 }
 
@@ -8977,7 +8992,6 @@ h4,
     font-family: var(--font-serif);
 }
 .site-header,
-.hero-topline,
 .eyebrow,
 .section-index,
 .section-label,
@@ -9297,6 +9311,15 @@ h4,
     .nintendo-documentation__copy {
         max-width: 680px;
     }
+    .nintendo-documentation__role {
+        font-size: 11px;
+    }
+    .nintendo-documentation__copy-lead {
+        font-size: 24px;
+    }
+    .nintendo-documentation__copy-body {
+        font-size: 15.5px;
+    }
     .nintendo-documentation__archives {
         height: auto;
         grid-template-columns: 1fr;
@@ -9320,11 +9343,41 @@ h4,
         min-height: 100svh;
         padding-top: 60px;
         padding-bottom: 50px;
+        background-size: auto, 32px 32px, 32px 32px, auto;
     }
     .selected-works-layout {
         grid-template-columns: 1fr;
-        gap: 52px;
         padding: 52px 0;
+    }
+    .team-projects-title {
+        top: 38%;
+        left: 50%;
+        width: min(calc(100% - 64px), 560px);
+        transform: translate(-50%, -50%);
+    }
+    .team-projects-title__serif {
+        margin-top: clamp(-40px, -6.5vw, -25px);
+        margin-right: clamp(7px, 3.2vw, 18px);
+        font-size: clamp(38px, 11vw, 58px);
+    }
+    .team-projects-editorial-meta {
+        bottom: 3%;
+        max-width: 76%;
+        gap: 5px;
+    }
+    .team-projects-editorial-meta span {
+        font-size: 7px;
+        letter-spacing: 0.1em;
+    }
+    .team-projects-editorial-meta strong {
+        font-size: clamp(16px, 4.8vw, 20px);
+    }
+    .team-projects-editorial-meta p {
+        font-size: 8px;
+    }
+    .team-projects-edge-caption {
+        bottom: 3%;
+        font-size: 7px;
     }
     .selected-works-title-serif {
         margin-top: 18px;
@@ -9384,21 +9437,6 @@ h4,
         bottom: 108px;
         left: 20px;
     }
-    .hero-topline {
-        grid-template-columns: 1fr 1fr;
-        padding-top: 10px;
-        font-size: 8px;
-        line-height: 1.4;
-    }
-    .hero-topline p:nth-child(2) {
-        display: none;
-    }
-    .hero-topline__edition {
-        gap: 6px;
-    }
-    .hero-topline__edition small {
-        padding-left: 6px;
-    }
     .hero-visual {
         min-height: 390px;
         margin-block: 8px;
@@ -9435,31 +9473,10 @@ h4,
         width: min(48vw, 220px);
         max-height: 43dvh;
     }
-    .hero-visual-meta {
-        top: 9%;
-        gap: 4px;
-        font-size: 7px;
-        letter-spacing: 0.08em;
-    }
-    .hero-visual-meta span:nth-child(n + 3) {
-        display: none;
-    }
-    .hero-visual-meta strong {
-        font-size: 10px;
-    }
-    .hero-visual-meta small {
-        font-size: 7px;
-    }
-    .hero-visual-meta::before {
-        width: 24px;
-    }
     .hero-footer {
         grid-template-columns: 1fr;
         gap: 10px;
         padding-top: 16px;
-    }
-    .hero-role {
-        font-size: 9px;
     }
     .hero-intro {
         justify-self: start;
@@ -10380,6 +10397,14 @@ h4,
     .nintendo-contribution__detail-media {
         min-height: 92px;
     }
+    .nintendo-contribution__detail--mobile-video {
+        grid-template-columns: 1fr;
+    }
+    .nintendo-contribution__detail--mobile-video .nintendo-contribution__detail-media {
+        height: auto;
+        min-height: 0;
+        aspect-ratio: 2 / 1;
+    }
     .nintendo-collaboration {
         padding-top: 110px;
         padding-bottom: 110px;
@@ -10425,10 +10450,8 @@ h4,
         background-size:
             auto,
             42px 42px,
-            42px 42px;
-    }
-    .nintendo-documentation__header > .eyebrow {
-        margin-bottom: 22px;
+            42px 42px,
+            auto;
     }
     .nintendo-documentation__title-primary {
         font-size: clamp(36px, 10.8vw, 56px);
@@ -10440,7 +10463,14 @@ h4,
         font-size: clamp(32px, 9.8vw, 50px);
     }
     .nintendo-documentation__copy-lead {
-        font-size: 19px;
+        font-size: clamp(20px, 5.8vw, 23px);
+    }
+    .nintendo-documentation__role {
+        font-size: 10px;
+    }
+    .nintendo-documentation__copy-body {
+        font-size: 14px;
+        line-height: 1.7;
     }
     .nintendo-documentation__archive {
         min-height: 480px;
@@ -11121,6 +11151,10 @@ h4,
     .logo,
     .logo img,
     .top-button img,
+    .team-projects-title__image,
+    .team-projects-title__serif,
+    .team-projects-editorial-meta,
+    .team-projects-edge-caption,
     .selected-works-intro__list a span,
     .selected-works-title-primary,
     .selected-works-title-serif,
@@ -11130,6 +11164,10 @@ h4,
     }
     .selected-works-heading.is-animation-ready .selected-works-title-primary,
     .selected-works-heading.is-animation-ready .selected-works-title-serif,
+    .selected-works-heading.is-animation-ready .team-projects-title__image,
+    .selected-works-heading.is-animation-ready .team-projects-title__serif,
+    .selected-works-heading.is-animation-ready .team-projects-editorial-meta,
+    .selected-works-heading.is-animation-ready .team-projects-edge-caption,
     .selected-works-heading.is-animation-ready .selected-works-intro__lead,
     .selected-works-heading.is-animation-ready .selected-works-intro__meta,
     .selected-works-heading.is-animation-ready .selected-works-intro__list li {

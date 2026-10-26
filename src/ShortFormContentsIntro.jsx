@@ -6,11 +6,22 @@ const shortFormMockups = [
         id: 'diptyque',
         src: '/images/shortform-diptyque-mockup.png',
         alt: '딥디크 향수 숏폼 광고 아이폰 목업',
+        label: '01 / DIPTYQUE',
+        category: 'FRAGRANCE FILM',
     },
     {
         id: 'running',
         src: '/images/shortform/shortform-running-mockup.png',
         alt: '러닝화 숏폼 광고 아이폰 목업',
+        label: '02 / ADIDAS',
+        category: 'RUNNING CAMPAIGN',
+    },
+    {
+        id: 'blue-bottle',
+        src: '/images/shortform/bluebottle-ipad-mockup.png',
+        alt: '블루보틀 커피 캠페인 아이패드 목업',
+        label: '03 / BLUE BOTTLE',
+        category: 'COFFEE CAMPAIGN',
     },
 ];
 
@@ -96,62 +107,23 @@ const shortFormFilms = [
     },
 ];
 
-const formatMediaTime = (value) => {
-    if (!Number.isFinite(value) || value < 0) return '0:00';
-    const minutes = Math.floor(value / 60);
-    const seconds = Math.floor(value % 60);
-    return `${minutes}:${String(seconds).padStart(2, '0')}`;
-};
-
 const ShortFormFilmPlayer = ({ film }) => {
     const playerRef = useRef(null);
     const videoRef = useRef(null);
     const userPausedRef = useRef(false);
-    const controlsTimerRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [controlsVisible, setControlsVisible] = useState(true);
+    const [controlsVisible, setControlsVisible] = useState(false);
     const [isMuted, setIsMuted] = useState(true);
-    const [volume, setVolume] = useState(1);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
     const [hasError, setHasError] = useState(false);
-    const [needsStart, setNeedsStart] = useState(false);
-
-    const clearControlsTimer = useCallback(() => {
-        if (controlsTimerRef.current !== null) {
-            window.clearTimeout(controlsTimerRef.current);
-            controlsTimerRef.current = null;
-        }
-    }, []);
-
-    const showControls = useCallback(
-        (keepVisible = false) => {
-            clearControlsTimer();
-            setControlsVisible(true);
-            if (!keepVisible && isPlaying) {
-                controlsTimerRef.current = window.setTimeout(() => {
-                    setControlsVisible(false);
-                    controlsTimerRef.current = null;
-                }, 1400);
-            }
-        },
-        [clearControlsTimer, isPlaying]
-    );
 
     const handleVideoPlay = () => {
-        clearControlsTimer();
         setIsPlaying(true);
-        setControlsVisible(true);
-        controlsTimerRef.current = window.setTimeout(() => {
-            setControlsVisible(false);
-            controlsTimerRef.current = null;
-        }, 1400);
     };
 
     const handleVideoPause = () => {
-        clearControlsTimer();
         setIsPlaying(false);
-        setControlsVisible(true);
     };
 
     const playVideo = useCallback(async () => {
@@ -159,9 +131,7 @@ const ShortFormFilmPlayer = ({ film }) => {
         if (!video || hasError) return;
         try {
             await video.play();
-            setNeedsStart(false);
         } catch {
-            setNeedsStart(true);
             setIsPlaying(false);
         }
     }, [hasError]);
@@ -169,7 +139,6 @@ const ShortFormFilmPlayer = ({ film }) => {
     const togglePlayback = () => {
         const video = videoRef.current;
         if (!video || hasError) return;
-        showControls();
         if (video.paused) {
             userPausedRef.current = false;
             playVideo();
@@ -182,43 +151,17 @@ const ShortFormFilmPlayer = ({ film }) => {
     const toggleMute = () => {
         const video = videoRef.current;
         if (!video) return;
-        showControls();
         const nextMuted = !video.muted;
         video.muted = nextMuted;
         setIsMuted(nextMuted);
     };
 
-    const handleVolume = (event) => {
-        const video = videoRef.current;
-        if (!video) return;
-        showControls();
-        const nextVolume = Number(event.target.value);
-        video.volume = nextVolume;
-        setVolume(nextVolume);
-        if (nextVolume === 0) {
-            video.muted = true;
-            setIsMuted(true);
-        }
-    };
-
     const handleSeek = (event) => {
         const video = videoRef.current;
         if (!video || !duration) return;
-        showControls();
         const nextTime = Number(event.target.value);
         video.currentTime = nextTime;
         setCurrentTime(nextTime);
-    };
-
-    const enterFullscreen = async () => {
-        const player = playerRef.current;
-        if (!player?.requestFullscreen) return;
-        showControls();
-        try {
-            await player.requestFullscreen();
-        } catch {
-            // Fullscreen availability is controlled by the browser.
-        }
     };
 
     const handleKeyDown = (event) => {
@@ -229,16 +172,12 @@ const ShortFormFilmPlayer = ({ film }) => {
             togglePlayback();
         } else if (event.key.toLowerCase() === 'm') {
             toggleMute();
-        } else if (event.key.toLowerCase() === 'f') {
-            enterFullscreen();
         } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
             event.preventDefault();
             const direction = event.key === 'ArrowRight' ? 5 : -5;
             video.currentTime = Math.min(Math.max(video.currentTime + direction, 0), duration);
         }
     };
-
-    useEffect(() => clearControlsTimer, [clearControlsTimer]);
 
     useEffect(() => {
         const player = playerRef.current;
@@ -251,7 +190,7 @@ const ShortFormFilmPlayer = ({ film }) => {
 
         const updatePlaybackForVisibility = () => {
             frame = 0;
-            const rect = panel.getBoundingClientRect();
+            const rect = player.getBoundingClientRect();
             const visibleWidth = Math.max(
                 0,
                 Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0)
@@ -294,19 +233,23 @@ const ShortFormFilmPlayer = ({ film }) => {
     return (
         <figure className="short-form-film-media short-form-film-media--player">
             <div
-                className={`short-form-video-player${controlsVisible ? ' is-controls-visible' : ''}${isPlaying ? '' : ' is-paused'}`}
+                className={`short-form-video-player${controlsVisible ? ' is-controls-visible' : ''}`}
                 ref={playerRef}
                 role="group"
                 aria-label={`${film.title} 영상 플레이어`}
                 tabIndex="0"
                 onKeyDown={handleKeyDown}
-                onMouseEnter={() => showControls()}
-                onMouseMove={() => showControls()}
-                onMouseLeave={() => showControls()}
-                onPointerDown={() => showControls()}
-                onFocusCapture={() => showControls(true)}
+                onMouseEnter={() => setControlsVisible(true)}
+                onMouseLeave={(event) => {
+                    if (!event.currentTarget.matches(':focus-within')) {
+                        setControlsVisible(false);
+                    }
+                }}
+                onFocusCapture={() => setControlsVisible(true)}
                 onBlurCapture={(event) => {
-                    if (!event.currentTarget.contains(event.relatedTarget)) showControls();
+                    if (!event.currentTarget.contains(event.relatedTarget)) {
+                        setControlsVisible(false);
+                    }
                 }}
             >
                 <video
@@ -318,9 +261,14 @@ const ShortFormFilmPlayer = ({ film }) => {
                     playsInline
                     preload="metadata"
                     aria-label={film.videoLabel}
-                    onClick={togglePlayback}
+                    onPointerUp={(event) => {
+                        if (event.pointerType !== 'mouse') {
+                            setControlsVisible((visible) => !visible);
+                        }
+                    }}
                     onPlay={handleVideoPlay}
                     onPause={handleVideoPause}
+                    onVolumeChange={(event) => setIsMuted(event.currentTarget.muted)}
                     onLoadedMetadata={(event) => setDuration(event.currentTarget.duration)}
                     onDurationChange={(event) => setDuration(event.currentTarget.duration)}
                     onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)}
@@ -337,64 +285,54 @@ const ShortFormFilmPlayer = ({ film }) => {
                     </div>
                 )}
 
-                {!hasError && needsStart && (
+                <div
+                    className="short-form-video-controls"
+                    onPointerDown={(event) => event.stopPropagation()}
+                    onPointerUp={(event) => event.stopPropagation()}
+                >
                     <button
-                        className="short-form-video-player__start"
                         type="button"
                         onClick={togglePlayback}
+                        aria-label={isPlaying ? '일시정지' : '재생'}
                     >
-                        ▶ 영상 재생
+                        {isPlaying ? (
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M7 5h4v14H7zm6 0h4v14h-4z" />
+                            </svg>
+                        ) : (
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m8 5 11 7-11 7z" />
+                            </svg>
+                        )}
                     </button>
-                )}
-
-                <div className="short-form-video-controls">
-                    <div className="short-form-video-controls__progress">
-                        <input
-                            type="range"
-                            min="0"
-                            max={duration || 0}
-                            step="0.01"
-                            value={Math.min(currentTime, duration || 0)}
-                            onChange={handleSeek}
-                            onPointerDown={() => showControls(true)}
-                            onPointerUp={() => showControls()}
-                            aria-label="영상 재생 위치"
-                        />
-                    </div>
-                    <div className="short-form-video-controls__row">
-                        <button
-                            type="button"
-                            onClick={togglePlayback}
-                            aria-label={isPlaying ? '일시정지' : '재생'}
-                        >
-                            {isPlaying ? 'Ⅱ' : '▶'}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={toggleMute}
-                            aria-label={isMuted ? '음소거 해제' : '음소거'}
-                        >
-                            {isMuted ? 'MUTE' : 'SOUND'}
-                        </button>
-                        <input
-                            className="short-form-video-controls__volume"
-                            type="range"
-                            min="0"
-                            max="1"
-                            step="0.05"
-                            value={volume}
-                            onChange={handleVolume}
-                            onPointerDown={() => showControls(true)}
-                            onPointerUp={() => showControls()}
-                            aria-label="볼륨"
-                        />
-                        <span className="short-form-video-controls__time" aria-live="off">
-                            {formatMediaTime(currentTime)} / {formatMediaTime(duration)}
-                        </span>
-                        <button type="button" onClick={enterFullscreen} aria-label="전체화면">
-                            FULL
-                        </button>
-                    </div>
+                    <input
+                        className="short-form-video-controls__progress"
+                        type="range"
+                        min="0"
+                        max={duration || 0}
+                        step="0.01"
+                        value={Math.min(currentTime, duration || 0)}
+                        onChange={handleSeek}
+                        style={{
+                            '--video-progress': `${duration ? (currentTime / duration) * 100 : 0}%`,
+                        }}
+                        aria-label="영상 재생 위치"
+                    />
+                    <button
+                        type="button"
+                        onClick={toggleMute}
+                        aria-label={isMuted ? '음소거 해제' : '음소거'}
+                    >
+                        {isMuted ? (
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M4 9v6h4l5 4V5L8 9zm11.5 1.1 1.4-1.4 2.1 2.1 2.1-2.1 1.4 1.4-2.1 2.1 2.1 2.1-1.4 1.4-2.1-2.1-2.1 2.1-1.4-1.4 2.1-2.1z" />
+                            </svg>
+                        ) : (
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M4 9v6h4l5 4V5L8 9zm11.5-.5a5 5 0 0 1 0 7l1.4 1.4a7 7 0 0 0 0-9.8zm2.8-2.8a9 9 0 0 1 0 12.6l1.4 1.4a11 11 0 0 0 0-15.4z" />
+                            </svg>
+                        )}
+                    </button>
                 </div>
             </div>
         </figure>
@@ -875,16 +813,8 @@ const ShortFormContentsIntro = () => {
                                             draggable="false"
                                         />
                                         <figcaption>
-                                            <strong>
-                                                {mockup.id === 'diptyque'
-                                                    ? '01 / DIPTYQUE'
-                                                    : '02 / ADIDAS'}
-                                            </strong>
-                                            <span>
-                                                {mockup.id === 'diptyque'
-                                                    ? 'FRAGRANCE FILM'
-                                                    : 'RUNNING CAMPAIGN'}
-                                            </span>
+                                            <strong>{mockup.label}</strong>
+                                            <span>{mockup.category}</span>
                                         </figcaption>
                                     </figure>
                                 ))}

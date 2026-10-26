@@ -230,10 +230,6 @@ const chromeStoryPaths = [
         panel: 6,
         d: 'M 70 735 C 275 690 420 545 610 575 C 815 610 900 355 1100 300 C 1280 250 1405 340 1530 225',
     },
-    {
-        panel: 7,
-        d: 'M 70 285 C 280 190 430 265 585 430 C 735 590 900 665 1085 520 C 1260 385 1395 230 1530 300',
-    },
 ];
 
 const loveCategories = {
@@ -347,29 +343,29 @@ const nintendoContributionItems = [
     },
     {
         number: '03',
-        label: 'Community Page',
-        title: '커뮤니티 페이지 디자인 및 구현',
-        tags: ['UI Design', 'Page Development'],
+        label: 'E-SHOP PAGE',
+        title: 'E-shop 페이지 공동 제작',
+        tags: ['COLLABORATION', 'UI DESIGN', 'FRONT-END'],
         description:
-            '사용자가 소통하고 콘텐츠를 탐색할 수 있는 커뮤니티 페이지 작업을 담당했습니다.',
+            '팀원과 협업하여 E-shop 페이지의 상품 구성과 UI 디자인, 프론트엔드 구현 작업에 참여했습니다.',
         media: {
             type: 'video',
-            src: '/videos/nintendo/nintendo-community.mp4',
-            label: '닌텐도 커뮤니티 페이지 시연 영상',
+            src: '/videos/nintendo-eshop-preview.mp4',
+            label: '닌텐도 E-shop 페이지 시연 영상',
         },
-        href: 'https://mbc-teamproject-red.vercel.app/community',
+        href: 'https://mbc-teamproject-red.vercel.app/store',
     },
     {
         number: '04',
-        label: 'E-Shop Page',
-        title: 'E-shop 페이지 공동 제작',
-        tags: ['Collaboration', 'UI Design', 'Front-End'],
+        label: 'NINTENDO SWITCH ONLINE',
+        title: 'Nintendo Switch Online 페이지 제작',
+        tags: ['UI DESIGN', 'FRONT-END', 'COLLABORATION'],
         description:
-            '팀원과 협업하여 총 4개 페이지로 구성된 E-shop의 디자인 및 구현 작업에 참여했습니다.',
+            'Nintendo Switch Online 서비스 페이지의 UI 디자인과 구현 작업에 참여했습니다.',
         media: {
             type: 'video',
-            src: '/videos/nintendo/nintendo-eshop.mp4',
-            label: '닌텐도 E-shop 페이지 시연 영상',
+            src: '/videos/nintendo-switch-online-preview.mp4',
+            label: 'Nintendo Switch Online 페이지 시연 영상',
         },
         href: 'https://mbc-teamproject-red.vercel.app/store',
     },
@@ -711,15 +707,12 @@ function App() {
     const developmentDialogRef = useRef(null);
     const developmentZoomRef = useRef(1);
     const developmentImageKeyRef = useRef('main');
-    const navHideTimerRef = useRef(null);
-    const isPointerOverNavRef = useRef(false);
     const previewTriggerRef = useRef(null);
     const previewDialogRef = useRef(null);
     const [isAboutHeadlineActive, setIsAboutHeadlineActive] = useState(false);
     const [activeMoreAboutPanel, setActiveMoreAboutPanel] = useState(0);
     const [visibleMoreAboutCards, setVisibleMoreAboutCards] = useState(0);
     const [moreAboutPosition, setMoreAboutPosition] = useState('before');
-    const [isNavExpanded, setIsNavExpanded] = useState(true);
     const [isNavOnDark, setIsNavOnDark] = useState(false);
     const [isNavHidden, setIsNavHidden] = useState(false);
     const [isTopButtonVisible, setIsTopButtonVisible] = useState(false);
@@ -1228,28 +1221,6 @@ function App() {
         let scrollDistance = 0;
         let animationFrame = null;
 
-        const clearNavigationTimer = () => {
-            if (navHideTimerRef.current !== null) {
-                window.clearTimeout(navHideTimerRef.current);
-                navHideTimerRef.current = null;
-            }
-        };
-
-        const scheduleNavigationHide = () => {
-            clearNavigationTimer();
-
-            const heroBottom = heroRef.current
-                ? heroRef.current.offsetTop + heroRef.current.offsetHeight
-                : window.innerHeight;
-
-            if (window.scrollY < heroBottom - 80 || isPointerOverNavRef.current) return;
-
-            navHideTimerRef.current = window.setTimeout(() => {
-                if (!isPointerOverNavRef.current) setIsNavHidden(true);
-                navHideTimerRef.current = null;
-            }, 2000);
-        };
-
         const updateNavigation = () => {
             const currentScrollY = window.scrollY;
             const heroBottom = heroRef.current
@@ -1257,19 +1228,18 @@ function App() {
                 : window.innerHeight;
             const delta = currentScrollY - lastScrollY;
 
-            if (currentScrollY < heroBottom - 80) {
-                setIsNavExpanded(true);
+            if (currentScrollY < heroBottom) {
                 setIsNavHidden(false);
                 scrollDistance = 0;
             } else if (Math.abs(delta) > 1) {
                 if (Math.sign(delta) !== Math.sign(scrollDistance)) scrollDistance = 0;
                 scrollDistance += delta;
 
-                if (scrollDistance > 18) {
-                    setIsNavExpanded(false);
+                if (scrollDistance >= 10) {
+                    setIsNavHidden(true);
                     scrollDistance = 0;
-                } else if (scrollDistance < -18) {
-                    setIsNavExpanded(true);
+                } else if (scrollDistance <= -10) {
+                    setIsNavHidden(false);
                     scrollDistance = 0;
                 }
             }
@@ -1305,13 +1275,9 @@ function App() {
 
             lastScrollY = currentScrollY;
             animationFrame = null;
-            scheduleNavigationHide();
         };
 
         const handleScroll = () => {
-            clearNavigationTimer();
-            setIsNavHidden(false);
-
             if (animationFrame === null) {
                 animationFrame = window.requestAnimationFrame(updateNavigation);
             }
@@ -1324,7 +1290,6 @@ function App() {
         return () => {
             window.removeEventListener('scroll', handleScroll);
             window.removeEventListener('resize', handleScroll);
-            clearNavigationTimer();
             if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
         };
     }, []);
@@ -1595,21 +1560,33 @@ function App() {
             const phase = position.phase;
             const holdReveal = 0.8;
             const arrivalReveal = 0.42;
+            const lastPanelIndex = panels.length - 1;
+            const previewSegmentCount = Math.max(1, lastPanelIndex - 1);
             let progress = 0;
 
-            if (phase?.type === 'hold' && phase.panel >= 2 && phase.panel <= 7) {
+            if (
+                phase?.type === 'hold' &&
+                phase.panel >= 2 &&
+                phase.panel <= lastPanelIndex
+            ) {
                 const segment = phase.panel - 2;
                 const segmentStart = segment === 0 ? 0 : segment + arrivalReveal;
-                const segmentEnd = segment + (phase.panel === 7 ? 1 : holdReveal);
+                const segmentEnd =
+                    segment + (phase.panel === lastPanelIndex ? 1 : holdReveal);
                 progress =
-                    (segmentStart + (segmentEnd - segmentStart) * position.phaseProgress) / 6;
-            } else if (phase?.type === 'transition' && phase.from >= 2 && phase.from < 7) {
+                    (segmentStart + (segmentEnd - segmentStart) * position.phaseProgress) /
+                    previewSegmentCount;
+            } else if (
+                phase?.type === 'transition' &&
+                phase.from >= 2 &&
+                phase.from < lastPanelIndex
+            ) {
                 const segment = phase.from - 2;
                 const transitionStart = segment + holdReveal;
                 const transitionEnd = segment + 1 + arrivalReveal;
                 progress =
                     (transitionStart + (transitionEnd - transitionStart) * position.phaseProgress) /
-                    6;
+                    previewSegmentCount;
             } else if (phase?.type === 'complete') {
                 progress = 1;
             }
@@ -1709,9 +1686,12 @@ function App() {
             story.classList.remove('is-horizontal');
             story.style.removeProperty('height');
             story.style.removeProperty('--horizontal-panel-width');
+            story.style.removeProperty('--horizontal-preview-panel-count');
             story.style.removeProperty('--horizontal-hold-progress');
             story.removeAttribute('data-horizontal-phase');
+            track.style.removeProperty('width');
             track.style.removeProperty('transform');
+            chromePathPreview.style.removeProperty('width');
             chromePathPreview.style.removeProperty('--chrome-preview-progress');
             hideChromeGuide();
             timeline = [];
@@ -1791,7 +1771,7 @@ function App() {
             track.style.transform = `translate3d(${-offset}px, 0, 0)`;
             story.style.setProperty('--horizontal-hold-progress', position.holdProgress.toFixed(4));
             panels.forEach((panel, panelIndex) => {
-                if (panelIndex < 2 || panelIndex > 7) return;
+                if (panelIndex < 2 || panelIndex >= panels.length) return;
                 const holdPhase = timeline.find(
                     (phase) => phase.type === 'hold' && phase.panel === panelIndex
                 );
@@ -1987,7 +1967,15 @@ function App() {
             story.classList.add('is-horizontal');
             chromePathLengths.clear();
             const stageHeight = stage.clientHeight;
-            story.style.setProperty('--horizontal-panel-width', `${stage.clientWidth}px`);
+            const stageWidth = stage.clientWidth;
+            const lastPanel = panels[panels.length - 1];
+            story.style.setProperty('--horizontal-panel-width', `${stageWidth}px`);
+            story.style.setProperty(
+                '--horizontal-preview-panel-count',
+                String(Math.max(1, panels.length - 2))
+            );
+            track.style.width = `${stageWidth * panels.length}px`;
+            chromePathPreview.style.width = `${stageWidth * Math.max(1, panels.length - 2)}px`;
             const hasOverflowingPanel = panels.some((panel, index) =>
                 isPanelOverflowing(panel, index, stageHeight)
             );
@@ -2003,14 +1991,16 @@ function App() {
                 return;
             }
 
-            horizontalTravelDistance = Math.max(0, track.scrollWidth - stage.clientWidth);
+            horizontalTravelDistance = Math.max(
+                0,
+                lastPanel.offsetLeft + lastPanel.offsetWidth - stageWidth
+            );
             if (horizontalTravelDistance <= 0) {
                 recordDiagnostic('measure:rejected-no-horizontal-travel');
                 resetStory();
                 return;
             }
 
-            const stageWidth = stage.clientWidth;
             const transitionDistance = stageWidth * 1.25;
             const holdDistance = Math.min(900, Math.max(500, stageWidth * 0.42));
             const completionHoldDistance = Math.min(
@@ -2075,7 +2065,10 @@ function App() {
                 resetStory();
                 return;
             }
-            horizontalTravelDistance = Math.max(0, track.scrollWidth - stage.clientWidth);
+            horizontalTravelDistance = Math.max(
+                0,
+                lastPanel.offsetLeft + lastPanel.offsetWidth - stageWidth
+            );
             story.style.height = `${stageHeight + verticalScrollDistance}px`;
             storyStart = story.offsetTop;
             isHorizontal = true;
@@ -2361,7 +2354,7 @@ function App() {
                     : 0
             );
             panels.forEach((panel, panelIndex) => {
-                if (panelIndex < 1 || panelIndex > 5) return;
+                if (panelIndex < 1 || panelIndex >= panels.length) return;
                 const holdPhase = timeline.find(
                     (phase) => phase.type === 'hold' && phase.panel === panelIndex
                 );
@@ -3447,35 +3440,6 @@ function App() {
         };
     }, [selectDesignDevelopmentArchive]);
 
-    const showNavigation = () => {
-        isPointerOverNavRef.current = true;
-        if (navHideTimerRef.current !== null) {
-            window.clearTimeout(navHideTimerRef.current);
-            navHideTimerRef.current = null;
-        }
-        setIsNavHidden(false);
-    };
-
-    const releaseNavigation = () => {
-        isPointerOverNavRef.current = false;
-
-        if (navHideTimerRef.current !== null) {
-            window.clearTimeout(navHideTimerRef.current);
-            navHideTimerRef.current = null;
-        }
-
-        const heroBottom = heroRef.current
-            ? heroRef.current.offsetTop + heroRef.current.offsetHeight
-            : window.innerHeight;
-
-        if (window.scrollY < heroBottom - 80) return;
-
-        navHideTimerRef.current = window.setTimeout(() => {
-            if (!isPointerOverNavRef.current) setIsNavHidden(true);
-            navHideTimerRef.current = null;
-        }, 2000);
-    };
-
     const scrollToTop = () => {
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
@@ -3617,33 +3581,16 @@ function App() {
 
     return (
         <div className="site-shell">
-            <button
-                className="nav-reveal-zone"
-                type="button"
-                aria-label="네비게이션 표시"
-                onMouseEnter={showNavigation}
-                onMouseLeave={releaseNavigation}
-                onFocus={showNavigation}
-                onBlur={releaseNavigation}
-            />
             <header
                 ref={headerRef}
-                className={`site-header ${isNavExpanded ? 'is-expanded' : 'is-collapsed'}${isNavOnDark ? ' is-on-dark' : ''}${isNavHidden ? ' is-auto-hidden' : ''}`}
+                className={`site-header${isNavOnDark ? ' is-on-dark' : ''}${isNavHidden ? ' is-auto-hidden' : ''}`}
                 aria-hidden={isNavHidden}
-                onMouseEnter={showNavigation}
-                onMouseLeave={releaseNavigation}
-                onFocus={showNavigation}
-                onBlur={releaseNavigation}
             >
-                <nav
-                    className="site-nav site-nav--left"
-                    aria-label="왼쪽 주요 메뉴"
-                    aria-hidden={!isNavExpanded}
-                >
-                    <a href="#about" tabIndex={isNavExpanded && !isNavHidden ? 0 : -1}>
+                <nav className="site-nav site-nav--left" aria-label="왼쪽 주요 메뉴">
+                    <a href="#about" tabIndex={isNavHidden ? -1 : 0}>
                         About
                     </a>
-                    <a href="#work" tabIndex={isNavExpanded && !isNavHidden ? 0 : -1}>
+                    <a href="#work" tabIndex={isNavHidden ? -1 : 0}>
                         Works
                     </a>
                 </nav>
@@ -3655,15 +3602,11 @@ function App() {
                 >
                     <img src="/images/yeoyebin-logo.png" alt="Yeo Yebin" />
                 </a>
-                <nav
-                    className="site-nav site-nav--right"
-                    aria-label="오른쪽 주요 메뉴"
-                    aria-hidden={!isNavExpanded}
-                >
-                    <a href="#skills" tabIndex={isNavExpanded && !isNavHidden ? 0 : -1}>
+                <nav className="site-nav site-nav--right" aria-label="오른쪽 주요 메뉴">
+                    <a href="#skills" tabIndex={isNavHidden ? -1 : 0}>
                         Skills
                     </a>
-                    <a href="#contact" tabIndex={isNavExpanded && !isNavHidden ? 0 : -1}>
+                    <a href="#contact" tabIndex={isNavHidden ? -1 : 0}>
                         Contact
                     </a>
                 </nav>
@@ -3671,19 +3614,10 @@ function App() {
 
             <main>
                 <section className="hero" id="home" ref={heroRef}>
-                    <div className="hero-topline">
-                        <p className="hero-topline__edition">
-                            <span>01 / PORTFOLIO</span>
-                            <small>Y2K EDITION</small>
-                        </p>
-                        <p>Seoul, Korea</p>
-                        <p>Web design · 2026</p>
-                    </div>
-
                     <div className="hero-visual" aria-label="웹 디자이너 여예빈">
                         <img
                             className="hero-chrome-decorations"
-                            src="/images/hero/hero-chrome-decorations.png"
+                            src="/images/hero-orbit-ring.png"
                             alt=""
                             draggable="false"
                             aria-hidden="true"
@@ -3714,24 +3648,9 @@ function App() {
                             draggable="false"
                             aria-hidden="true"
                         />
-                        <div className="hero-visual-meta hero-visual-meta--left" aria-hidden="true">
-                            <span className="hero-visual-meta__label">DESIGN PROFILE</span>
-                            <strong>WEB DESIGN</strong>
-                            <span>+ PUBLISHING</span>
-                            <small>EST. 2026</small>
-                        </div>
-                        <div className="hero-visual-meta hero-visual-meta--right" aria-hidden="true">
-                            <span className="hero-visual-meta__label">
-                                <i /> STATUS
-                            </span>
-                            <strong>DESIGNING</strong>
-                            <span>TOMORROW.</span>
-                            <small>SEOUL · 2026</small>
-                        </div>
                     </div>
 
                     <div className="hero-footer">
-                        <p className="hero-role">WEB DESIGN &amp; PUBLISHING</p>
                         <div className="hero-intro">
                             <span className="hero-intro__label">A LITTLE ABOUT ME</span>
                             <p>
@@ -3828,49 +3747,37 @@ function App() {
                                 >
                                     <div className="section-index section-index--light">
                                         <span>02</span>
-                                        <span>Selected works</span>
+                                        <span>Team Project</span>
                                     </div>
                                     <div className="selected-works-layout">
-                                        <h2 ref={selectedWorksTitleRef}>
-                                            <span className="selected-works-title-primary">
-                                                SELECTED
-                                            </span>
-                                            <span className="selected-works-title-serif">
-                                                WORKS
+                                        <h2
+                                            className="team-projects-title"
+                                            ref={selectedWorksTitleRef}
+                                        >
+                                            <img
+                                                className="team-projects-title__image"
+                                                src="/images/nintendo/team-chrome-title.png"
+                                                alt="TEAM"
+                                                draggable="false"
+                                            />
+                                            <span className="team-projects-title__serif">
+                                                Projects.
                                             </span>
                                         </h2>
-                                        <div className="selected-works-intro">
-                                            <p className="selected-works-intro__lead">
-                                                아이디어를 실제 웹 경험으로 연결한 프로젝트들.
-                                            </p>
-                                            <p className="selected-works-intro__meta">
-                                                UI DESIGN · WEB PUBLISHING
-                                            </p>
-                                            <div className="selected-works-intro__line" />
-                                            <ol className="selected-works-intro__list">
-                                                <li>
-                                                    <a href="#nintendo">
-                                                        <span>01</span>
-                                                        <span>Nintendo</span>
-                                                        <span aria-hidden="true">↗</span>
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="#diptyque-project-01">
-                                                        <span>02</span>
-                                                        <span>Diptyque</span>
-                                                        <span aria-hidden="true">↗</span>
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="#swarovski-project-01">
-                                                        <span>03</span>
-                                                        <span>Swarovski</span>
-                                                        <span aria-hidden="true">↗</span>
-                                                    </a>
-                                                </li>
-                                            </ol>
+                                        <div
+                                            className="team-projects-editorial-meta"
+                                            aria-hidden="true"
+                                        >
+                                            <span>FEATURED COLLABORATION</span>
+                                            <strong>Ideas made together.</strong>
+                                            <p>From concept to interactive experience.</p>
                                         </div>
+                                        <p
+                                            className="team-projects-edge-caption"
+                                            aria-hidden="true"
+                                        >
+                                            01 / NINTENDO
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="project-hero section" id="nintendo">
@@ -4264,7 +4171,11 @@ function App() {
                                         <div className="nintendo-contribution__details">
                                             {nintendoContributionItems.slice(1).map((item) => (
                                                 <article
-                                                    className="nintendo-contribution__detail"
+                                                    className={`nintendo-contribution__detail${
+                                                        item.number === '03' || item.number === '04'
+                                                            ? ' nintendo-contribution__detail--mobile-video'
+                                                            : ''
+                                                    }`}
                                                     key={item.label}
                                                 >
                                                     <div className="nintendo-contribution__detail-media">
@@ -4412,88 +4323,6 @@ function App() {
                                     </p>
                                 </div>
 
-                                <div className="nintendo-documentation section">
-                                    <header className="nintendo-documentation__header">
-                                        <p className="eyebrow">07 / Team Documentation</p>
-                                        <div className="nintendo-documentation__heading">
-                                            <h3>
-                                                <span className="nintendo-documentation__title-primary">
-                                                    IDEAS INTO
-                                                </span>
-                                                <span className="nintendo-documentation__title-serif">
-                                                    Records.
-                                                </span>
-                                            </h3>
-                                            <div className="nintendo-documentation__copy">
-                                                <p className="nintendo-documentation__role">
-                                                    <span>MY ROLE</span> / TEAM SECRETARY ·
-                                                    DOCUMENTATION
-                                                </p>
-                                                <p className="nintendo-documentation__copy-lead">
-                                                    아이디어를 기록하고, 팀의 작업을 연결하다.
-                                                </p>
-                                                <p className="nintendo-documentation__copy-body">
-                                                    팀 프로젝트의 서기를 맡아 매일 회의 내용을
-                                                    기록하고, 팀원별 역할 분담과 아이디어, 피드백을
-                                                    체계적으로 정리해 공유했습니다.
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </header>
-
-                                    <div className="nintendo-documentation__archives">
-                                        {nintendoDocumentationArchives.map((archive) => (
-                                            <article
-                                                className={`nintendo-documentation__archive nintendo-documentation__archive--${archive.key}`}
-                                                key={archive.key}
-                                            >
-                                                <div className="nintendo-documentation__archive-heading">
-                                                    <p>{archive.label}</p>
-                                                    <h4>{archive.title}</h4>
-                                                    <span>{archive.description}</span>
-                                                </div>
-                                                <div className="nintendo-documentation__media">
-                                                    {archive.images.map((item, index) => (
-                                                        <button
-                                                            className={`nintendo-documentation__image${index === 0 ? ' nintendo-documentation__image--main' : ' nintendo-documentation__image--detail'}`}
-                                                            type="button"
-                                                            key={item.src}
-                                                            onClick={(event) =>
-                                                                openDocumentPreview(
-                                                                    {
-                                                                        ...item,
-                                                                        isDetail: index > 0,
-                                                                    },
-                                                                    event
-                                                                )
-                                                            }
-                                                            aria-label={`${item.alt} 확대 보기`}
-                                                        >
-                                                            <img
-                                                                src={item.src}
-                                                                alt={item.alt}
-                                                                loading="lazy"
-                                                                decoding="async"
-                                                            />
-                                                            {index > 0 && (
-                                                                <span className="nintendo-documentation__preview-label">
-                                                                    <span>
-                                                                        Document{' '}
-                                                                        {String(index).padStart(
-                                                                            2,
-                                                                            '0'
-                                                                        )}
-                                                                    </span>
-                                                                    <strong>Open ↗</strong>
-                                                                </span>
-                                                            )}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </article>
-                                        ))}
-                                    </div>
-                                </div>
                                 <div className="nintendo-chrome-path-preview" aria-hidden="true">
                                     <svg
                                         viewBox="0 0 9600 900"
@@ -4692,7 +4521,7 @@ function App() {
                         </span>
 
                         <div className="nintendo-planning-intro__content">
-                            <p className="nintendo-planning-intro__label">08 / PLANNING PROCESS</p>
+                            <p className="nintendo-planning-intro__label">07 / PLANNING PROCESS</p>
 
                             <div className="nintendo-planning-intro__title-wrap">
                                 <span
@@ -4736,7 +4565,7 @@ function App() {
                     >
                         <div className="nintendo-research-archive__inner">
                             <header className="nintendo-research-archive__meta">
-                                <p>09 / RESEARCH ARCHIVE</p>
+                                <p>08 / RESEARCH ARCHIVE</p>
                                 <span>ANALYSIS FILES · NINTENDO RENEWAL</span>
                             </header>
 
@@ -4886,7 +4715,7 @@ function App() {
                     >
                         <div className="nintendo-research-archive__inner">
                             <header className="nintendo-research-archive__meta">
-                                <p>10 / USER INSIGHT</p>
+                                <p>09 / USER INSIGHT</p>
                                 <span>PROCESS ARCHIVE · NINTENDO RENEWAL</span>
                             </header>
 
@@ -5100,7 +4929,7 @@ function App() {
                     >
                         <div className="nintendo-research-archive__inner">
                             <header className="nintendo-research-archive__meta">
-                                <p>11 / DESIGN STRUCTURE</p>
+                                <p>10 / DESIGN STRUCTURE</p>
                                 <span>PROCESS ARCHIVE · NINTENDO RENEWAL</span>
                             </header>
                             <div className="nintendo-research-archive__layout">
@@ -5239,7 +5068,7 @@ function App() {
                     >
                         <div className="nintendo-research-archive__inner">
                             <header className="nintendo-research-archive__meta">
-                                <p>12 / DESIGN DEVELOPMENT</p>
+                                <p>11 / DESIGN DEVELOPMENT</p>
                                 <span>PROCESS ARCHIVE · NINTENDO RENEWAL</span>
                             </header>
                             <div className="nintendo-research-archive__layout">
@@ -5393,6 +5222,88 @@ function App() {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </section>
+
+                    <section className="nintendo-documentation section">
+                        <header className="nintendo-documentation__header">
+                            <div className="nintendo-research-archive__meta nintendo-documentation__meta">
+                                <p>12 / TEAM DOCUMENTATION</p>
+                                <span>MY CONTRIBUTION · NINTENDO RENEWAL</span>
+                            </div>
+                            <div className="nintendo-documentation__heading">
+                                <h3>
+                                    <span className="nintendo-documentation__title-primary">
+                                        IDEAS INTO
+                                    </span>
+                                    <span className="nintendo-documentation__title-serif">
+                                        Records.
+                                    </span>
+                                </h3>
+                                <div className="nintendo-documentation__copy">
+                                    <p className="nintendo-documentation__role">
+                                        <span>MY ROLE</span> / TEAM SECRETARY · DOCUMENTATION
+                                    </p>
+                                    <p className="nintendo-documentation__copy-lead">
+                                        아이디어를 기록하고, 팀의 작업을 연결하다.
+                                    </p>
+                                    <p className="nintendo-documentation__copy-body">
+                                        팀 프로젝트의 서기를 맡아 매일 회의 내용을 기록하고,
+                                        팀원별 역할 분담과 아이디어, 피드백을 체계적으로 정리해
+                                        공유했습니다.
+                                    </p>
+                                </div>
+                            </div>
+                        </header>
+
+                        <div className="nintendo-documentation__archives">
+                            {nintendoDocumentationArchives.map((archive) => (
+                                <article
+                                    className={`nintendo-documentation__archive nintendo-documentation__archive--${archive.key}`}
+                                    key={archive.key}
+                                >
+                                    <div className="nintendo-documentation__archive-heading">
+                                        <p>{archive.label}</p>
+                                        <h4>{archive.title}</h4>
+                                        <span>{archive.description}</span>
+                                    </div>
+                                    <div className="nintendo-documentation__media">
+                                        {archive.images.map((item, index) => (
+                                            <button
+                                                className={`nintendo-documentation__image${index === 0 ? ' nintendo-documentation__image--main' : ' nintendo-documentation__image--detail'}`}
+                                                type="button"
+                                                key={item.src}
+                                                onClick={(event) =>
+                                                    openDocumentPreview(
+                                                        {
+                                                            ...item,
+                                                            isDetail: index > 0,
+                                                        },
+                                                        event
+                                                    )
+                                                }
+                                                aria-label={`${item.alt} 확대 보기`}
+                                            >
+                                                <img
+                                                    src={item.src}
+                                                    alt={item.alt}
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                />
+                                                {index > 0 && (
+                                                    <span className="nintendo-documentation__preview-label">
+                                                        <span>
+                                                            Document{' '}
+                                                            {String(index).padStart(2, '0')}
+                                                        </span>
+                                                        <strong>Open ↗</strong>
+                                                    </span>
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </article>
+                            ))}
                         </div>
                     </section>
 
