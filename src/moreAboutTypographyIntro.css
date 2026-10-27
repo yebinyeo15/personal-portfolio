@@ -1,0 +1,119 @@
+.more-about-typography-intro {
+    position: relative;
+    height: 290vh;
+    height: 290svh;
+    overflow: clip;
+    color: #152235;
+    background: #c9e4f2;
+}
+
+.more-about-typography-intro__stage {
+    position: sticky;
+    top: 0;
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    height: 100svh;
+    align-items: center;
+    overflow: hidden;
+}
+
+.more-about-typography-intro__stage p {
+    position: relative;
+    flex: 0 0 auto;
+    margin: 0;
+    color: inherit;
+    font-family: var(--font-display), Manrope, sans-serif;
+    font-size: clamp(150px, 15vw, 300px);
+    font-weight: 400;
+    line-height: 0.9;
+    letter-spacing: -0.055em;
+    white-space: nowrap;
+    transform: translate3d(var(--more-about-type-x, 20vw), 0, 0);
+    will-change: transform;
+}
+
+.more-about-type-word {
+    white-space: nowrap;
+}
+
+.more-about-type-word--sans {
+    color: #152235;
+    font-family: var(--font-display), Manrope, sans-serif;
+    font-style: normal;
+    font-weight: 400;
+}
+
+.more-about-type-word--serif {
+    position: relative;
+    top: -0.015em;
+    color: #152235;
+    font-family: 'Cormorant Garamond', var(--font-serif);
+    font-size: 1.03em;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.065em;
+}
+
+.more-about-type-glyph {
+    display: inline-block;
+    color: inherit;
+    font: inherit;
+    opacity: var(--more-about-absorb-opacity, 1);
+    filter: blur(var(--more-about-absorb-blur, 0));
+    transform: translate3d(
+            var(--more-about-absorb-x, 0),
+            var(--more-about-absorb-y, 0),
+            0
+        )
+        scale(
+            var(--more-about-absorb-scale-x, 1),
+            var(--more-about-absorb-scale-y, 1)
+        );
+    transform-origin: center bottom;
+    will-change: transform, opacity, filter;
+}
+
+@media (max-width: 700px) {
+    .more-about-typography-intro {
+        height: 165vh;
+        height: 165svh;
+    }
+
+    .more-about-typography-intro__stage p {
+        font-size: clamp(82px, 25vw, 118px);
+        letter-spacing: -0.06em;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .more-about-typography-intro {
+        height: auto;
+        min-height: 100vh;
+        min-height: 100svh;
+    }
+
+    .more-about-typography-intro__stage {
+        position: relative;
+        min-height: 100vh;
+        min-height: 100svh;
+    }
+
+    .more-about-typography-intro__stage p {
+        width: 100%;
+        padding-inline: clamp(20px, 5vw, 80px);
+        justify-content: center;
+        font-size: clamp(17px, 5.2vw, 84px);
+        letter-spacing: -0.045em;
+        text-align: center;
+        transform: none;
+        will-change: auto;
+    }
+
+    .more-about-type-glyph {
+        opacity: 1;
+        filter: none;
+        transform: none;
+        will-change: auto;
+    }
+}

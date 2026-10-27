@@ -161,6 +161,17 @@
     outline-offset: 4px;
 }
 
+@media (min-width: 901px) {
+    .nintendo-final-outcome-13 {
+        --nintendo-final-content-offset: clamp(70px, 5vw, 90px);
+    }
+
+    .nintendo-final-outcome-13__heading,
+    .nintendo-final-outcome-13__action {
+        transform: translateY(var(--nintendo-final-content-offset));
+    }
+}
+
 @media (min-width: 901px) and (max-height: 820px) {
     .nintendo-final-outcome-13 {
         padding-top: 48px;

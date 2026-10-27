@@ -3,8 +3,8 @@
     --skills-reveal-y: 20px;
     box-sizing: border-box;
     position: relative;
-    height: 500vh;
-    height: 500svh;
+    height: 311vh;
+    height: 311svh;
     overflow: clip;
     color: #f1f4f8;
     background: #111827;
@@ -250,8 +250,8 @@
 
 @media (max-width: 900px) {
     .skills-section {
-        height: 360vh;
-        height: 360svh;
+        height: 269vh;
+        height: 269svh;
     }
 
     .skills-section__stage {

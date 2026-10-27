@@ -140,7 +140,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .is-fan-community .other-works-card__primary-image {
@@ -156,39 +156,76 @@
     border: 1px solid rgba(213, 220, 231, 0.92);
     object-fit: cover;
     object-position: top center;
-    transition: transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.other-works-card__overlay {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    background: #000;
+    opacity: 0;
+    transition: opacity 600ms cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
 }
 
 .other-works-card__view {
     position: absolute;
-    right: 14px;
-    bottom: 14px;
-    padding: 9px 12px;
-    color: #f8f9fc;
-    background: rgba(17, 24, 39, 0.86);
-    font: 700 9px/1 var(--font-mono);
-    letter-spacing: 0.08em;
+    z-index: 3;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    justify-items: center;
+    gap: clamp(16px, 1.2vw, 20px);
+    color: #fff;
     opacity: 0;
-    transform: translateY(6px);
+    transform: translate(-50%, calc(-50% + 12px));
     transition:
-        opacity 300ms ease,
-        transform 300ms ease;
+        opacity 600ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+}
+
+.other-works-card__view i {
+    display: grid;
+    width: clamp(88px, 6vw, 92px);
+    height: clamp(88px, 6vw, 92px);
+    place-items: center;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    color: #fff;
+    background: transparent;
+    font: 400 clamp(34px, 2.5vw, 38px)/1 var(--font-body);
+    font-style: normal;
+}
+
+.other-works-card__view strong {
+    color: #fff;
+    font: 650 clamp(16px, 1.1vw, 18px)/1.2 var(--font-body);
+    letter-spacing: 0.08em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.28);
+    white-space: nowrap;
 }
 
 .other-works-card__visual-link:hover .other-works-card__primary-image,
 .other-works-card__visual-link:focus-visible .other-works-card__primary-image {
-    transform: scale(1.03);
+    transform: scale(1.04);
 }
 
 .other-works-card__visual-link:hover .other-works-card__secondary-image,
 .other-works-card__visual-link:focus-visible .other-works-card__secondary-image {
-    transform: scale(1.025);
+    transform: scale(1.04);
+}
+
+.other-works-card__visual-link:hover .other-works-card__overlay,
+.other-works-card__visual-link:focus-visible .other-works-card__overlay {
+    opacity: 0.48;
 }
 
 .other-works-card__visual-link:hover .other-works-card__view,
 .other-works-card__visual-link:focus-visible .other-works-card__view {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate(-50%, -50%);
 }
 
 .other-works-card__visual-link:focus-visible,
@@ -375,6 +412,12 @@
         pointer-events: auto;
         will-change: auto;
     }
+
+    .other-works-card__view i {
+        width: 76px;
+        height: 76px;
+        font-size: 30px;
+    }
 }
 
 @media (max-width: 600px) {
@@ -413,6 +456,20 @@
         font-size: 14px;
     }
 
+    .other-works-card__view {
+        gap: 16px;
+    }
+
+    .other-works-card__view i {
+        width: 64px;
+        height: 64px;
+        font-size: 26px;
+    }
+
+    .other-works-card__view strong {
+        font-size: 14px;
+    }
+
     .other-works-card__links a {
         min-height: 44px;
     }
@@ -425,6 +482,7 @@
 @media (prefers-reduced-motion: reduce) {
     .other-works-card__primary-image,
     .other-works-card__secondary-image,
+    .other-works-card__overlay,
     .other-works-card__view {
         transition-duration: 0.01ms;
     }

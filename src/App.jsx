@@ -15,13 +15,7 @@ import ShortFormContentsIntro from './ShortFormContentsIntro.jsx';
 import OtherWorks from './OtherWorks.jsx';
 import SkillsTypographyIntro from './SkillsTypographyIntro.jsx';
 import SkillsQAFlow from './SkillsQAFlow.jsx';
-
-const personalityReactions = {
-    curious: 'ALWAYS EXPLORING',
-    action: 'MAKE IT HAPPEN',
-    connection: 'BETTER TOGETHER',
-    positive: 'GOOD VIBES ONLY',
-};
+import ContactSection from './ContactSection.jsx';
 
 const uxArchitectureArtifacts = [
     {
@@ -83,13 +77,13 @@ const designDevelopmentArtifacts = [
             {
                 key: 'main',
                 label: 'MAIN PAGE',
-                src: '/images/nintendo/research/nintendo-wireframe-main.png',
+                src: '/images/nintendo/nintendo-wireframe-main.png',
                 alt: 'Nintendo 메인 페이지 전체 와이어프레임',
             },
             {
                 key: 'mario',
                 label: 'SUPER MARIO',
-                src: '/images/nintendo/research/nintendo-wireframe-mario.png',
+                src: '/images/nintendo/nintendo-wireframe-mario.png',
                 alt: 'Super Mario 상세 페이지 전체 와이어프레임',
             },
         ],
@@ -231,86 +225,6 @@ const chromeStoryPaths = [
         d: 'M 70 735 C 275 690 420 545 610 575 C 815 610 900 355 1100 300 C 1280 250 1405 340 1530 225',
     },
 ];
-
-const loveCategories = {
-    travel: {
-        number: '01',
-        label: 'TRAVEL',
-        headline: 'Collecting moments, not miles.',
-        description:
-            '낯선 도시를 걸으며 새로운 풍경과 분위기를 발견하는 순간을 좋아합니다. 여행에서 마주한 장면들은 저만의 취향과 시각을 넓혀 줍니다.',
-    },
-    fashion: {
-        number: '02',
-        label: 'FASHION',
-        headline: 'My style, my mood.',
-        description:
-            '패션은 저만의 분위기와 취향을 표현하는 방법입니다. 다양한 스타일을 시도하며 새로운 조합을 발견하는 과정을 즐깁니다.',
-    },
-    music: {
-        number: '03',
-        label: 'MUSIC',
-        headline: 'The soundtrack of my days.',
-        description:
-            '음악은 일상의 분위기를 바꾸고 순간을 더 오래 기억하게 만드는 요소입니다. 그날의 기분에 어울리는 음악을 찾는 것을 좋아합니다.',
-    },
-    cafe: {
-        number: '04',
-        label: 'CAFE',
-        headline: 'Little pauses, big inspiration.',
-        description:
-            '좋아하는 공간에서 여유를 즐기고 작은 디테일을 발견하는 시간을 좋아합니다. 카페마다 다른 분위기와 감각을 경험하는 것도 즐거움 중 하나입니다.',
-    },
-};
-
-const travelArchive = [
-    {
-        src: '/images/about/paris-view.jpg',
-        city: 'PARIS',
-        label: 'CITY VIEW',
-        number: 'A-001',
-        alt: '파리 전망대에서 바라본 도시 풍경',
-        position: '61% 52%',
-    },
-    {
-        src: '/images/about/paris-eiffel.jpg',
-        city: 'PARIS',
-        label: 'EIFFEL',
-        number: 'A-002',
-        alt: '에펠탑과 파리 여행 풍경',
-        position: '50% 45%',
-    },
-    {
-        src: '/images/about/paris-louvre.jpg',
-        city: 'PARIS',
-        label: 'LOUVRE',
-        number: 'A-003',
-        alt: '루브르 박물관 앞 여행 기록',
-        position: '58% 53%',
-    },
-    {
-        src: '/images/about/venice.jpg',
-        city: 'VENICE',
-        label: 'CANAL WALK',
-        number: 'A-004',
-        alt: '베네치아 운하 옆 여행 기록',
-        position: '63% 50%',
-    },
-    {
-        src: '/images/about/las-vegas.jpg',
-        city: 'LAS VEGAS',
-        label: 'NEON CITY',
-        number: 'A-005',
-        alt: '라스베이거스 여행 풍경',
-        position: '59% 55%',
-    },
-];
-
-const Placeholder = ({ label, className = '' }) => (
-    <div className={`placeholder ${className}`} role="img" aria-label={`${label} placeholder`}>
-        <span>{label}</span>
-    </div>
-);
 
 const nintendoContributionItems = [
     {
@@ -664,7 +578,9 @@ const interpolatePanelBackground = (panelColors, trackPosition) => {
 
 function App() {
     const aboutRef = useRef(null);
-    const moreAboutRef = useRef(null);
+    const aboutBrowserRef = useRef(null);
+    const aboutPopupRef = useRef(null);
+    const aboutPopupDragRef = useRef(null);
     const headerRef = useRef(null);
     const heroRef = useRef(null);
     const selectedWorksRef = useRef(null);
@@ -710,9 +626,8 @@ function App() {
     const previewTriggerRef = useRef(null);
     const previewDialogRef = useRef(null);
     const [isAboutHeadlineActive, setIsAboutHeadlineActive] = useState(false);
-    const [activeMoreAboutPanel, setActiveMoreAboutPanel] = useState(0);
-    const [visibleMoreAboutCards, setVisibleMoreAboutCards] = useState(0);
-    const [moreAboutPosition, setMoreAboutPosition] = useState('before');
+    const [aboutPopupPosition, setAboutPopupPosition] = useState({ x: 0, y: 0 });
+    const [isAboutPopupDragging, setIsAboutPopupDragging] = useState(false);
     const [isNavOnDark, setIsNavOnDark] = useState(false);
     const [isNavHidden, setIsNavHidden] = useState(false);
     const [isTopButtonVisible, setIsTopButtonVisible] = useState(false);
@@ -747,10 +662,6 @@ function App() {
     const [developmentViewMode, setDevelopmentViewMode] = useState('fit');
     const [isDevelopmentImageReady, setIsDevelopmentImageReady] = useState(false);
     const [activeUserInterview, setActiveUserInterview] = useState('user-01');
-    const [selectedPersonalityTrait, setSelectedPersonalityTrait] = useState('curious');
-    const [previewPersonalityTrait, setPreviewPersonalityTrait] = useState(null);
-    const [activeLoveCategory, setActiveLoveCategory] = useState('travel');
-    const [selectedTravelIndex, setSelectedTravelIndex] = useState(0);
 
     useEffect(() => {
         architectureZoomRef.current = architectureZoom;
@@ -1170,49 +1081,71 @@ function App() {
     }, []);
 
     useEffect(() => {
-        const section = moreAboutRef.current;
+        const resetAboutPopupPosition = () => setAboutPopupPosition({ x: 0, y: 0 });
+        window.addEventListener('resize', resetAboutPopupPosition);
+        return () => window.removeEventListener('resize', resetAboutPopupPosition);
+    }, []);
 
+    useEffect(() => {
+        const section = aboutRef.current;
         if (!section) return undefined;
 
-        let animationFrame = null;
+        const desktopQuery = window.matchMedia('(min-width: 901px)');
+        const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+        let frame = 0;
 
-        const updateMoreAboutPanel = () => {
-            const rect = section.getBoundingClientRect();
-            const scrollRange = Math.max(section.offsetHeight - window.innerHeight, 1);
-            const progress = Math.min(Math.max(-rect.top / scrollRange, 0), 1);
-            const nextPanel =
-                progress < 0.3 ? 0 : Math.min(3, Math.floor((progress - 0.3) / 0.2334) + 1);
-            const nextVisibleCards =
-                progress < 0.04 ? 0 : progress < 0.12 ? 1 : progress < 0.2 ? 2 : 3;
-            const nextPosition =
-                rect.top > 0 ? 'before' : rect.bottom <= window.innerHeight ? 'after' : 'pinned';
-
-            setActiveMoreAboutPanel((currentPanel) =>
-                currentPanel === nextPanel ? currentPanel : nextPanel
-            );
-            setVisibleMoreAboutCards((currentCount) =>
-                currentCount === nextVisibleCards ? currentCount : nextVisibleCards
-            );
-            setMoreAboutPosition((currentPosition) =>
-                currentPosition === nextPosition ? currentPosition : nextPosition
-            );
-            animationFrame = null;
+        const clamp = (value) => Math.min(1, Math.max(0, value));
+        const segment = (progress, start, end) => clamp((progress - start) / (end - start));
+        const setCompleted = () => {
+            [
+                '--about-browser-progress',
+                '--about-photo-progress',
+                '--about-name-ko-progress',
+                '--about-name-en-progress',
+                '--about-role-progress',
+                '--about-lead-progress',
+                '--about-body-progress',
+                '--about-popup-progress',
+            ].forEach((property) => section.style.setProperty(property, '1'));
         };
-
-        const handleScroll = () => {
-            if (animationFrame === null) {
-                animationFrame = window.requestAnimationFrame(updateMoreAboutPanel);
+        const renderAboutScroll = () => {
+            frame = 0;
+            if (!desktopQuery.matches || reducedMotionQuery.matches) {
+                setCompleted();
+                return;
             }
+            const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+            const scrollRange = Math.max(section.offsetHeight - window.innerHeight, 1);
+            const progress = clamp((window.scrollY - sectionTop) / scrollRange);
+            const values = {
+                '--about-browser-progress': segment(progress, 0, 0.17),
+                '--about-photo-progress': segment(progress, 0.15, 0.34),
+                '--about-name-ko-progress': segment(progress, 0.31, 0.43),
+                '--about-name-en-progress': segment(progress, 0.36, 0.48),
+                '--about-role-progress': segment(progress, 0.41, 0.53),
+                '--about-lead-progress': segment(progress, 0.47, 0.62),
+                '--about-body-progress': segment(progress, 0.55, 0.7),
+                '--about-popup-progress': segment(progress, 0.66, 0.82),
+            };
+            Object.entries(values).forEach(([property, value]) =>
+                section.style.setProperty(property, value.toFixed(4))
+            );
+        };
+        const requestAboutRender = () => {
+            if (!frame) frame = window.requestAnimationFrame(renderAboutScroll);
         };
 
-        updateMoreAboutPanel();
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        window.addEventListener('resize', handleScroll);
-
+        renderAboutScroll();
+        window.addEventListener('scroll', requestAboutRender, { passive: true });
+        window.addEventListener('resize', requestAboutRender);
+        desktopQuery.addEventListener('change', requestAboutRender);
+        reducedMotionQuery.addEventListener('change', requestAboutRender);
         return () => {
-            window.removeEventListener('scroll', handleScroll);
-            window.removeEventListener('resize', handleScroll);
-            if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+            if (frame) window.cancelAnimationFrame(frame);
+            window.removeEventListener('scroll', requestAboutRender);
+            window.removeEventListener('resize', requestAboutRender);
+            desktopQuery.removeEventListener('change', requestAboutRender);
+            reducedMotionQuery.removeEventListener('change', requestAboutRender);
         };
     }, []);
 
@@ -3445,23 +3378,6 @@ function App() {
         window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
     };
 
-    const openMoreAboutPanel = (panel) => {
-        const section = moreAboutRef.current;
-        if (!section) return;
-
-        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const scrollRange = Math.max(section.offsetHeight - window.innerHeight, 1);
-        const panelProgress = [0, 0.34, 0.57, 0.8][panel];
-
-        window.scrollTo({
-            top: section.offsetTop + scrollRange * panelProgress,
-            behavior: reduceMotion ? 'auto' : 'smooth',
-        });
-    };
-
-    const activePersonalityTrait = previewPersonalityTrait || selectedPersonalityTrait;
-    const activeLove = loveCategories[activeLoveCategory];
-    const activeTravelImage = travelArchive[selectedTravelIndex];
     const selectedResearchArchive = researchArchiveCategories.find(
         (category) => category.key === activeResearchArchive
     );
@@ -3579,6 +3495,56 @@ function App() {
         (item) => item.key === activeDevelopmentImage
     );
 
+    const startAboutPopupDrag = (event) => {
+        if (
+            event.pointerType === 'touch' ||
+            window.matchMedia('(max-width: 1180px), (pointer: coarse)').matches
+        ) {
+            return;
+        }
+        const browser = aboutBrowserRef.current;
+        const popup = aboutPopupRef.current;
+        if (!browser || !popup) return;
+        event.preventDefault();
+        event.currentTarget.setPointerCapture(event.pointerId);
+        aboutPopupDragRef.current = {
+            pointerId: event.pointerId,
+            startX: event.clientX,
+            startY: event.clientY,
+            originX: aboutPopupPosition.x,
+            originY: aboutPopupPosition.y,
+            browserRect: browser.getBoundingClientRect(),
+            popupRect: popup.getBoundingClientRect(),
+        };
+        setIsAboutPopupDragging(true);
+    };
+
+    const moveAboutPopup = (event) => {
+        const drag = aboutPopupDragRef.current;
+        if (!drag || drag.pointerId !== event.pointerId) return;
+        const deltaX = event.clientX - drag.startX;
+        const deltaY = event.clientY - drag.startY;
+        const baseLeft = drag.popupRect.left - drag.originX;
+        const baseTop = drag.popupRect.top - drag.originY;
+        const x = Math.min(
+            drag.browserRect.right - baseLeft - drag.popupRect.width,
+            Math.max(drag.browserRect.left - baseLeft, drag.originX + deltaX)
+        );
+        const y = Math.min(
+            drag.browserRect.bottom - baseTop - drag.popupRect.height,
+            Math.max(drag.browserRect.top - baseTop, drag.originY + deltaY)
+        );
+        setAboutPopupPosition({ x, y });
+    };
+
+    const endAboutPopupDrag = (event) => {
+        const drag = aboutPopupDragRef.current;
+        if (!drag || drag.pointerId !== event.pointerId) return;
+        aboutPopupDragRef.current = null;
+        setIsAboutPopupDragging(false);
+        event.currentTarget.releasePointerCapture?.(event.pointerId);
+    };
+
     return (
         <div className="site-shell">
             <header
@@ -3587,11 +3553,11 @@ function App() {
                 aria-hidden={isNavHidden}
             >
                 <nav className="site-nav site-nav--left" aria-label="왼쪽 주요 메뉴">
-                    <a href="#about" tabIndex={isNavHidden ? -1 : 0}>
-                        About
-                    </a>
                     <a href="#work" tabIndex={isNavHidden ? -1 : 0}>
                         Works
+                    </a>
+                    <a href="#skills" tabIndex={isNavHidden ? -1 : 0}>
+                        Skills
                     </a>
                 </nav>
                 <a
@@ -3603,8 +3569,8 @@ function App() {
                     <img src="/images/yeoyebin-logo.png" alt="Yeo Yebin" />
                 </a>
                 <nav className="site-nav site-nav--right" aria-label="오른쪽 주요 메뉴">
-                    <a href="#skills" tabIndex={isNavHidden ? -1 : 0}>
-                        Skills
+                    <a href="#more-about-gallery" tabIndex={isNavHidden ? -1 : 0}>
+                        About
                     </a>
                     <a href="#contact" tabIndex={isNavHidden ? -1 : 0}>
                         Contact
@@ -3664,76 +3630,133 @@ function App() {
                     </div>
                 </section>
 
-                <section className="about section" id="about" ref={aboutRef}>
-                    <div className="section-index">
-                        <span>01</span>
-                        <span>About me</span>
+                <section
+                    className={`about section${isAboutHeadlineActive ? ' is-visible' : ''}`}
+                    id="about"
+                    ref={aboutRef}
+                >
+                    <div className="about-desktop-decor" aria-hidden="true">
+                        <img src="/images/lavender-sparkle.png" alt="" />
+                        <img src="/images/chrome-star.png" alt="" />
+                        <span>▱</span>
                     </div>
-                    <div className="about-grid">
-                        <div className="about-heading">
-                            <p className="eyebrow">Hello, I&apos;m</p>
-                            <h2>
-                                여예빈
-                                <br />
-                                <span>YEO YEBIN</span>
-                            </h2>
-                            <p className="about-profile-keywords">ESTP · POSITIVE ENERGY</p>
-                            <img
-                                className="about-sparkle"
-                                src="/images/lavender-sparkle.png"
-                                alt=""
-                                aria-hidden="true"
-                            />
+                    <div className="about__sticky">
+                        <div className="section-index">
+                            <span>01</span>
+                            <span>About me</span>
                         </div>
-                        <div className="about-profile-visual">
-                            <Placeholder label="PROFILE IMAGE" className="profile-placeholder" />
-                            <img
-                                className="about-chrome-star"
-                                src="/images/chrome-star.png"
-                                alt=""
-                                aria-hidden="true"
-                            />
-                        </div>
-                        <div className="about-copy">
-                            <p
-                                className={`about-lead${isAboutHeadlineActive ? ' is-highlighted' : ''}`}
-                            >
-                                <span className="about-highlight" data-text="밝은">
-                                    밝은
-                                </span>{' '}
-                                에너지로{' '}
-                                <span className="about-highlight" data-text="소통">
-                                    소통
-                                </span>
-                                하고,
-                                <br />
-                                아이디어를{' '}
-                                <span className="about-highlight" data-text="디자인">
-                                    디자인
-                                </span>
-                                으로 연결합니다.
-                            </p>
-                            <div className="body-copy about-body-copy">
-                                <p>
-                                    긍정적인 태도와 적극적인 소통을 바탕으로 새로운 아이디어를
-                                    발견하고,
-                                    <br />
-                                    직접 실행하는 과정을 즐깁니다.
-                                </p>
-                                <p>
-                                    사람들과 의견을 나누며 다양한 관점을 배우고, 피드백을 통해
-                                    디자인을 발전시키는 것을 중요하게 생각합니다.
-                                </p>
-                                <p>
-                                    브랜드의 개성을 이해하는 기획부터 UI 디자인과 웹 퍼블리싱까지,
-                                    아이디어를 실제 웹 경험으로 연결하는 디자이너로 성장하고
-                                    있습니다.
-                                </p>
+                        <div className="about-browser" ref={aboutBrowserRef}>
+                        <div className="about-browser__toolbar">
+                            <div className="about-browser__history" aria-hidden="true">
+                                <span>←</span>
+                                <span>→</span>
                             </div>
-                            <p className="about-copy-keywords">
-                                POSITIVE ENERGY · COMMUNICATION · EXECUTION
-                            </p>
+                            <div className="about-browser__address">yeyebin.profile</div>
+                            <div className="about-browser__controls" aria-hidden="true">
+                                <i />
+                                <i />
+                                <i />
+                            </div>
                         </div>
+                        <div className="about-browser__tabs" aria-label="프로필">
+                            <span>PROFILE</span>
+                        </div>
+                        <div className="about-browser__panel">
+                            <figure className="about-browser__portrait">
+                                <div className="about-browser__portrait-frame">
+                                    <img
+                                        className="profile-placeholder"
+                                        src="/images/about/about-profile.png"
+                                        alt="여예빈 프로필"
+                                    />
+                                </div>
+                                <img
+                                    className="about-chrome-star"
+                                    src="/images/chrome-star.png"
+                                    alt=""
+                                    aria-hidden="true"
+                                />
+                            </figure>
+
+                            <article className="about-browser__copy">
+                                <header className="about-browser__identity">
+                                    <h2>여예빈</h2>
+                                    <strong>YEO YEBIN</strong>
+                                    <p>웹디자이너 · 웹퍼블리셔</p>
+                                </header>
+                                <p
+                                    className={`about-lead${isAboutHeadlineActive ? ' is-highlighted' : ''}`}
+                                >
+                                    <span className="about-highlight" data-text="밝은">
+                                        밝은
+                                    </span>{' '}
+                                    에너지로{' '}
+                                    <span className="about-highlight" data-text="소통">
+                                        소통
+                                    </span>
+                                    하고,
+                                    <br />
+                                    아이디어를{' '}
+                                    <span className="about-highlight" data-text="디자인">
+                                        디자인
+                                    </span>
+                                    으로 연결합니다.
+                                </p>
+                                <div className="body-copy about-body-copy">
+                                    <p>
+                                        긍정적인 태도와 적극적인 소통을 바탕으로 새로운 아이디어를
+                                        발견하고, 직접 실행하는 과정을 즐깁니다.
+                                    </p>
+                                    <p>
+                                        사람들과 의견을 나누며 다양한 관점을 배우고, 기획부터
+                                        디자인과 웹 퍼블리싱까지 아이디어를 실제 경험으로 구현하는
+                                        디자이너로 성장하고 있습니다.
+                                    </p>
+                                </div>
+                            </article>
+
+                            <aside
+                                className={`about-id-popup${isAboutPopupDragging ? ' is-dragging' : ''}`}
+                                ref={aboutPopupRef}
+                                style={{
+                                    '--about-popup-x': `${aboutPopupPosition.x}px`,
+                                    '--about-popup-y': `${aboutPopupPosition.y}px`,
+                                }}
+                                aria-label="Personal ID"
+                            >
+                                <div className="about-id-popup__window">
+                                    <div
+                                        className="about-id-popup__titlebar"
+                                        onPointerDown={startAboutPopupDrag}
+                                        onPointerMove={moveAboutPopup}
+                                        onPointerUp={endAboutPopupDrag}
+                                        onPointerCancel={endAboutPopupDrag}
+                                    >
+                                        <strong>PERSONAL ID</strong>
+                                        <span aria-hidden="true">—</span>
+                                    </div>
+                                    <dl>
+                                        <div className="is-mbti">
+                                            <dt>MBTI</dt>
+                                            <dd>ESTP</dd>
+                                        </div>
+                                        <div>
+                                            <dt>성격</dt>
+                                            <dd>밝고 적극적인 성격</dd>
+                                        </div>
+                                        <div>
+                                            <dt>강점</dt>
+                                            <dd>소통 능력 · 실행력</dd>
+                                        </div>
+                                        <div>
+                                            <dt>가치관</dt>
+                                            <dd>경험하며 배우는 자세</dd>
+                                        </div>
+                                    </dl>
+                                </div>
+                            </aside>
+                        </div>
+                    </div>
                     </div>
                 </section>
 
@@ -5681,723 +5704,13 @@ function App() {
 
                 <SkillsQAFlow />
 
-                <section
-                    className="more-about"
-                    id="more-about"
-                    ref={moreAboutRef}
-                    aria-labelledby="more-about-title"
-                >
-                    <div
-                        className={`more-about-sticky section is-${moreAboutPosition}${activeMoreAboutPanel === 0 ? ' is-intro' : ''}`}
-                    >
-                        <div className="more-about-heading">
-                            <p className="more-about-label">Personal Identity System</p>
-                            <h2 id="more-about-title">Beyond the Design.</h2>
-                            <p className="more-about-heading__copy">
-                                디자인 너머의 취향과 태도, 생각을 기록한 개인 아카이브입니다.
-                            </p>
-                        </div>
-                        <div
-                            className={`more-about-intro${activeMoreAboutPanel === 0 ? ' is-active' : ''}`}
-                            aria-hidden={activeMoreAboutPanel !== 0}
-                        >
-                            <div className="more-about-desktop" aria-label="Personal archive files">
-                                <span className="more-about-desktop__path" aria-hidden="true">
-                                    C:\PERSONAL\ARCHIVE\
-                                </span>
-                                <span className="more-about-desktop__system" aria-hidden="true">
-                                    SYS / 2000 · ONLINE
-                                </span>
-                                <span className="more-about-desktop__sticker" aria-hidden="true">
-                                    ✦
-                                </span>
 
-                                <button
-                                    className={`identity-file identity-file--profile${visibleMoreAboutCards >= 1 ? ' is-visible' : ''}`}
-                                    type="button"
-                                    onClick={() => openMoreAboutPanel(1)}
-                                    tabIndex={activeMoreAboutPanel === 0 ? 0 : -1}
-                                >
-                                    <span className="identity-file__bar">
-                                        <span>PROFILE.EXE</span>
-                                        <span aria-hidden="true">— □ ×</span>
-                                    </span>
-                                    <span className="identity-profile__body">
-                                        <span className="identity-avatar" aria-hidden="true">
-                                            <i />
-                                            <i />
-                                        </span>
-                                        <span className="identity-profile__info">
-                                            <small>01 / PERSONAL ID</small>
-                                            <strong>WHO I AM</strong>
-                                            <span className="identity-profile__keywords">
-                                                <i>HONEST</i>
-                                                <i>CURIOUS</i>
-                                                <i>OUTGOING</i>
-                                                <i>PLAYFUL</i>
-                                            </span>
-                                        </span>
-                                        <span
-                                            className="identity-profile__status"
-                                            aria-hidden="true"
-                                        >
-                                            <span>
-                                                <i>SOCIAL MODE</i>
-                                                <b>ON</b>
-                                            </span>
-                                            <span>
-                                                <i>CURIOSITY</i>
-                                                <b>ACTIVE</b>
-                                            </span>
-                                            <span>
-                                                <i>ENERGY</i>
-                                                <b>HIGH</b>
-                                            </span>
-                                        </span>
-                                        <span
-                                            className="identity-profile__sparkles"
-                                            aria-hidden="true"
-                                        >
-                                            ✦ ˚ ✧
-                                        </span>
-                                        <span
-                                            className="identity-profile__sticker"
-                                            aria-hidden="true"
-                                        >
-                                            BE
-                                            <br />
-                                            CURIOUS
-                                        </span>
-                                    </span>
-                                    <span className="identity-file__footer">
-                                        <span>STATUS: ONLINE</span>
-                                        <span>OPEN ↗</span>
-                                    </span>
-                                </button>
-
-                                <button
-                                    className={`identity-file identity-file--favorites${visibleMoreAboutCards >= 2 ? ' is-visible' : ''}`}
-                                    type="button"
-                                    onClick={() => openMoreAboutPanel(2)}
-                                    tabIndex={activeMoreAboutPanel === 0 ? 0 : -1}
-                                >
-                                    <span className="identity-file__bar">
-                                        <span>FAVORITES.ZIP</span>
-                                        <span aria-hidden="true">— □ ×</span>
-                                    </span>
-                                    <span className="favorites-window__grid" aria-hidden="true">
-                                        <i>
-                                            <b>✈</b>
-                                            <span>
-                                                <strong>TRAVEL</strong>
-                                                <small>NEW PLACES</small>
-                                            </span>
-                                        </i>
-                                        <i>
-                                            <b>◇</b>
-                                            <span>
-                                                <strong>FASHION</strong>
-                                                <small>PERSONAL STYLE</small>
-                                            </span>
-                                        </i>
-                                        <i>
-                                            <b>♫</b>
-                                            <span>
-                                                <strong>MUSIC</strong>
-                                                <small>DAILY RHYTHM</small>
-                                            </span>
-                                        </i>
-                                        <i>
-                                            <b>☕</b>
-                                            <span>
-                                                <strong>CAFE</strong>
-                                                <small>SLOW MOMENTS</small>
-                                            </span>
-                                        </i>
-                                    </span>
-                                    <span className="identity-file__title">
-                                        <small>02 / MY ARCHIVE</small>
-                                        <strong>WHAT I LOVE</strong>
-                                        <span>4 THINGS I LOVE ♡</span>
-                                    </span>
-                                    <span className="identity-file__footer">
-                                        <span>4 ITEMS</span>
-                                        <span>OPEN ↗</span>
-                                    </span>
-                                </button>
-
-                                <button
-                                    className={`identity-file identity-file--mindset${visibleMoreAboutCards >= 3 ? ' is-visible' : ''}`}
-                                    type="button"
-                                    onClick={() => openMoreAboutPanel(3)}
-                                    tabIndex={activeMoreAboutPanel === 0 ? 0 : -1}
-                                >
-                                    <span className="identity-file__bar">
-                                        <span>MINDSET.TXT</span>
-                                        <span aria-hidden="true">— □ ×</span>
-                                    </span>
-                                    <span className="mindset-note__copy">
-                                        <small>03 / PERSONAL MEMO</small>
-                                        <strong>HOW I THINK</strong>
-                                        <span className="mindset-note__lead">
-                                            TRY FIRST.<i aria-hidden="true">_</i>
-                                        </span>
-                                        <span className="mindset-note__steps">
-                                            <b>01 / LEARN</b>
-                                            <b>02 / GROW</b>
-                                        </span>
-                                        <span className="mindset-note__message">
-                                            Progress over perfection.
-                                        </span>
-                                    </span>
-                                    <span className="mindset-note__star" aria-hidden="true">
-                                        ✦
-                                    </span>
-                                    <span className="identity-file__footer">
-                                        <span>AUTO SAVED ·</span>
-                                        <span>OPEN ↗</span>
-                                    </span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="more-about-panels">
-                            <article
-                                className={`more-about-panel${activeMoreAboutPanel === 1 ? ' is-active' : ''}`}
-                                data-personality={activePersonalityTrait}
-                            >
-                                <div className="more-about-panel__copy">
-                                    <div className="more-about-panel__meta">
-                                        <span>01</span>
-                                        <span>Personality</span>
-                                    </div>
-                                    <h3>
-                                        Curious by nature.
-                                        <br />
-                                        Bold in action.
-                                    </h3>
-                                    <p className="personality-lead">
-                                        새로운 것을 발견하는 호기심과, 생각을 행동으로 옮기는
-                                        실행력을 가진 사람입니다.
-                                    </p>
-                                    <div className="personality-traits">
-                                        <button
-                                            className={`personality-trait personality-trait--curious${selectedPersonalityTrait === 'curious' ? ' is-selected' : ''}${activePersonalityTrait === 'curious' ? ' is-active' : ''}`}
-                                            type="button"
-                                            aria-pressed={selectedPersonalityTrait === 'curious'}
-                                            onMouseEnter={() =>
-                                                setPreviewPersonalityTrait('curious')
-                                            }
-                                            onMouseLeave={() => setPreviewPersonalityTrait(null)}
-                                            onFocus={() => setPreviewPersonalityTrait('curious')}
-                                            onBlur={() => setPreviewPersonalityTrait(null)}
-                                            onClick={() => setSelectedPersonalityTrait('curious')}
-                                        >
-                                            <span>01</span>
-                                            <strong>CURIOUS</strong>
-                                            <p>
-                                                익숙하지 않은 것에도 먼저 관심을 갖고, 새로운 시도를
-                                                즐깁니다.
-                                            </p>
-                                            <i aria-hidden="true" />
-                                        </button>
-                                        <button
-                                            className={`personality-trait personality-trait--action${selectedPersonalityTrait === 'action' ? ' is-selected' : ''}${activePersonalityTrait === 'action' ? ' is-active' : ''}`}
-                                            type="button"
-                                            aria-pressed={selectedPersonalityTrait === 'action'}
-                                            onMouseEnter={() =>
-                                                setPreviewPersonalityTrait('action')
-                                            }
-                                            onMouseLeave={() => setPreviewPersonalityTrait(null)}
-                                            onFocus={() => setPreviewPersonalityTrait('action')}
-                                            onBlur={() => setPreviewPersonalityTrait(null)}
-                                            onClick={() => setSelectedPersonalityTrait('action')}
-                                        >
-                                            <span>02</span>
-                                            <strong>ACTION</strong>
-                                            <p>
-                                                오래 고민하기보다 직접 시도하고, 경험하면서 답을
-                                                찾아갑니다.
-                                            </p>
-                                            <i aria-hidden="true" />
-                                        </button>
-                                        <button
-                                            className={`personality-trait personality-trait--connection${selectedPersonalityTrait === 'connection' ? ' is-selected' : ''}${activePersonalityTrait === 'connection' ? ' is-active' : ''}`}
-                                            type="button"
-                                            aria-pressed={selectedPersonalityTrait === 'connection'}
-                                            onMouseEnter={() =>
-                                                setPreviewPersonalityTrait('connection')
-                                            }
-                                            onMouseLeave={() => setPreviewPersonalityTrait(null)}
-                                            onFocus={() => setPreviewPersonalityTrait('connection')}
-                                            onBlur={() => setPreviewPersonalityTrait(null)}
-                                            onClick={() =>
-                                                setSelectedPersonalityTrait('connection')
-                                            }
-                                        >
-                                            <span>03</span>
-                                            <strong>CONNECTION</strong>
-                                            <p>
-                                                다양한 사람과 소통하며 새로운 관점을 발견하는 걸
-                                                좋아합니다.
-                                            </p>
-                                            <i aria-hidden="true" />
-                                        </button>
-                                        <button
-                                            className={`personality-trait personality-trait--positive${selectedPersonalityTrait === 'positive' ? ' is-selected' : ''}${activePersonalityTrait === 'positive' ? ' is-active' : ''}`}
-                                            type="button"
-                                            aria-pressed={selectedPersonalityTrait === 'positive'}
-                                            onMouseEnter={() =>
-                                                setPreviewPersonalityTrait('positive')
-                                            }
-                                            onMouseLeave={() => setPreviewPersonalityTrait(null)}
-                                            onFocus={() => setPreviewPersonalityTrait('positive')}
-                                            onBlur={() => setPreviewPersonalityTrait(null)}
-                                            onClick={() => setSelectedPersonalityTrait('positive')}
-                                        >
-                                            <span>04</span>
-                                            <strong>POSITIVE ENERGY</strong>
-                                            <p>
-                                                밝고 솔직한 태도로 분위기를 만들고, 유연하게
-                                                적응합니다.
-                                            </p>
-                                            <i aria-hidden="true" />
-                                        </button>
-                                    </div>
-                                </div>
-                                <div
-                                    className="more-about-visual more-about-visual--personality"
-                                    aria-hidden="true"
-                                >
-                                    <span className="identity-collage__coords identity-collage__coords--top">
-                                        ID.01 / 37°33'N
-                                    </span>
-                                    <span className="identity-collage__coords identity-collage__coords--bottom">
-                                        X 004 / Y 017
-                                    </span>
-                                    <span className="identity-collage__keyword identity-collage__keyword--honest">
-                                        HONEST
-                                    </span>
-                                    <span className="identity-collage__keyword identity-collage__keyword--curious">
-                                        CURIOUS
-                                    </span>
-                                    <span className="identity-collage__keyword identity-collage__keyword--outgoing">
-                                        OUTGOING
-                                    </span>
-                                    <span className="identity-collage__keyword identity-collage__keyword--playful">
-                                        PLAYFUL
-                                    </span>
-                                    <div className="identity-collage__object">
-                                        <span className="identity-collage__orbit" />
-                                        <span className="identity-collage__chrome">
-                                            <i />
-                                            <i />
-                                        </span>
-                                    </div>
-                                    <i className="identity-collage__star identity-collage__star--one">
-                                        ✦
-                                    </i>
-                                    <i className="identity-collage__star identity-collage__star--two">
-                                        ✧
-                                    </i>
-                                    <i className="identity-collage__point identity-collage__point--one" />
-                                    <i className="identity-collage__point identity-collage__point--two" />
-                                    <span
-                                        className="identity-collage__reaction"
-                                        key={activePersonalityTrait}
-                                    >
-                                        {personalityReactions[activePersonalityTrait]}
-                                    </span>
-                                </div>
-                            </article>
-
-                            <article
-                                className={`more-about-panel more-about-panel--love${activeMoreAboutPanel === 2 ? ' is-active' : ''}`}
-                            >
-                                <div className="love-editorial">
-                                    <div className="more-about-panel__meta">
-                                        <span>02</span>
-                                        <span>My Favorites</span>
-                                    </div>
-                                    <p className="love-editorial__kicker">
-                                        PERSONAL DIGITAL ARCHIVE / 04 CATEGORIES
-                                    </p>
-                                    <h3
-                                        className="love-editorial__headline"
-                                        key={activeLoveCategory}
-                                    >
-                                        {activeLove.headline}
-                                    </h3>
-                                    <p className="love-editorial__description">
-                                        {activeLove.description}
-                                    </p>
-                                    <nav className="love-category-nav" aria-label="취향 카테고리">
-                                        {Object.entries(loveCategories).map(([key, category]) => (
-                                            <button
-                                                className={
-                                                    activeLoveCategory === key ? 'is-active' : ''
-                                                }
-                                                type="button"
-                                                key={key}
-                                                aria-pressed={activeLoveCategory === key}
-                                                onClick={(event) => {
-                                                    event.stopPropagation();
-                                                    setActiveLoveCategory(key);
-                                                }}
-                                            >
-                                                <span>{category.number}</span>
-                                                <strong>{category.label}</strong>
-                                                <i aria-hidden="true" />
-                                            </button>
-                                        ))}
-                                    </nav>
-                                </div>
-                                <section
-                                    className={`love-archive love-archive--${activeLoveCategory}`}
-                                    aria-label={`${activeLove.label} archive`}
-                                    aria-live="polite"
-                                >
-                                    <div className="love-archive__system-bar" aria-hidden="true">
-                                        <span>FAVORITES.DB</span>
-                                        <span>INDEX / {activeLove.number}</span>
-                                    </div>
-
-                                    {activeLoveCategory === 'travel' && (
-                                        <div className="love-archive__stage love-travel">
-                                            <figure className="love-travel__hero">
-                                                <img
-                                                    key={activeTravelImage.src}
-                                                    src={activeTravelImage.src}
-                                                    alt={activeTravelImage.alt}
-                                                    style={{
-                                                        objectPosition: activeTravelImage.position,
-                                                    }}
-                                                />
-                                                <figcaption>
-                                                    <span>ARCHIVE {activeTravelImage.number}</span>
-                                                    <strong>{activeTravelImage.city}</strong>
-                                                    <small>
-                                                        {activeTravelImage.label} / MEMORY FILE
-                                                    </small>
-                                                </figcaption>
-                                                <i aria-hidden="true">VIEW / 35MM</i>
-                                            </figure>
-                                            <div
-                                                className="love-travel__film"
-                                                aria-label="여행 사진 선택"
-                                            >
-                                                {travelArchive.map((image, index) => (
-                                                    <button
-                                                        className={
-                                                            selectedTravelIndex === index
-                                                                ? 'is-active'
-                                                                : ''
-                                                        }
-                                                        type="button"
-                                                        key={image.src}
-                                                        aria-label={`${image.city} ${image.label} 사진 보기`}
-                                                        aria-pressed={selectedTravelIndex === index}
-                                                        onClick={(event) => {
-                                                            event.stopPropagation();
-                                                            setSelectedTravelIndex(index);
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={image.src}
-                                                            alt=""
-                                                            style={{
-                                                                objectPosition: image.position,
-                                                            }}
-                                                        />
-                                                        <span>{image.number}</span>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                            <span
-                                                className="love-archive__chrome-star"
-                                                aria-hidden="true"
-                                            >
-                                                ✦
-                                            </span>
-                                        </div>
-                                    )}
-
-                                    {activeLoveCategory === 'fashion' && (
-                                        <div className="love-archive__stage love-fashion">
-                                            <figure className="love-fashion__look love-fashion__look--main">
-                                                <img
-                                                    src="/images/about/paris-view.jpg"
-                                                    alt="파리 여행에서 기록한 개인 스타일"
-                                                />
-                                                <figcaption>LOOK 01 / CITY NEUTRAL</figcaption>
-                                            </figure>
-                                            <figure className="love-fashion__look love-fashion__look--detail">
-                                                <img
-                                                    src="/images/about/venice.jpg"
-                                                    alt="베네치아 여행에서 기록한 개인 스타일"
-                                                />
-                                                <figcaption>LOOK 02 / BLACK LAYER</figcaption>
-                                            </figure>
-                                            <div className="love-fashion__type" aria-hidden="true">
-                                                <span>PERSONAL LOOKBOOK</span>
-                                                <strong>
-                                                    STYLE
-                                                    <br />
-                                                    IS A MOOD.
-                                                </strong>
-                                                <small>NEUTRAL · LAYERED · MODERN</small>
-                                            </div>
-                                            <span
-                                                className="love-fashion__chrome"
-                                                aria-hidden="true"
-                                            />
-                                        </div>
-                                    )}
-
-                                    {activeLoveCategory === 'music' && (
-                                        <div className="love-archive__stage love-music">
-                                            <div className="love-music__player" aria-hidden="true">
-                                                <span className="love-music__backplate" />
-                                                <div className="love-music__toprail">
-                                                    <span>CYBER POP / 03</span>
-                                                    <i />
-                                                    <i />
-                                                    <i />
-                                                </div>
-                                                <div className="love-music__display">
-                                                    <span>VISUAL MODE</span>
-                                                    <strong>03:47</strong>
-                                                    <i />
-                                                    <i />
-                                                    <i />
-                                                    <i />
-                                                    <i />
-                                                    <i />
-                                                </div>
-                                                <div className="love-music__disc-bay">
-                                                    <div className="love-music__disc">
-                                                        <i />
-                                                        <span>
-                                                            DAILY
-                                                            <br />
-                                                            MOOD
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <span className="love-music__side-label">
-                                                    CHROME DISC ARCHIVE
-                                                </span>
-                                                <div className="love-music__controls">
-                                                    <i>Ⅱ</i>
-                                                    <i>‹‹</i>
-                                                    <i>››</i>
-                                                    <i>◆</i>
-                                                </div>
-                                                <span className="love-music__speaker" />
-                                                <span className="love-music__shine" />
-                                            </div>
-                                            <div className="love-music__keyring" aria-hidden="true">
-                                                <i />
-                                                <i />
-                                                <i />
-                                                <span>♡</span>
-                                            </div>
-                                            <span
-                                                className="love-music__star love-music__star--one"
-                                                aria-hidden="true"
-                                            >
-                                                ✦
-                                            </span>
-                                            <span
-                                                className="love-music__star love-music__star--two"
-                                                aria-hidden="true"
-                                            >
-                                                ✧
-                                            </span>
-                                            <span
-                                                className="love-music__sticker"
-                                                aria-hidden="true"
-                                            >
-                                                MOOD
-                                                <br />
-                                                ON
-                                            </span>
-                                            <div className="love-music__caption">
-                                                <span>VISUAL SOUND ARCHIVE / NO AUDIO</span>
-                                                <strong>
-                                                    RHYTHM
-                                                    <br />
-                                                    EVERY DAY.
-                                                </strong>
-                                                <div aria-hidden="true">
-                                                    <i />
-                                                    <i />
-                                                    <i />
-                                                    <i />
-                                                    <i />
-                                                    <i />
-                                                    <i />
-                                                    <i />
-                                                </div>
-                                                <small>AMBIENCE · RHYTHM · MEMORY</small>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {activeLoveCategory === 'cafe' && (
-                                        <div className="love-archive__stage love-cafe">
-                                            <span className="love-cafe__orbit" aria-hidden="true" />
-                                            <div className="love-cafe__cup" aria-hidden="true">
-                                                <span className="love-cafe__rim">
-                                                    <i />
-                                                </span>
-                                                <span className="love-cafe__handle" />
-                                                <span className="love-cafe__reflection" />
-                                                <span className="love-cafe__saucer" />
-                                            </div>
-                                            <div className="love-cafe__card">
-                                                <div className="love-cafe__card-meta">
-                                                    <span>CAFE ARCHIVE</span>
-                                                    <span>NO. 004</span>
-                                                </div>
-                                                <strong>
-                                                    PAUSE,
-                                                    <br />
-                                                    NOTICE,
-                                                    <br />
-                                                    INSPIRE.
-                                                </strong>
-                                                <p>
-                                                    Soft light, quiet corners
-                                                    <br />
-                                                    and a little time for myself.
-                                                </p>
-                                                <div className="love-cafe__card-tags">
-                                                    <span>SPACE</span>
-                                                    <span>DETAIL</span>
-                                                    <span>MOOD</span>
-                                                </div>
-                                                <div
-                                                    className="love-cafe__barcode"
-                                                    aria-hidden="true"
-                                                >
-                                                    <i />
-                                                    <i />
-                                                    <i />
-                                                    <i />
-                                                    <i />
-                                                    <i />
-                                                    <i />
-                                                    <i />
-                                                    <i />
-                                                </div>
-                                                <small>ARCHIVED / 2026.10 · STATUS: SLOW</small>
-                                                <span
-                                                    className="love-cafe__card-shine"
-                                                    aria-hidden="true"
-                                                />
-                                            </div>
-                                            <div className="love-cafe__sticker" aria-hidden="true">
-                                                <span>♡</span>
-                                                <strong>
-                                                    STAY
-                                                    <br />A WHILE
-                                                </strong>
-                                            </div>
-                                            <span className="love-cafe__star" aria-hidden="true">
-                                                ✦
-                                            </span>
-                                            <span className="love-cafe__heart" aria-hidden="true">
-                                                ♥
-                                            </span>
-                                        </div>
-                                    )}
-                                </section>
-                            </article>
-
-                            <article
-                                className={`more-about-panel${activeMoreAboutPanel === 3 ? ' is-active' : ''}`}
-                            >
-                                <div className="more-about-panel__copy">
-                                    <div className="more-about-panel__meta">
-                                        <span>03</span>
-                                        <span>My Mindset</span>
-                                    </div>
-                                    <h3>
-                                        Try first.
-                                        <br />
-                                        Learn along the way.
-                                    </h3>
-                                    <p>
-                                        완벽한 준비를 기다리기보다 직접 부딪히고 경험하며 배워가는
-                                        것을 좋아합니다. 모든 과정이 쉽거나 즐겁지만은 않지만, 한번
-                                        시작한 일은 책임감을 가지고 끝까지 해내려고 노력합니다.
-                                        예상과 다른 결과를 만나더라도 그 안에서 배울 점을 찾고,
-                                        조금씩 더 나은 방향으로 나아갑니다.
-                                    </p>
-                                    <ul className="more-about-keywords" aria-label="Keywords">
-                                        {['TRY', 'LEARN', 'KEEP GOING'].map((keyword) => (
-                                            <li key={keyword}>{keyword}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                                <div
-                                    className="more-about-visual more-about-visual--mindset"
-                                    aria-hidden="true"
-                                >
-                                    <span>TRY</span>
-                                    <i>→</i>
-                                    <span>LEARN</span>
-                                    <i>→</i>
-                                    <span>GROW</span>
-                                    <div className="more-about-orbit" />
-                                </div>
-                            </article>
-                        </div>
-
-                        <div className="more-about-progress" aria-hidden="true">
-                            {[1, 2, 3].map((panel) => (
-                                <i
-                                    className={activeMoreAboutPanel === panel ? 'is-active' : ''}
-                                    key={panel}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                <section className="contact section" id="contact">
-                    <div className="section-index">
-                        <span>07</span>
-                        <span>Contact</span>
-                    </div>
-                    <div className="contact-copy">
-                        <p className="eyebrow">Let&apos;s make something meaningful</p>
-                        <h2>
-                            LET&apos;S
-                            <br />
-                            <span>CONNECT.</span>
-                        </h2>
-                    </div>
-                    <div className="contact-links">
-                        <div>
-                            <span>Email</span>
-                            <p>이메일 주소를 입력해 주세요.</p>
-                        </div>
-                        <div>
-                            <span>GitHub</span>
-                            <p>GitHub 주소를 입력해 주세요.</p>
-                        </div>
-                    </div>
-                    <a className="contact-top" href="#home">
-                        Back to top ↑
-                    </a>
-                </section>
+                <ContactSection />
             </main>
             <footer className="site-footer">
                 <p>YEO YEBIN</p>
                 <p>WEB DESIGN &amp; PUBLISHING PORTFOLIO</p>
-                <p>© 2026</p>
+                <p>© 2026 YEO YEBIN</p>
             </footer>
             {documentPreview && (
                 <div

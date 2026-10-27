@@ -15,16 +15,9 @@ const otherWorksProjects = [
         secondaryImage: '/images/other-works/yeopddeok-design-system.png',
         secondaryAlt: '엽기떡볶이 웹사이트 스타일 가이드와 컴포넌트',
         imageLink: 'https://yebinyeo15.github.io/YUBDDUK-web-pracrice/',
-        links: [
-            {
-                label: 'LIVE WEBSITE',
-                href: 'https://yebinyeo15.github.io/YUBDDUK-web-pracrice/',
-            },
-            {
-                label: 'FIGMA DESIGN',
-                href: 'https://www.figma.com/design/5FkhDRrZIDS9L2Op85IJUK/YUPDDUK-WEB-PRACTICE?node-id=0-1',
-            },
-        ],
+        imageLinkLabel: 'YUPDDUK 웹사이트 방문',
+        imageLinkPrompt: 'VIEW WEBSITE',
+        links: [],
     },
     {
         id: '02',
@@ -38,12 +31,9 @@ const otherWorksProjects = [
         primaryAlt: '팬 커뮤니티 모바일 UI를 보여주는 네 개의 아이폰 목업',
         imageLink:
             'https://www.figma.com/design/qM6U31T5Q9AFtVMJmQ9GUk/FAN-COMMUNITY-%7C-Mobile-UI-Design?node-id=0-1',
-        links: [
-            {
-                label: 'FIGMA DESIGN',
-                href: 'https://www.figma.com/design/qM6U31T5Q9AFtVMJmQ9GUk/FAN-COMMUNITY-%7C-Mobile-UI-Design?node-id=0-1',
-            },
-        ],
+        imageLinkLabel: 'FAN COMMUNITY 피그마 디자인 보기',
+        imageLinkPrompt: 'VIEW DESIGN',
+        links: [],
     },
     {
         id: '03',
@@ -88,7 +78,11 @@ const ProjectVisual = ({ project }) => {
                     alt={project.secondaryAlt}
                 />
             )}
-            <span className="other-works-card__view">VIEW PROJECT ↗</span>
+            <span className="other-works-card__overlay" aria-hidden="true" />
+            <span className="other-works-card__view" aria-hidden="true">
+                <i>↗</i>
+                <strong>{project.imageLinkPrompt}</strong>
+            </span>
         </div>
     );
 
@@ -98,7 +92,7 @@ const ProjectVisual = ({ project }) => {
             href={project.imageLink}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`${project.title} 프로젝트 보기`}
+            aria-label={project.imageLinkLabel}
         >
             {visual}
         </a>

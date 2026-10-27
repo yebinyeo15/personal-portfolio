@@ -6,22 +6,16 @@ const shortFormMockups = [
         id: 'diptyque',
         src: '/images/shortform-diptyque-mockup.png',
         alt: '딥디크 향수 숏폼 광고 아이폰 목업',
-        label: '01 / DIPTYQUE',
-        category: 'FRAGRANCE FILM',
     },
     {
         id: 'running',
         src: '/images/shortform/shortform-running-mockup.png',
         alt: '러닝화 숏폼 광고 아이폰 목업',
-        label: '02 / ADIDAS',
-        category: 'RUNNING CAMPAIGN',
     },
     {
         id: 'blue-bottle',
         src: '/images/shortform/bluebottle-ipad-mockup.png',
         alt: '블루보틀 커피 캠페인 아이패드 목업',
-        label: '03 / BLUE BOTTLE',
-        category: 'COFFEE CAMPAIGN',
     },
 ];
 
@@ -117,6 +111,7 @@ const ShortFormFilmPlayer = ({ film }) => {
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
     const [hasError, setHasError] = useState(false);
+    const [isFullscreen, setIsFullscreen] = useState(false);
 
     const handleVideoPlay = () => {
         setIsPlaying(true);
@@ -164,6 +159,31 @@ const ShortFormFilmPlayer = ({ film }) => {
         setCurrentTime(nextTime);
     };
 
+    const toggleFullscreen = async () => {
+        const player = playerRef.current;
+        const video = videoRef.current;
+        if (!player || !video) return;
+
+        const fullscreenElement = document.fullscreenElement ?? document.webkitFullscreenElement;
+
+        try {
+            if (fullscreenElement) {
+                const exitFullscreen = document.exitFullscreen ?? document.webkitExitFullscreen;
+                await exitFullscreen?.call(document);
+                return;
+            }
+
+            const requestFullscreen = player.requestFullscreen ?? player.webkitRequestFullscreen;
+            if (requestFullscreen) {
+                await requestFullscreen.call(player);
+            } else if (typeof video.webkitEnterFullscreen === 'function') {
+                video.webkitEnterFullscreen();
+            }
+        } catch {
+            setIsFullscreen(false);
+        }
+    };
+
     const handleKeyDown = (event) => {
         const video = videoRef.current;
         if (!video) return;
@@ -172,12 +192,41 @@ const ShortFormFilmPlayer = ({ film }) => {
             togglePlayback();
         } else if (event.key.toLowerCase() === 'm') {
             toggleMute();
+        } else if (event.key.toLowerCase() === 'f') {
+            event.preventDefault();
+            toggleFullscreen();
         } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
             event.preventDefault();
             const direction = event.key === 'ArrowRight' ? 5 : -5;
             video.currentTime = Math.min(Math.max(video.currentTime + direction, 0), duration);
         }
     };
+
+    useEffect(() => {
+        const player = playerRef.current;
+        const video = videoRef.current;
+        if (!player || !video) return undefined;
+
+        const syncFullscreenState = () => {
+            const fullscreenElement =
+                document.fullscreenElement ?? document.webkitFullscreenElement;
+            setIsFullscreen(fullscreenElement === player);
+        };
+        const handleNativeFullscreenStart = () => setIsFullscreen(true);
+        const handleNativeFullscreenEnd = () => setIsFullscreen(false);
+
+        document.addEventListener('fullscreenchange', syncFullscreenState);
+        document.addEventListener('webkitfullscreenchange', syncFullscreenState);
+        video.addEventListener('webkitbeginfullscreen', handleNativeFullscreenStart);
+        video.addEventListener('webkitendfullscreen', handleNativeFullscreenEnd);
+
+        return () => {
+            document.removeEventListener('fullscreenchange', syncFullscreenState);
+            document.removeEventListener('webkitfullscreenchange', syncFullscreenState);
+            video.removeEventListener('webkitbeginfullscreen', handleNativeFullscreenStart);
+            video.removeEventListener('webkitendfullscreen', handleNativeFullscreenEnd);
+        };
+    }, []);
 
     useEffect(() => {
         const player = playerRef.current;
@@ -330,6 +379,22 @@ const ShortFormFilmPlayer = ({ film }) => {
                         ) : (
                             <svg viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M4 9v6h4l5 4V5L8 9zm11.5-.5a5 5 0 0 1 0 7l1.4 1.4a7 7 0 0 0 0-9.8zm2.8-2.8a9 9 0 0 1 0 12.6l1.4 1.4a11 11 0 0 0 0-15.4z" />
+                            </svg>
+                        )}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={toggleFullscreen}
+                        aria-label={isFullscreen ? '전체화면 종료' : '전체화면'}
+                        aria-pressed={isFullscreen}
+                    >
+                        {isFullscreen ? (
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M9 4H7v3H4v2h5zm6 0v5h5V7h-3V4zM4 15v2h3v3h2v-5zm16 0h-5v5h2v-3h3z" />
+                            </svg>
+                        ) : (
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M4 4v5h2V6h3V4zm11 0v2h3v3h2V4zM4 15v5h5v-2H6v-3zm14 0v3h-3v2h5v-5z" />
                             </svg>
                         )}
                     </button>
@@ -812,10 +877,6 @@ const ShortFormContentsIntro = () => {
                                             alt={mockup.alt}
                                             draggable="false"
                                         />
-                                        <figcaption>
-                                            <strong>{mockup.label}</strong>
-                                            <span>{mockup.category}</span>
-                                        </figcaption>
                                     </figure>
                                 ))}
                             </div>
