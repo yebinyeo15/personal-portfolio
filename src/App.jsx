@@ -16,6 +16,7 @@ import OtherWorks from './OtherWorks.jsx';
 import SkillsTypographyIntro from './SkillsTypographyIntro.jsx';
 import SkillsQAFlow from './SkillsQAFlow.jsx';
 import ContactSection from './ContactSection.jsx';
+import PortfolioChatbot from './PortfolioChatbot.jsx';
 
 const uxArchitectureArtifacts = [
     {
@@ -625,12 +626,14 @@ function App() {
     const developmentImageKeyRef = useRef('main');
     const previewTriggerRef = useRef(null);
     const previewDialogRef = useRef(null);
+    const topButtonRef = useRef(null);
     const [isAboutHeadlineActive, setIsAboutHeadlineActive] = useState(false);
     const [aboutPopupPosition, setAboutPopupPosition] = useState({ x: 0, y: 0 });
     const [isAboutPopupDragging, setIsAboutPopupDragging] = useState(false);
     const [isNavOnDark, setIsNavOnDark] = useState(false);
     const [isNavHidden, setIsNavHidden] = useState(false);
     const [isTopButtonVisible, setIsTopButtonVisible] = useState(false);
+    const [isTopButtonOnDark, setIsTopButtonOnDark] = useState(true);
     const [isSelectedWorksTitleVisible, setIsSelectedWorksTitleVisible] = useState(false);
     const [isPlanningIntroVisible, setIsPlanningIntroVisible] = useState(false);
     const [nintendoComparePosition, setNintendoComparePosition] = useState(50);
@@ -1202,6 +1205,43 @@ function App() {
                         const [red, green, blue] = channels;
                         const luminance = (red * 299 + green * 587 + blue * 114) / 255000;
                         setIsNavOnDark(luminance < 0.5);
+                    }
+                }
+            }
+
+            const topButton = topButtonRef.current;
+
+            if (topButton) {
+                const buttonRect = topButton.getBoundingClientRect();
+                const sampleX = Math.min(
+                    Math.max(buttonRect.left + buttonRect.width / 2, 0),
+                    window.innerWidth - 1
+                );
+                const sampleY = Math.min(
+                    Math.max(buttonRect.top + buttonRect.height / 2, 0),
+                    window.innerHeight - 1
+                );
+                const backgroundLayer = document
+                    .elementsFromPoint(sampleX, sampleY)
+                    .find((element) => {
+                        if (topButton.contains(element)) return false;
+
+                        const color = window.getComputedStyle(element).backgroundColor;
+                        const channels = color.match(/[\d.]+/g)?.map(Number);
+
+                        return channels && channels.length >= 3 && (channels[3] ?? 1) > 0;
+                    });
+
+                if (backgroundLayer) {
+                    const channels = window
+                        .getComputedStyle(backgroundLayer)
+                        .backgroundColor.match(/[\d.]+/g)
+                        ?.map(Number);
+
+                    if (channels) {
+                        const [red, green, blue] = channels;
+                        const luminance = (red * 299 + green * 587 + blue * 114) / 255000;
+                        setIsTopButtonOnDark(luminance < 0.5);
                     }
                 }
             }
@@ -6061,7 +6101,8 @@ function App() {
                     document.body
                 )}
             <button
-                className={`top-button${isTopButtonVisible ? ' is-visible' : ''}`}
+                ref={topButtonRef}
+                className={`top-button${isTopButtonVisible ? ' is-visible' : ''}${isTopButtonOnDark ? '' : ' is-on-light'}`}
                 type="button"
                 aria-label="맨 위로 이동"
                 aria-hidden={!isTopButtonVisible}
@@ -6069,8 +6110,11 @@ function App() {
                 disabled={!isTopButtonVisible}
                 onClick={scrollToTop}
             >
-                <img src="/images/top-button.png" alt="" aria-hidden="true" />
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 19V5M6.5 10.5 12 5l5.5 5.5" />
+                </svg>
             </button>
+            <PortfolioChatbot />
         </div>
     );
 }

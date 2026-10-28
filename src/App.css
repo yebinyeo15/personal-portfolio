@@ -7363,61 +7363,48 @@ h4,
 .top-button {
     position: fixed;
     z-index: 15;
-    right: 48px;
-    bottom: 44px;
-    width: 72px;
-    height: 72px;
+    right: 56px;
+    bottom: 72px;
+    width: 48px;
+    height: 48px;
     transform: translateY(10px);
     border: 0;
     padding: 0;
+    color: #dce3ec;
     background: transparent;
+    box-shadow: none;
     opacity: 0;
     pointer-events: none;
     transition:
         opacity 0.3s ease,
-        transform 0.3s ease;
+        transform 0.3s ease,
+        color 0.25s ease;
 }
 .top-button.is-visible {
     transform: translateY(0);
     opacity: 1;
     pointer-events: auto;
 }
-.top-button img {
-    position: absolute;
-    top: 50%;
-    left: 50%;
+.top-button.is-on-light {
+    color: #263447;
+}
+.top-button svg {
     display: block;
-    width: 130px;
-    height: 130px;
-    max-width: none;
-    transform: translate(-50%, -50%);
-    object-fit: contain;
-    filter: sepia(0) saturate(1) hue-rotate(0deg) brightness(1) contrast(1)
-        drop-shadow(0 0 0 rgba(255, 255, 255, 0));
-    transition: filter 0.35s ease;
+    width: 24px;
+    height: 24px;
+    margin: auto;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.5;
+    transition: transform 0.25s ease;
 }
-.top-button.is-visible:hover img {
-    filter: sepia(0.45) saturate(2.4) hue-rotate(220deg) brightness(1) contrast(1.08)
-        drop-shadow(0 0 4px rgba(151, 128, 216, 0.22));
-    animation: top-button-chrome-flash 0.75s ease-out forwards;
+.top-button.is-visible:hover {
+    color: #b9a6df;
 }
-@keyframes top-button-chrome-flash {
-    0% {
-        filter: sepia(0) saturate(1) hue-rotate(0deg) brightness(1) contrast(1)
-            drop-shadow(0 0 0 rgba(255, 255, 255, 0));
-    }
-    33.33% {
-        filter: sepia(0.05) saturate(1.1) hue-rotate(0deg) brightness(1.2) contrast(1.14)
-            drop-shadow(0 0 3px rgba(255, 255, 255, 0.28));
-    }
-    53.33% {
-        filter: sepia(0.28) saturate(1.8) hue-rotate(220deg) brightness(1.15) contrast(1.12)
-            drop-shadow(0 0 4px rgba(190, 174, 232, 0.26));
-    }
-    100% {
-        filter: sepia(0.45) saturate(2.4) hue-rotate(220deg) brightness(1) contrast(1.08)
-            drop-shadow(0 0 4px rgba(151, 128, 216, 0.22));
-    }
+.top-button.is-visible:hover svg {
+    transform: translateY(-3px);
 }
 
 @media (max-width: 900px) {
@@ -7430,14 +7417,10 @@ h4,
         transform: none !important;
     }
     .top-button {
-        right: 24px;
-        bottom: 24px;
-        width: 72px;
-        height: 72px;
-    }
-    .top-button img {
-        width: 110px;
-        height: 110px;
+        right: 56px;
+        bottom: 72px;
+        width: 48px;
+        height: 48px;
     }
     .site-nav {
         gap: clamp(14px, 2.4vw, 24px);
@@ -7711,14 +7694,10 @@ h4,
         padding: 12px 10px;
     }
     .top-button {
-        right: 18px;
-        bottom: 18px;
-        width: 72px;
-        height: 72px;
-    }
-    .top-button img {
-        width: 92px;
-        height: 92px;
+        right: 23px;
+        bottom: 42px;
+        width: 48px;
+        height: 48px;
     }
     .logo {
         padding: 6px 8px;
@@ -9504,7 +9483,7 @@ h4,
     }
     .logo,
     .logo img,
-    .top-button img,
+    .top-button svg,
     .team-projects-title__image,
     .team-projects-title__serif,
     .team-projects-editorial-meta,
@@ -9556,8 +9535,8 @@ h4,
         transform: none;
         transition: none;
     }
-    .top-button.is-visible:hover img {
-        animation: none;
+    .top-button.is-visible:hover svg {
+        transform: none;
     }
 }
 
