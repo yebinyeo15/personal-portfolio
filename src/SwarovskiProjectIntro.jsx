@@ -1,7 +1,7 @@
 import ProjectWebsiteButton from './ProjectWebsiteButton';
 import './swarovskiProjectIntro.css';
 
-const SWAROVSKI_WEBSITE_URL = '';
+const SWAROVSKI_WEBSITE_URL = 'https://swarovski-portfolio.vercel.app/';
 
 export default function SwarovskiProjectIntro() {
     return (

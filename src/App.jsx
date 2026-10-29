@@ -3458,10 +3458,17 @@ function App() {
         const categoryIndex = userInsightCategories.findIndex((item) => item.key === key);
         if (!section || categoryIndex < 0) return;
 
+        const isHorizontalStory = nintendoLateStoryRef.current?.classList.contains('is-horizontal');
+        if (isHorizontalStory) {
+            selectUserInsight(key);
+            return;
+        }
+
         const scrollRange = Math.max(section.offsetHeight - window.innerHeight, 1);
         const categoryCenter = (categoryIndex + 0.5) / userInsightCategories.length;
+        const sectionTop = window.scrollY + section.getBoundingClientRect().top;
         window.scrollTo({
-            top: section.offsetTop + scrollRange * categoryCenter,
+            top: sectionTop + scrollRange * categoryCenter,
             behavior: 'auto',
         });
         selectUserInsight(key);
@@ -3476,10 +3483,17 @@ function App() {
         const section = designStructureRef.current;
         const index = designStructureArtifacts.findIndex((item) => item.key === key);
         if (!section || index < 0) return;
+
+        const isHorizontalStory = nintendoLateStoryRef.current?.classList.contains('is-horizontal');
+        if (isHorizontalStory) {
+            selectDesignStructure(key);
+            return;
+        }
+
         const scrollRange = Math.max(section.offsetHeight - window.innerHeight, 1);
+        const sectionTop = window.scrollY + section.getBoundingClientRect().top;
         window.scrollTo({
-            top:
-                section.offsetTop + scrollRange * ((index + 0.5) / designStructureArtifacts.length),
+            top: sectionTop + scrollRange * ((index + 0.5) / designStructureArtifacts.length),
             behavior: 'auto',
         });
         selectDesignStructure(key);
@@ -3520,10 +3534,18 @@ function App() {
         const section = designDevelopmentArchiveRef.current;
         const index = designDevelopmentArtifacts.findIndex((item) => item.key === key);
         if (!section || index < 0) return;
+
+        const isHorizontalStory = nintendoLateStoryRef.current?.classList.contains('is-horizontal');
+        if (isHorizontalStory) {
+            selectDesignDevelopmentArchive(key);
+            return;
+        }
+
         const scrollRange = Math.max(section.offsetHeight - window.innerHeight, 1);
+        const sectionTop = window.scrollY + section.getBoundingClientRect().top;
         window.scrollTo({
             top:
-                section.offsetTop +
+                sectionTop +
                 scrollRange * ((index + 0.5) / designDevelopmentArtifacts.length),
             behavior: 'auto',
         });

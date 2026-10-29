@@ -30,7 +30,7 @@ const otherWorksProjects = [
         primaryImage: '/images/other-works/fan-community-mockup.png',
         primaryAlt: '팬 커뮤니티 모바일 UI를 보여주는 네 개의 아이폰 목업',
         imageLink:
-            'https://www.figma.com/design/qM6U31T5Q9AFtVMJmQ9GUk/FAN-COMMUNITY-%7C-Mobile-UI-Design?node-id=0-1',
+            'https://www.figma.com/proto/qM6U31T5Q9AFtVMJmQ9GUk/FAN-COMMUNITY-%7C-Mobile-UI-Design?node-id=13-2438&viewport=5575%2C2178%2C1.27&t=IBOfiP4e89eSkinI-1&scaling=scale-down&content-scaling=fixed&page-id=0%3A1',
         imageLinkLabel: 'FAN COMMUNITY 피그마 디자인 보기',
         imageLinkPrompt: 'VIEW DESIGN',
         links: [],
@@ -38,6 +38,17 @@ const otherWorksProjects = [
     {
         id: '03',
         slug: 'next-project',
+        title: 'NEXT PROJECT',
+        label: 'CREATIVE PRACTICE',
+        category: 'COMING SOON',
+        description:
+            '새로운 브랜드의 웹 경험을 기획하고 디자인하는 프로젝트를 준비 중입니다.',
+        links: [],
+    },
+    {
+        id: '04',
+        slug: 'next-project',
+        alignment: 'right',
         title: 'NEXT PROJECT',
         label: 'CREATIVE PRACTICE',
         category: 'COMING SOON',
@@ -57,7 +68,7 @@ const ProjectVisual = ({ project }) => {
     if (!project.primaryImage) {
         return (
             <div className="other-works-placeholder" aria-label="다음 프로젝트 준비 중">
-                <span>03</span>
+                <span>{project.id}</span>
                 <strong>NEXT<br />EXPERIENCE</strong>
                 <small>IN PROGRESS · 2026</small>
             </div>
@@ -129,8 +140,11 @@ const OtherWorks = () => {
             const rect = section.getBoundingClientRect();
             const travel = Math.max(1, rect.height - window.innerHeight);
             const progress = clamp(-rect.top / travel);
-            const starts = [0.08, 0.37, 0.66];
-            const cardInterval = 0.29;
+            const originalTravel = 6.6;
+            const extendedTravel = originalTravel + 0.29 * originalTravel;
+            const progressScale = originalTravel / extendedTravel;
+            const starts = [0.08, 0.37, 0.66, 0.95].map((start) => start * progressScale);
+            const cardInterval = 0.29 * progressScale;
 
             cards.forEach((card, index) => {
                 const start = starts[index];
@@ -187,7 +201,7 @@ const OtherWorks = () => {
                 <div className="other-works__cards">
                     {otherWorksProjects.map((project) => (
                         <article
-                            className={`other-works-card is-${project.slug}`}
+                            className={`other-works-card is-${project.slug}${project.alignment ? ` is-${project.alignment}` : ''}`}
                             key={project.id}
                         >
                             <ProjectVisual project={project} />
