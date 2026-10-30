@@ -4,7 +4,7 @@
     --other-lavender: #9780c8;
     --other-line: #d5dce7;
     position: relative;
-    height: 951.4vh;
+    height: 1142.8vh;
     color: var(--other-ink);
     background: #f1f4f8;
 }
@@ -91,19 +91,14 @@
     will-change: opacity, transform;
 }
 
-.other-works-card.is-yupdduk,
-.other-works-card.is-next-project {
+.other-works-card:not(.is-right) {
     left: clamp(34px, 3.5vw, 76px);
 }
 
-.other-works-card.is-fan-community {
-    right: clamp(34px, 3.5vw, 76px);
-    width: min(30vw, 650px);
-}
-
-.other-works-card.is-next-project.is-right {
+.other-works-card.is-right {
     right: clamp(34px, 3.5vw, 76px);
     left: auto;
+    width: min(30vw, 650px);
 }
 
 .other-works-card.is-motion-active {
@@ -128,7 +123,10 @@
     background: #e7ebf1;
 }
 
-.other-works-card__visual-inner.is-yupdduk {
+.other-works-card__visual-inner.is-mmca,
+.other-works-card__visual-inner.is-yupdduk,
+.other-works-card__visual-inner.is-modern-house,
+.other-works-card__visual-inner.is-cj-group {
     aspect-ratio: 1.76 / 1;
 }
 
@@ -403,10 +401,8 @@
     }
 
     .other-works-card,
-    .other-works-card.is-yupdduk,
-    .other-works-card.is-fan-community,
-    .other-works-card.is-next-project,
-    .other-works-card.is-next-project.is-right {
+    .other-works-card:not(.is-right),
+    .other-works-card.is-right {
         position: relative;
         top: auto;
         right: auto;

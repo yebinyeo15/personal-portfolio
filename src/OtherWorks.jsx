@@ -4,10 +4,26 @@ import './otherWorks.css';
 const otherWorksProjects = [
     {
         id: '01',
-        slug: 'yupdduk',
-        title: 'YUPDDUK',
+        slug: 'mmca',
+        title: 'MMCA REDESIGN',
         label: 'WEB DESIGN & PUBLISHING',
-        category: 'WEBSITE CUSTOMIZATION',
+        category: 'MUSEUM WEBSITE REDESIGN',
+        description:
+            '국립현대미술관의 전시와 소장품을 더욱 직관적으로 탐색할 수 있도록 정보 구조를 재정비하고, 전시 콘텐츠 중심의 시각적 경험을 강화한 웹사이트 리디자인 프로젝트입니다.',
+        primaryImage: '/images/other-works/mmca-thumbnail.png',
+        primaryAlt: '국립현대미술관 웹사이트 리디자인',
+        imageLink: 'https://mmca-redesign.vercel.app',
+        imageLinkLabel: 'MMCA REDESIGN 웹사이트 방문',
+        imageLinkPrompt: 'VIEW WEBSITE',
+        links: [],
+    },
+    {
+        id: '02',
+        slug: 'yupdduk',
+        alignment: 'right',
+        title: 'YUPDDUK REDESIGN',
+        label: 'WEB DESIGN & PUBLISHING',
+        category: 'FOOD BRAND WEBSITE',
         description:
             '기존 웹사이트 실습 구조를 바탕으로 엽기떡볶이 브랜드에 맞게 콘텐츠와 비주얼을 재구성했습니다. 스타일 가이드와 컴포넌트를 체계적으로 정리하고, 인터랙션과 웹 퍼블리싱을 함께 연습한 프로젝트입니다.',
         primaryImage: '/images/other-works/yeopddeok-main.png',
@@ -20,11 +36,11 @@ const otherWorksProjects = [
         links: [],
     },
     {
-        id: '02',
+        id: '03',
         slug: 'fan-community',
         title: 'FAN COMMUNITY',
-        label: 'MOBILE UI DESIGN',
-        category: 'MOBILE UI CUSTOMIZATION',
+        label: 'MOBILE UI/UX DESIGN',
+        category: 'FAN COMMUNITY APP',
         description:
             '팬 커뮤니티 서비스를 주제로 기존 모바일 UI 디자인을 분석하고, 컬러와 콘텐츠, 화면 구성을 재해석한 디자인 실습 프로젝트입니다. 커뮤니티, 아티스트 선택, 채팅, 음악 플레이어 등 다양한 화면을 일관된 UI로 구성했습니다.',
         primaryImage: '/images/other-works/fan-community-mockup.png',
@@ -36,24 +52,34 @@ const otherWorksProjects = [
         links: [],
     },
     {
-        id: '03',
-        slug: 'next-project',
-        title: 'NEXT PROJECT',
-        label: 'CREATIVE PRACTICE',
-        category: 'COMING SOON',
+        id: '04',
+        slug: 'modern-house',
+        alignment: 'right',
+        title: 'MODERN HOUSE REDESIGN',
+        label: 'WEB DESIGN & PUBLISHING',
+        category: 'E-COMMERCE WEBSITE REDESIGN',
         description:
-            '새로운 브랜드의 웹 경험을 기획하고 디자인하는 프로젝트를 준비 중입니다.',
+            '모던하우스의 감각적인 라이프스타일을 중심으로 상품 탐색 구조와 쇼핑 경험을 재구성하고, 브랜드의 분위기를 시각적으로 전달하는 이커머스 웹사이트 리디자인 프로젝트입니다.',
+        primaryImage: '/images/other-works/modernhouse-thumbnail.png',
+        primaryAlt: '모던하우스 이커머스 웹사이트 리디자인',
+        imageLink: 'https://modernhouse-redesign.vercel.app',
+        imageLinkLabel: 'MODERN HOUSE REDESIGN 웹사이트 방문',
+        imageLinkPrompt: 'VIEW WEBSITE',
         links: [],
     },
     {
-        id: '04',
-        slug: 'next-project',
-        alignment: 'right',
-        title: 'NEXT PROJECT',
-        label: 'CREATIVE PRACTICE',
-        category: 'COMING SOON',
+        id: '05',
+        slug: 'cj-group',
+        title: 'CJ GROUP REDESIGN',
+        label: 'WEB DESIGN & PUBLISHING',
+        category: 'CORPORATE WEBSITE REDESIGN',
         description:
-            '새로운 브랜드의 웹 경험을 기획하고 디자인하는 프로젝트를 준비 중입니다.',
+            'CJ그룹의 브랜드 가치와 다양한 사업 영역을 효과적으로 전달하기 위해 콘텐츠 구조를 재정비하고, 기업 아이덴티티를 반영한 시각적 구성으로 개선한 웹사이트 리디자인 프로젝트입니다.',
+        primaryImage: '/images/other-works/cj-thumbnail.png',
+        primaryAlt: 'CJ그룹 기업 웹사이트 리디자인',
+        imageLink: 'https://cj-group-redesign.vercel.app',
+        imageLinkLabel: 'CJ GROUP REDESIGN 웹사이트 방문',
+        imageLinkPrompt: 'VIEW WEBSITE',
         links: [],
     },
 ];
@@ -141,9 +167,9 @@ const OtherWorks = () => {
             const travel = Math.max(1, rect.height - window.innerHeight);
             const progress = clamp(-rect.top / travel);
             const originalTravel = 6.6;
-            const extendedTravel = originalTravel + 0.29 * originalTravel;
+            const extendedTravel = originalTravel + 2 * 0.29 * originalTravel;
             const progressScale = originalTravel / extendedTravel;
-            const starts = [0.08, 0.37, 0.66, 0.95].map((start) => start * progressScale);
+            const starts = [0.08, 0.37, 0.66, 0.95, 1.24].map((start) => start * progressScale);
             const cardInterval = 0.29 * progressScale;
 
             cards.forEach((card, index) => {
