@@ -208,25 +208,6 @@ const researchArchiveCategories = [
     },
 ];
 
-const chromeStoryPaths = [
-    {
-        panel: 3,
-        d: 'M 75 255 C 280 170 430 245 575 405 C 730 575 900 650 1080 520 C 1260 390 1375 220 1530 285',
-    },
-    {
-        panel: 4,
-        d: 'M 65 690 C 265 610 390 650 565 735 C 760 830 880 575 1040 455 C 1220 320 1380 365 1535 245',
-    },
-    {
-        panel: 5,
-        d: 'M 65 315 C 255 210 415 250 590 390 C 770 535 905 630 1090 540 C 1280 445 1380 255 1535 320',
-    },
-    {
-        panel: 6,
-        d: 'M 70 735 C 275 690 420 545 610 575 C 815 610 900 355 1100 300 C 1280 250 1405 340 1530 225',
-    },
-];
-
 const nintendoContributionItems = [
     {
         number: '01',
@@ -596,10 +577,8 @@ function App() {
     const personalStoryStageRef = useRef(null);
     const personalStoryTrackRef = useRef(null);
     const planningIntroRef = useRef(null);
-    const chromeStoryOverlayRef = useRef(null);
-    const chromeStoryPathRefs = useRef(new Map());
-    const chromeStoryGroupRefs = useRef(new Map());
-    const chromeStoryStarRef = useRef(null);
+    const chromePathPreviewRef = useRef(null);
+    const chromePathRevealRef = useRef(null);
     const researchArchiveRef = useRef(null);
     const userInsightRef = useRef(null);
     const designStructureRef = useRef(null);
@@ -1333,11 +1312,10 @@ function App() {
         const story = horizontalStoryRef.current;
         const stage = horizontalStoryStageRef.current;
         const track = horizontalStoryTrackRef.current;
-        const chromeOverlay = chromeStoryOverlayRef.current;
-        const chromeStar = chromeStoryStarRef.current;
-        const chromePathPreview = track?.querySelector('.nintendo-chrome-path-preview');
+        const chromePathPreview = chromePathPreviewRef.current;
+        const chromePathReveal = chromePathRevealRef.current;
 
-        if (!story || !stage || !track || !chromeOverlay || !chromeStar || !chromePathPreview) {
+        if (!story || !stage || !track || !chromePathPreview || !chromePathReveal) {
             return undefined;
         }
 
@@ -1353,8 +1331,8 @@ function App() {
         let verticalScrollDistance = 0;
         let timeline = [];
         let panelAlignmentDistances = [];
-        const chromePathLengths = new Map();
-        let activeChromePanel = null;
+        let chromeSvgTrackLeft = 0;
+        let chromeSvgTrackWidth = 1;
         let activePanelIndex = -1;
         let snapTimer = null;
         let snapAnimationFrame = null;
@@ -1517,139 +1495,62 @@ function App() {
             });
         };
 
-        const hideChromeGuide = () => {
-            if (activeChromePanel !== null) {
-                chromeStoryGroupRefs.current.get(activeChromePanel)?.classList.remove('is-active');
-            }
-            activeChromePanel = null;
-            chromeOverlay.classList.remove('is-visible');
-            chromeOverlay.removeAttribute('data-chrome-panel');
-            chromeStar.style.opacity = '0';
-            chromeOverlay.style.setProperty('--nintendo-02-trail-progress', '0');
-            chromeOverlay.style.setProperty('--nintendo-02-star-progress', '0');
-        };
-
-        const updateChromePathPreview = (position) => {
+        const updateChromePathPreview = (position, scrollDistance) => {
             const phase = position.phase;
-            const holdReveal = 0.8;
-            const arrivalReveal = 0.42;
-            const lastPanelIndex = panels.length - 1;
-            const previewSegmentCount = Math.max(1, lastPanelIndex - 1);
-            let progress = 0;
+            const firstChromePanel = 2;
+            const svgPanelWidth = 1600;
+            const svgViewBoxWidth = 8000;
+            const viewportLeftX =
+                ((position.offset - chromeSvgTrackLeft) / chromeSvgTrackWidth) * svgViewBoxWidth;
+            let targetX = 0;
 
-            if (
-                phase?.type === 'hold' &&
-                phase.panel >= 2 &&
-                phase.panel <= lastPanelIndex
-            ) {
-                const segment = phase.panel - 2;
-                const segmentStart = segment === 0 ? 0 : segment + arrivalReveal;
-                const segmentEnd =
-                    segment + (phase.panel === lastPanelIndex ? 1 : holdReveal);
-                progress =
-                    (segmentStart + (segmentEnd - segmentStart) * position.phaseProgress) /
-                    previewSegmentCount;
+            if (phase?.type === 'hold' && phase.panel >= firstChromePanel) {
+                const segment = phase.panel - firstChromePanel;
+                const previousTransition = timeline.find(
+                    (item) =>
+                        item.type === 'transition' &&
+                        item.from === phase.panel - 1 &&
+                        item.to === phase.panel
+                );
+                const arrivalProgress = previousTransition
+                    ? previousTransition.distance / (previousTransition.distance + phase.distance)
+                    : 0;
+                const holdProgress = Math.min(
+                    1,
+                    Math.max(0, (scrollDistance - phase.start) / phase.distance)
+                );
+                targetX =
+                    segment * svgPanelWidth +
+                    (arrivalProgress + (1 - arrivalProgress) * holdProgress) * svgPanelWidth;
             } else if (
                 phase?.type === 'transition' &&
-                phase.from >= 2 &&
-                phase.from < lastPanelIndex
+                phase.from >= firstChromePanel &&
+                phase.to > phase.from
             ) {
-                const segment = phase.from - 2;
-                const transitionStart = segment + holdReveal;
-                const transitionEnd = segment + 1 + arrivalReveal;
-                progress =
-                    (transitionStart + (transitionEnd - transitionStart) * position.phaseProgress) /
-                    previewSegmentCount;
+                const segment = phase.from - firstChromePanel;
+                const nextHold = timeline.find(
+                    (item) => item.type === 'hold' && item.panel === phase.to
+                );
+                const arrivalProgress = nextHold
+                    ? phase.distance / (phase.distance + nextHold.distance)
+                    : 0;
+                const transitionStartViewportX =
+                    ((phase.fromOffset - chromeSvgTrackLeft) / chromeSvgTrackWidth) *
+                    svgViewBoxWidth;
+                const transitionTravelX = Math.min(
+                    svgPanelWidth,
+                    Math.max(0, viewportLeftX - transitionStartViewportX)
+                );
+                targetX =
+                    (segment + 1) * svgPanelWidth + arrivalProgress * transitionTravelX;
             } else if (phase?.type === 'complete') {
-                progress = 1;
+                targetX = 8000;
             }
 
-            chromePathPreview.style.setProperty(
-                '--chrome-preview-progress',
-                Math.min(1, Math.max(0, progress)).toFixed(4)
+            chromePathReveal.setAttribute(
+                'width',
+                Math.min(svgViewBoxWidth, Math.max(0, targetX)).toFixed(3)
             );
-        };
-
-        const updateChromeGuide = (position) => {
-            const phase = position.phase;
-            if (!phase || phase.type !== 'hold' || phase.panel < 2) {
-                hideChromeGuide();
-                return;
-            }
-
-            const panel = phase.panel;
-
-            if (panel === 2) {
-                if (activeChromePanel !== null) {
-                    chromeStoryGroupRefs.current
-                        .get(activeChromePanel)
-                        ?.classList.remove('is-active');
-                    activeChromePanel = null;
-                }
-
-                const progress = position.holdProgress;
-                const trailProgress = Math.min(1, progress / 0.68);
-                const starProgress = Math.min(1, Math.max(0, (progress - 0.68) / 0.32));
-                chromeOverlay.style.setProperty(
-                    '--nintendo-02-trail-progress',
-                    trailProgress.toFixed(4)
-                );
-                chromeOverlay.style.setProperty(
-                    '--nintendo-02-star-progress',
-                    starProgress.toFixed(4)
-                );
-                chromeStar.style.opacity = '0';
-                chromeOverlay.dataset.chromePanel = '2';
-                chromeOverlay.classList.add('is-visible');
-                return;
-            }
-
-            const path = chromeStoryPathRefs.current.get(panel);
-            const group = chromeStoryGroupRefs.current.get(panel);
-            if (!path || !group) {
-                hideChromeGuide();
-                return;
-            }
-
-            chromeOverlay.dataset.chromePanel = String(panel);
-
-            if (activeChromePanel !== panel) {
-                if (activeChromePanel !== null) {
-                    chromeStoryGroupRefs.current
-                        .get(activeChromePanel)
-                        ?.classList.remove('is-active');
-                }
-                group.classList.add('is-active');
-                activeChromePanel = panel;
-            }
-
-            const progress = position.holdProgress;
-            group.style.setProperty('--chrome-path-progress', progress.toFixed(4));
-
-            let pathLength = chromePathLengths.get(panel);
-            if (!pathLength) {
-                pathLength = path.getTotalLength();
-                chromePathLengths.set(panel, pathLength);
-            }
-
-            const point = path.getPointAtLength(pathLength * progress);
-            const tangentDistance = Math.min(3, pathLength * 0.01);
-            const previousPoint = path.getPointAtLength(
-                Math.max(0, pathLength * progress - tangentDistance)
-            );
-            const nextPoint = path.getPointAtLength(
-                Math.min(pathLength, pathLength * progress + tangentDistance)
-            );
-            const angle =
-                (Math.atan2(nextPoint.y - previousPoint.y, nextPoint.x - previousPoint.x) * 180) /
-                Math.PI;
-
-            chromeStar.setAttribute(
-                'transform',
-                `translate(${point.x} ${point.y}) rotate(${angle}) translate(-43 -43)`
-            );
-            chromeStar.style.opacity = '1';
-            chromeOverlay.classList.add('is-visible');
         };
 
         const resetStory = () => {
@@ -1664,9 +1565,11 @@ function App() {
             story.removeAttribute('data-horizontal-phase');
             track.style.removeProperty('width');
             track.style.removeProperty('transform');
+            chromePathPreview.style.removeProperty('left');
             chromePathPreview.style.removeProperty('width');
-            chromePathPreview.style.removeProperty('--chrome-preview-progress');
-            hideChromeGuide();
+            chromePathReveal.setAttribute('width', '0');
+            chromeSvgTrackLeft = 0;
+            chromeSvgTrackWidth = 1;
             timeline = [];
             panelAlignmentDistances = [];
             panels.forEach((panel) => {
@@ -1776,12 +1679,7 @@ function App() {
             });
             story.dataset.horizontalPhase = position.phase?.type ?? 'transition';
             setActivePanel(position.activePanel);
-            updateChromePathPreview(position);
-            if (scrollDistance > verticalScrollDistance) {
-                hideChromeGuide();
-            } else {
-                updateChromeGuide(position);
-            }
+            updateChromePathPreview(position, scrollDistance);
         };
 
         const scheduleUpdate = () => {
@@ -1938,7 +1836,6 @@ function App() {
             }
 
             story.classList.add('is-horizontal');
-            chromePathLengths.clear();
             const stageHeight = stage.clientHeight;
             const stageWidth = stage.clientWidth;
             const lastPanel = panels[panels.length - 1];
@@ -1948,7 +1845,11 @@ function App() {
                 String(Math.max(1, panels.length - 2))
             );
             track.style.width = `${stageWidth * panels.length}px`;
+            chromePathPreview.style.left = `${panels[2].offsetLeft}px`;
             chromePathPreview.style.width = `${stageWidth * Math.max(1, panels.length - 2)}px`;
+            chromeSvgTrackLeft = chromePathPreview.offsetLeft;
+            chromeSvgTrackWidth = chromePathPreview.offsetWidth || 1;
+            chromePathReveal.setAttribute('width', '0');
             const hasOverflowingPanel = panels.some((panel, index) =>
                 isPanelOverflowing(panel, index, stageHeight)
             );
@@ -4408,168 +4309,58 @@ function App() {
                                     </p>
                                 </div>
 
-                                <div className="nintendo-chrome-path-preview" aria-hidden="true">
+                                <div
+                                    className="nintendo-chrome-path-preview"
+                                    ref={chromePathPreviewRef}
+                                    aria-hidden="true"
+                                >
                                     <svg
-                                        viewBox="0 0 9600 900"
+                                        viewBox="0 0 8000 900"
                                         preserveAspectRatio="none"
                                         focusable="false"
                                     >
-                                        <path
-                                            d="M 60 830 C 430 795 1340 770 1600 760 C 1860 750 2940 835 3200 850 C 3460 865 4540 855 4800 860 C 5060 865 5380 848 5700 846 C 6020 844 6140 851 6400 850 C 6660 849 6940 842 7220 844 C 7500 846 7740 846 8000 848 C 8260 850 8500 832 8720 830 C 8940 828 9280 822 9580 812"
-                                            pathLength="1"
-                                        />
-                                    </svg>
-                                </div>
-                            </div>
-                            <div
-                                className="horizontal-story__chrome-guide"
-                                ref={chromeStoryOverlayRef}
-                                aria-hidden="true"
-                            >
-                                <svg
-                                    viewBox="0 0 1600 900"
-                                    preserveAspectRatio="none"
-                                    focusable="false"
-                                >
-                                    <defs>
-                                        <mask
-                                            id="nintendo-02-trail-mask"
-                                            maskUnits="userSpaceOnUse"
-                                            x="0"
-                                            y="0"
-                                            width="1600"
-                                            height="900"
-                                        >
+                                        <defs>
+                                            <linearGradient
+                                                id="nintendo-continuous-silver"
+                                                x1="0"
+                                                y1="0"
+                                                x2="8000"
+                                                y2="0"
+                                                gradientUnits="userSpaceOnUse"
+                                            >
+                                                <stop offset="0" stopColor="#7f8996" />
+                                                <stop offset="0.16" stopColor="#f7f9fc" />
+                                                <stop offset="0.34" stopColor="#aeb7c2" />
+                                                <stop offset="0.52" stopColor="#ffffff" />
+                                                <stop offset="0.7" stopColor="#939eab" />
+                                                <stop offset="0.86" stopColor="#e8edf3" />
+                                                <stop offset="1" stopColor="#818b98" />
+                                            </linearGradient>
+                                            <clipPath
+                                                id="nintendo-continuous-line-reveal"
+                                                clipPathUnits="userSpaceOnUse"
+                                            >
+                                                <rect
+                                                    ref={chromePathRevealRef}
+                                                    x="0"
+                                                    y="0"
+                                                    width="0"
+                                                    height="900"
+                                                />
+                                            </clipPath>
+                                        </defs>
+                                        <g clipPath="url(#nintendo-continuous-line-reveal)">
                                             <path
-                                                className="nintendo-02-chrome__trail-mask"
-                                                d="M 43 794 C 210 730 310 690 451 691 C 620 695 700 700 820 620 C 950 535 1120 515 1338 558"
-                                                pathLength="1"
-                                            />
-                                        </mask>
-                                        <mask
-                                            id="nintendo-02-star-mask"
-                                            maskUnits="userSpaceOnUse"
-                                            x="1320"
-                                            y="493"
-                                            width="238"
-                                            height="180"
-                                        >
-                                            <rect
-                                                className="nintendo-02-chrome__star-mask"
-                                                x="1320"
-                                                y="493"
-                                                height="180"
-                                            />
-                                        </mask>
-                                        <linearGradient
-                                            id="chrome-story-silver"
-                                            x1="0"
-                                            y1="0"
-                                            x2="1"
-                                            y2="1"
-                                        >
-                                            <stop offset="0" stopColor="#6f7b8c" />
-                                            <stop offset="0.22" stopColor="#f8fbff" />
-                                            <stop offset="0.43" stopColor="#9fb7d1" />
-                                            <stop offset="0.65" stopColor="#eee9ff" />
-                                            <stop offset="0.84" stopColor="#7d8999" />
-                                            <stop offset="1" stopColor="#f9fbff" />
-                                        </linearGradient>
-                                        <filter
-                                            id="chrome-story-soft-shadow"
-                                            x="-20%"
-                                            y="-20%"
-                                            width="140%"
-                                            height="140%"
-                                        >
-                                            <feDropShadow
-                                                dx="0"
-                                                dy="4"
-                                                stdDeviation="5"
-                                                floodColor="#02050b"
-                                                floodOpacity="0.42"
-                                            />
-                                        </filter>
-                                    </defs>
-
-                                    <g className="nintendo-02-chrome">
-                                        <image
-                                            className="nintendo-02-chrome__trail"
-                                            href="/images/chrome-trail-only.png"
-                                            x="28"
-                                            y="425"
-                                            width="1312"
-                                            height="438"
-                                            preserveAspectRatio="xMidYMid meet"
-                                            mask="url(#nintendo-02-trail-mask)"
-                                        />
-                                        <image
-                                            className="nintendo-02-chrome__star"
-                                            href="/images/chrome-shooting-star.png"
-                                            x="1320"
-                                            y="493"
-                                            width="238"
-                                            height="180"
-                                            preserveAspectRatio="xMidYMid meet"
-                                            mask="url(#nintendo-02-star-mask)"
-                                        />
-                                    </g>
-
-                                    {chromeStoryPaths.map((item) => (
-                                        <g
-                                            className="chrome-story-path"
-                                            data-panel={item.panel}
-                                            key={item.panel}
-                                            ref={(node) => {
-                                                if (node) {
-                                                    chromeStoryGroupRefs.current.set(
-                                                        item.panel,
-                                                        node
-                                                    );
-                                                } else {
-                                                    chromeStoryGroupRefs.current.delete(item.panel);
-                                                }
-                                            }}
-                                        >
-                                            <path
-                                                className="chrome-story-path__shadow"
-                                                d={item.d}
-                                                pathLength="1"
+                                                className="nintendo-chrome-path-preview__main"
+                                                d="M 40 820 C 420 815 1220 760 1600 760 C 1980 760 2820 830 3200 830 C 3580 830 4420 780 4800 780 C 5180 780 6020 845 6400 845 C 6780 845 7540 800 7960 775"
                                             />
                                             <path
-                                                className="chrome-story-path__silver"
-                                                d={item.d}
-                                                pathLength="1"
-                                                ref={(node) => {
-                                                    if (node) {
-                                                        chromeStoryPathRefs.current.set(
-                                                            item.panel,
-                                                            node
-                                                        );
-                                                    } else {
-                                                        chromeStoryPathRefs.current.delete(
-                                                            item.panel
-                                                        );
-                                                    }
-                                                }}
-                                            />
-                                            <path
-                                                className="chrome-story-path__highlight"
-                                                d={item.d}
-                                                pathLength="1"
+                                                className="nintendo-chrome-path-preview__highlight"
+                                                d="M 40 820 C 420 815 1220 760 1600 760 C 1980 760 2820 830 3200 830 C 3580 830 4420 780 4800 780 C 5180 780 6020 845 6400 845 C 6780 845 7540 800 7960 775"
                                             />
                                         </g>
-                                    ))}
-
-                                    <image
-                                        className="chrome-story-star"
-                                        ref={chromeStoryStarRef}
-                                        href="/images/chrome-star.png"
-                                        width="86"
-                                        height="86"
-                                        preserveAspectRatio="xMidYMid meet"
-                                    />
-                                </svg>
+                                    </svg>
+                                </div>
                             </div>
                         </div>
                     </div>
