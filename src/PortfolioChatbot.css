@@ -423,6 +423,18 @@
     }
 }
 
+@media (max-width: 767px) {
+    .portfolio-chatbot {
+        right: 16px;
+        bottom: max(24px, env(safe-area-inset-bottom));
+        left: auto;
+    }
+
+    .portfolio-chatbot__nudge {
+        display: none;
+    }
+}
+
 @media (max-width: 380px) {
     .portfolio-chatbot__questions {
         padding: 12px;

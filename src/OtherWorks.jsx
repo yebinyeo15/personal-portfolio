@@ -144,7 +144,7 @@ const OtherWorks = () => {
         if (!section) return undefined;
 
         const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-        const desktop = window.matchMedia('(min-width: 901px)');
+        const desktop = window.matchMedia('(min-width: 1024px)');
         const cards = Array.from(section.querySelectorAll('.other-works-card'));
         let frame = 0;
 

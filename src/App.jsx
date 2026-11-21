@@ -581,6 +581,7 @@ function App() {
     const chromePathRevealRef = useRef(null);
     const researchArchiveRef = useRef(null);
     const userInsightRef = useRef(null);
+    const userInsightMobileGalleryRef = useRef(null);
     const designStructureRef = useRef(null);
     const designDevelopmentArchiveRef = useRef(null);
     const activeResearchArchiveRef = useRef('nintendo');
@@ -606,15 +607,18 @@ function App() {
     const previewTriggerRef = useRef(null);
     const previewDialogRef = useRef(null);
     const topButtonRef = useRef(null);
+    const collaborationGalleryRef = useRef(null);
     const [isAboutHeadlineActive, setIsAboutHeadlineActive] = useState(false);
     const [aboutPopupPosition, setAboutPopupPosition] = useState({ x: 0, y: 0 });
     const [isAboutPopupDragging, setIsAboutPopupDragging] = useState(false);
     const [isNavOnDark, setIsNavOnDark] = useState(false);
     const [isNavHidden, setIsNavHidden] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isTopButtonVisible, setIsTopButtonVisible] = useState(false);
     const [isTopButtonOnDark, setIsTopButtonOnDark] = useState(true);
     const [isSelectedWorksTitleVisible, setIsSelectedWorksTitleVisible] = useState(false);
     const [isPlanningIntroVisible, setIsPlanningIntroVisible] = useState(false);
+    const [activeCollaborationSlide, setActiveCollaborationSlide] = useState(0);
     const [nintendoComparePosition, setNintendoComparePosition] = useState(50);
     const [activeResearchArchive, setActiveResearchArchive] = useState('nintendo');
     const [activeResearchArchiveImage, setActiveResearchArchiveImage] =
@@ -1132,6 +1136,24 @@ function App() {
     }, []);
 
     useEffect(() => {
+        if (!isMobileMenuOpen) return undefined;
+
+        const handleMobileMenuKeyDown = (event) => {
+            if (event.key === 'Escape') setIsMobileMenuOpen(false);
+        };
+        const handleMobileMenuResize = () => {
+            if (window.innerWidth >= 768) setIsMobileMenuOpen(false);
+        };
+
+        window.addEventListener('keydown', handleMobileMenuKeyDown);
+        window.addEventListener('resize', handleMobileMenuResize);
+        return () => {
+            window.removeEventListener('keydown', handleMobileMenuKeyDown);
+            window.removeEventListener('resize', handleMobileMenuResize);
+        };
+    }, [isMobileMenuOpen]);
+
+    useEffect(() => {
         let lastScrollY = window.scrollY;
         let scrollDistance = 0;
         let animationFrame = null;
@@ -1319,7 +1341,7 @@ function App() {
             return undefined;
         }
 
-        const desktopQuery = window.matchMedia('(min-width: 901px)');
+        const desktopQuery = window.matchMedia('(min-width: 1024px)');
         const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
         const panels = Array.from(track.children).filter((panel) =>
             panel.classList.contains('section')
@@ -2119,7 +2141,7 @@ function App() {
 
         if (!story || !stage || !track) return undefined;
 
-        const desktopQuery = window.matchMedia('(min-width: 901px)');
+        const desktopQuery = window.matchMedia('(min-width: 1024px)');
         const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
         const panels = Array.from(track.children).filter(
             (panel) => panel.classList.contains('section') && !panel.hidden
@@ -2574,7 +2596,7 @@ function App() {
 
         if (!story || !stage || !track) return undefined;
 
-        const desktopQuery = window.matchMedia('(min-width: 901px)');
+        const desktopQuery = window.matchMedia('(min-width: 1024px)');
         const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
         const panels = Array.from(track.children).filter((panel) => !panel.hidden);
         const panelBackgrounds = panels.map((panel) =>
@@ -3199,12 +3221,16 @@ function App() {
 
     useEffect(() => {
         const section = userInsightRef.current;
-        if (!section) return undefined;
+        if (!section || window.matchMedia('(max-width: 767px)').matches) return undefined;
 
         let animationFrame = null;
         let scrollCategory = null;
 
         const updateUserInsight = () => {
+            if (window.matchMedia('(max-width: 767px)').matches) {
+                animationFrame = null;
+                return;
+            }
             const rect = section.getBoundingClientRect();
             const scrollRange = Math.max(rect.height - window.innerHeight, 1);
             const progress = Math.min(1, Math.max(0, -rect.top / scrollRange));
@@ -3240,11 +3266,15 @@ function App() {
 
     useEffect(() => {
         const section = designStructureRef.current;
-        if (!section) return undefined;
+        if (!section || window.matchMedia('(max-width: 767px)').matches) return undefined;
         let animationFrame = null;
         let scrollCategory = null;
 
         const updateDesignStructure = () => {
+            if (window.matchMedia('(max-width: 767px)').matches) {
+                animationFrame = null;
+                return;
+            }
             const rect = section.getBoundingClientRect();
             const scrollRange = Math.max(rect.height - window.innerHeight, 1);
             const progress = Math.min(1, Math.max(0, -rect.top / scrollRange));
@@ -3278,11 +3308,15 @@ function App() {
 
     useEffect(() => {
         const section = designDevelopmentArchiveRef.current;
-        if (!section) return undefined;
+        if (!section || window.matchMedia('(max-width: 767px)').matches) return undefined;
         let animationFrame = null;
         let scrollCategory = null;
 
         const updateDesignDevelopmentArchive = () => {
+            if (window.matchMedia('(max-width: 767px)').matches) {
+                animationFrame = null;
+                return;
+            }
             const rect = section.getBoundingClientRect();
             const scrollRange = Math.max(rect.height - window.innerHeight, 1);
             const progress = Math.min(1, Math.max(0, -rect.top / scrollRange));
@@ -3313,6 +3347,16 @@ function App() {
             if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
         };
     }, [selectDesignDevelopmentArchive]);
+
+    useEffect(() => {
+        if (!window.matchMedia('(max-width: 767px)').matches) return undefined;
+
+        const animationFrame = window.requestAnimationFrame(() => {
+            userInsightMobileGalleryRef.current?.scrollTo({ left: 0, behavior: 'auto' });
+        });
+
+        return () => window.cancelAnimationFrame(animationFrame);
+    }, [activeUserInsight]);
 
     const scrollToTop = () => {
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -3354,10 +3398,39 @@ function App() {
         activeUserInsightImageRef.current = key;
         setActiveUserInsightImage(key);
     };
+    const handleUserInsightMobileGalleryScroll = (event) => {
+        const gallery = event.currentTarget;
+        const slides = Array.from(
+            gallery.querySelectorAll('.nintendo-user-insight__mobile-slide')
+        );
+        if (!slides.length) return;
+
+        const galleryCenter = gallery.scrollLeft + gallery.clientWidth / 2;
+        const nearestSlide = slides.reduce((nearest, slide) => {
+            const nearestDistance = Math.abs(
+                nearest.offsetLeft + nearest.offsetWidth / 2 - galleryCenter
+            );
+            const slideDistance = Math.abs(
+                slide.offsetLeft + slide.offsetWidth / 2 - galleryCenter
+            );
+            return slideDistance < nearestDistance ? slide : nearest;
+        });
+        const nextKey = nearestSlide.dataset.imageKey;
+
+        if (nextKey && activeUserInsightImageRef.current !== nextKey) {
+            activeUserInsightImageRef.current = nextKey;
+            setActiveUserInsightImage(nextKey);
+        }
+    };
     const selectUserInsightFromControl = (key) => {
         const section = userInsightRef.current;
         const categoryIndex = userInsightCategories.findIndex((item) => item.key === key);
         if (!section || categoryIndex < 0) return;
+
+        if (window.matchMedia('(max-width: 767px)').matches) {
+            selectUserInsight(key);
+            return;
+        }
 
         const isHorizontalStory = nintendoLateStoryRef.current?.classList.contains('is-horizontal');
         if (isHorizontalStory) {
@@ -3384,6 +3457,11 @@ function App() {
         const section = designStructureRef.current;
         const index = designStructureArtifacts.findIndex((item) => item.key === key);
         if (!section || index < 0) return;
+
+        if (window.matchMedia('(max-width: 767px)').matches) {
+            selectDesignStructure(key);
+            return;
+        }
 
         const isHorizontalStory = nintendoLateStoryRef.current?.classList.contains('is-horizontal');
         if (isHorizontalStory) {
@@ -3435,6 +3513,11 @@ function App() {
         const section = designDevelopmentArchiveRef.current;
         const index = designDevelopmentArtifacts.findIndex((item) => item.key === key);
         if (!section || index < 0) return;
+
+        if (window.matchMedia('(max-width: 767px)').matches) {
+            selectDesignDevelopmentArchive(key);
+            return;
+        }
 
         const isHorizontalStory = nintendoLateStoryRef.current?.classList.contains('is-horizontal');
         if (isHorizontalStory) {
@@ -3508,12 +3591,36 @@ function App() {
         event.currentTarget.releasePointerCapture?.(event.pointerId);
     };
 
+    const handleCollaborationGalleryScroll = useCallback((event) => {
+        const gallery = event.currentTarget;
+        const slides = Array.from(
+            gallery.querySelectorAll('.nintendo-collaboration__photo')
+        );
+        if (!slides.length) return;
+
+        const galleryCenter = gallery.scrollLeft + gallery.clientWidth / 2;
+        const nextIndex = slides.reduce((nearestIndex, slide, index) => {
+            const nearest = slides[nearestIndex];
+            const nearestDistance = Math.abs(
+                nearest.offsetLeft + nearest.offsetWidth / 2 - galleryCenter
+            );
+            const slideDistance = Math.abs(
+                slide.offsetLeft + slide.offsetWidth / 2 - galleryCenter
+            );
+            return slideDistance < nearestDistance ? index : nearestIndex;
+        }, 0);
+
+        setActiveCollaborationSlide((current) =>
+            current === nextIndex ? current : nextIndex
+        );
+    }, []);
+
     return (
         <div className="site-shell">
             <header
                 ref={headerRef}
-                className={`site-header${isNavOnDark ? ' is-on-dark' : ''}${isNavHidden ? ' is-auto-hidden' : ''}`}
-                aria-hidden={isNavHidden}
+                className={`site-header${isNavOnDark ? ' is-on-dark' : ''}${isNavHidden ? ' is-auto-hidden' : ''}${isMobileMenuOpen ? ' is-mobile-menu-open' : ''}`}
+                aria-hidden={isNavHidden && !isMobileMenuOpen}
             >
                 <nav className="site-nav site-nav--left" aria-label="왼쪽 주요 메뉴">
                     <a href="#work" tabIndex={isNavHidden ? -1 : 0}>
@@ -3538,6 +3645,39 @@ function App() {
                     <a href="#contact" tabIndex={isNavHidden ? -1 : 0}>
                         Contact
                     </a>
+                </nav>
+                <button
+                    className="mobile-menu-toggle"
+                    type="button"
+                    aria-label={isMobileMenuOpen ? '모바일 메뉴 닫기' : '모바일 메뉴 열기'}
+                    aria-expanded={isMobileMenuOpen}
+                    aria-controls="mobile-navigation"
+                    onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
+                >
+                    <span />
+                    <span />
+                </button>
+                <nav
+                    className="mobile-navigation"
+                    id="mobile-navigation"
+                    aria-label="모바일 주요 메뉴"
+                    aria-hidden={!isMobileMenuOpen}
+                >
+                    {[
+                        ['#work', 'Works'],
+                        ['#skills', 'Skills'],
+                        ['#more-about-gallery', 'About'],
+                        ['#contact', 'Contact'],
+                    ].map(([href, label]) => (
+                        <a
+                            href={href}
+                            key={href}
+                            tabIndex={isMobileMenuOpen ? 0 : -1}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            {label}
+                        </a>
+                    ))}
                 </nav>
             </header>
 
@@ -3719,6 +3859,71 @@ function App() {
                                 </div>
                             </aside>
                         </div>
+                    </div>
+                    <div className="about-mobile-content">
+                        <aside className="about-mobile-id" aria-label="Personal ID">
+                            <div className="about-id-popup__window">
+                                <div className="about-id-popup__titlebar">
+                                    <strong>PERSONAL ID</strong>
+                                    <span aria-hidden="true">—</span>
+                                </div>
+                                <dl>
+                                    <div className="is-mbti">
+                                        <dt>MBTI</dt>
+                                        <dd>ESTP</dd>
+                                    </div>
+                                    <div>
+                                        <dt>성격</dt>
+                                        <dd>밝고 적극적인 성격</dd>
+                                    </div>
+                                    <div>
+                                        <dt>강점</dt>
+                                        <dd>소통 능력 · 실행력</dd>
+                                    </div>
+                                    <div>
+                                        <dt>가치관</dt>
+                                        <dd>경험하며 배우는 자세</dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </aside>
+
+                        <section
+                            className="about-mobile-introduction"
+                            aria-labelledby="about-mobile-introduction-title"
+                        >
+                            <p className="eyebrow">INTRODUCTION</p>
+                            <p
+                                className={`about-lead${isAboutHeadlineActive ? ' is-highlighted' : ''}`}
+                                id="about-mobile-introduction-title"
+                            >
+                                <span className="about-highlight" data-text="밝은">
+                                    밝은
+                                </span>{' '}
+                                에너지로{' '}
+                                <span className="about-highlight" data-text="소통">
+                                    소통
+                                </span>
+                                하고,
+                                <br />
+                                아이디어를{' '}
+                                <span className="about-highlight" data-text="디자인">
+                                    디자인
+                                </span>
+                                으로 연결합니다.
+                            </p>
+                            <div className="body-copy about-body-copy">
+                                <p>
+                                    긍정적인 태도와 적극적인 소통을 바탕으로 새로운 아이디어를
+                                    발견하고, 직접 실행하는 과정을 즐깁니다.
+                                </p>
+                                <p>
+                                    사람들과 의견을 나누며 다양한 관점을 배우고, 기획부터 디자인과
+                                    웹 퍼블리싱까지 아이디어를 실제 경험으로 구현하는 디자이너로
+                                    성장하고 있습니다.
+                                </p>
+                            </div>
+                        </section>
                     </div>
                     </div>
                 </section>
@@ -4251,7 +4456,11 @@ function App() {
                                         </div>
                                     </header>
 
-                                    <div className="nintendo-collaboration__gallery">
+                                    <div
+                                        className="nintendo-collaboration__gallery"
+                                        ref={collaborationGalleryRef}
+                                        onScroll={handleCollaborationGalleryScroll}
+                                    >
                                         <figure className="nintendo-collaboration__photo nintendo-collaboration__photo--main">
                                             <div className="nintendo-collaboration__photo-frame">
                                                 <div className="nintendo-collaboration__photo-image">
@@ -4302,6 +4511,15 @@ function App() {
                                                 </figcaption>
                                             </div>
                                         </figure>
+                                    </div>
+
+                                    <div className="nintendo-collaboration__gallery-guide">
+                                        <span aria-live="polite">
+                                            {String(activeCollaborationSlide + 1).padStart(2, '0')} / 03
+                                        </span>
+                                        <p aria-hidden="true">
+                                            <i>←</i> SWIPE TO EXPLORE <i>→</i>
+                                        </p>
                                     </div>
 
                                     <p className="nintendo-collaboration__keywords">
@@ -4743,6 +4961,66 @@ function App() {
                                                 </>
                                             )}
                                     </div>
+
+                                    <div
+                                        className="nintendo-user-insight__mobile-gallery"
+                                        ref={userInsightMobileGalleryRef}
+                                        onScroll={handleUserInsightMobileGalleryScroll}
+                                        aria-label={`${selectedUserInsight.label} 모바일 자료 갤러리`}
+                                    >
+                                        {selectedUserInsight.images.map((image) => (
+                                            <article
+                                                className="nintendo-user-insight__mobile-slide"
+                                                data-image-key={image.key}
+                                                key={image.key}
+                                            >
+                                                {activeUserInsight === 'interview' ? (
+                                                    <InterviewEditorialCard interview={image} />
+                                                ) : (
+                                                    <button
+                                                        className="nintendo-user-insight__mobile-image"
+                                                        type="button"
+                                                        onClick={(event) =>
+                                                            openDocumentPreview(
+                                                                {
+                                                                    src: image.src,
+                                                                    alt: image.alt,
+                                                                    isResearch: true,
+                                                                },
+                                                                event
+                                                            )
+                                                        }
+                                                        aria-label={`${image.label} 자료 크게 보기`}
+                                                    >
+                                                        <img src={image.src} alt={image.alt} />
+                                                        <span>
+                                                            VIEW FULL IMAGE{' '}
+                                                            <i aria-hidden="true">↗</i>
+                                                        </span>
+                                                    </button>
+                                                )}
+                                            </article>
+                                        ))}
+                                    </div>
+                                    <div
+                                        className="nintendo-user-insight__mobile-guide"
+                                        aria-live="polite"
+                                    >
+                                        <span>
+                                            {String(
+                                                selectedUserInsight.images.findIndex(
+                                                    (image) =>
+                                                        image.key === activeUserInsightImage
+                                                ) + 1
+                                            ).padStart(2, '0')}{' '}
+                                            /{' '}
+                                            {String(selectedUserInsight.images.length).padStart(
+                                                2,
+                                                '0'
+                                            )}
+                                        </span>
+                                        <p aria-hidden="true">← SWIPE TO EXPLORE →</p>
+                                    </div>
                                 </div>
 
                                 <div className="nintendo-research-archive__content">
@@ -4830,6 +5108,10 @@ function App() {
                                             }
                                             aria-label={`${selectedDesignStructure.title} 원본 이미지 확대 보기`}
                                         >
+                                            <strong className="nintendo-design-structure__mobile-preview-title">
+                                                {selectedDesignStructure.number} /{' '}
+                                                {selectedDesignStructure.title}
+                                            </strong>
                                             <img
                                                 className="is-entering"
                                                 key={selectedDesignStructure.key}

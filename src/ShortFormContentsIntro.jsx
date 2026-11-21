@@ -499,7 +499,7 @@ const ShortFormContentsIntro = () => {
         const track = trackRef.current;
         if (!story || !stage || !track) return undefined;
 
-        const desktopQuery = window.matchMedia('(min-width: 901px)');
+        const desktopQuery = window.matchMedia('(min-width: 1024px)');
         const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
         const panels = Array.from(track.children);
         const panelColors = [
